@@ -1,0 +1,23 @@
+{
+    "theme_name": "Modern Geopolitics",
+    "metrics": {
+        "metric_1": "Global Stability",
+        "metric_2": "Approval Rating",
+        "metric_3": "Consumer Price Index",
+        "metric_4": "Institutional Trust",
+        "metric_5": "Stock Market Index",
+        "metric_6": "Bond Yields",
+        "metric_7": "Unemployment Rate",
+        "metric_8": "Oil Price"
+    },
+    "demographics": {
+        "demo_1": "Working Class",
+        "demo_2": "Institutional Elites",
+        "demo_3": "Global Allies"
+    },
+    "system": {
+        "volatility": "Stock Market Volatility",
+        "fear_index": "Global Fear Index",
+        "provocation": "Leader Provocation"
+    }
+}

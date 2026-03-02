@@ -1,0 +1,23 @@
+{
+    "theme_name": "High Fantasy Cartel",
+    "metrics": {
+        "metric_1": "Realm Stability",
+        "metric_2": "Guild Favor",
+        "metric_3": "Mana Inflation",
+        "metric_4": "Arcane Trust",
+        "metric_5": "Leyline Output",
+        "metric_6": "Mercenary Costs",
+        "metric_7": "Peasant Unrest",
+        "metric_8": "Alchemical Supply"
+    },
+    "demographics": {
+        "demo_1": "Serfs & Laborers",
+        "demo_2": "High Mages & Nobles",
+        "demo_3": "Elven Envoys"
+    },
+    "system": {
+        "volatility": "Aetheric Turbulence",
+        "fear_index": "Abyssal Dread",
+        "provocation": "Overlord Hubris"
+    }
+}

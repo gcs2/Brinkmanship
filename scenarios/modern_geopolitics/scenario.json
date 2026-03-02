@@ -1,0 +1,93 @@
+{
+  "theme_name": "Modern Geopolitics",
+  "mappings": {
+    "metrics": {
+      "metric_1": "Global Stability",
+      "metric_2": "Approval Rating",
+      "metric_3": "Consumer Price Index",
+      "metric_4": "Institutional Trust",
+      "metric_5": "Stock Market Index",
+      "metric_6": "Bond Yields",
+      "metric_7": "Unemployment Rate",
+      "metric_8": "Oil Price"
+    },
+    "demographics": {
+      "demo_1": "Working Class",
+      "demo_2": "Institutional Elites",
+      "demo_3": "Global Allies"
+    },
+    "system": {
+      "volatility": "Stock Market Volatility",
+      "fear_index": "Global Fear Index",
+      "provocation": "Leader Provocation"
+    }
+  },
+  "events": [
+    {
+      "event_id": "CHINA_EMBARGO_001",
+      "title": "The Silicon Shield Drops",
+      "actor_origin": "CHINA",
+      "trigger_condition": {
+        "oil_price": ">120",
+        "global_stability": "<40"
+      },
+      "description": "Beijing has announced an 'Environmental Audit' on all semiconductor exports to the U.S. Supply chains are freezing.",
+      "options": [
+        {
+          "id": "OPT_A",
+          "text": "File WTO Complaint & Subsidize Domestic Chips",
+          "requirements": {
+            "party_funds": 50
+          },
+          "threshold": 50,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "The markets stabilize slightly, but the cost of bread (and phones) just went up.",
+              "effects": {
+                "stock_market_index": -5,
+                "bond_yields": 1.5,
+                "consumer_price_index": 2.0
+              }
+            },
+            "FAILURE": {
+              "description": "Silicon Valley is in freefall. Retailers report empty shelves. The base is restless.",
+              "effects": {
+                "stock_market_index": -20,
+                "unemployment_rate": 2.5,
+                "approval": -15
+              }
+            }
+          }
+        },
+        {
+          "id": "OPT_B",
+          "text": "Transactional Pivot: Offer Tariff Rollbacks",
+          "category": "diplomacy",
+          "threshold": 40,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "A 'Great Deal' is struck. You traded agricultural dominance for tech stability. It works... for now.",
+              "effects": {
+                "global_stability": 15,
+                "china_aggression": -30,
+                "stock_market_index": 10
+              }
+            },
+            "FAILURE": {
+              "description": "They rejected the deal and leaked the transcripts. You look weak.",
+              "effects": {
+                "approval": -10,
+                "institutional_trust": -10,
+                "global_stability": -5
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "assets": {
+    "background_image": "/assets/modern_geopolitics/bg.webp",
+    "dossier_modal_bg": "/assets/modern_geopolitics/modal.webp"
+  }
+}

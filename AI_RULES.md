@@ -1,0 +1,25 @@
+# AI_RULES.md (System Directives)
+
+This document serves as the persistent rulebook and guidelines for any AI agents operating within the Brinkmanship development environment.
+
+## 1. Documentation Synchronicity
+- **Rule of Thumb**: Code changes require documentation updates.
+- If a new metric, feature, or logic mechanic is introduced programmatically (e.g., in `state_manager.py` or `event_processor.py`), the corresponding PRD documentation MUST be updated simultaneously.
+- If a new mechanic is requested by the user but wasn't explicitly said to be documented, ALWAYS document it proactively in the relevant `Brinkmanship split/` file and sync it back to `PRD_MASTER.md`. 
+- **Brevity**: Do not be overly verbose. Use bullet points and organized requirement lists to state facts and mechanical interactions directly (e.g., `Mechanic X: Impact Y`).
+
+## 2. PRD Master Sync
+- The `PRD_MASTER.md` is the source of truth for the entire project.
+- Whenever a sub-document in the `Brinkmanship split/` folder is modified or created (e.g., `06_DIPLOMATIC_LEDGER.md`), its contents must be appended or updated in the equivalent section of the `PRD_MASTER.md`.
+
+## 3. "Trust but Verify" Principle
+- If creating a new complex mechanic (like the Escalation Ladder), always construct the matching test files (e.g., `test_escalation.py`) and ensure they pass before declaring the feature complete.
+- Verify any UI changes (like Terminal ANSI outputs) handle the new state changes gracefully without overflowing or producing `NaN` errors.
+
+## 4. Phase-Based Execution
+- Work in tightly scoped phases.
+- Do not build features for Phase 3 (e.g., The 2D War Room React app) unless instructed to move past the Phase 1 & 2 Terminal-based MVS (Minimum Viable Simulation). Focus entirely on refining the core math and logic for the current milestone.
+
+## 5. Artifact generation
+- For complex tasks, output `task.md`, `implementation_plan.md`, and `walkthrough.md` to cleanly separate the intent, step tracking, and results for the user's review.
+- For audit steps, produce an `audit_report.md` artifact detailing findings objectively.

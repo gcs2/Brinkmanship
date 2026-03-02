@@ -1,0 +1,23 @@
+{
+    "theme_name": "Cyberpunk Syndicate",
+    "metrics": {
+        "metric_1": "Grid Stability",
+        "metric_2": "Street Cred",
+        "metric_3": "CredChip Inflation",
+        "metric_4": "Corp Trust",
+        "metric_5": "Neuro-Net Integrity",
+        "metric_6": "Cyberware Costs",
+        "metric_7": "Meatspace Unrest",
+        "metric_8": "Energy Credits"
+    },
+    "demographics": {
+        "demo_1": "Street Punks & Edgerunners",
+        "demo_2": "Corp Execs",
+        "demo_3": "Nomad Clans"
+    },
+    "system": {
+        "volatility": "Data Maelstrom",
+        "fear_index": "Corporate Paranoia",
+        "provocation": "Runner Audacity"
+    }
+}
