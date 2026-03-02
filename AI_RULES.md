@@ -28,3 +28,7 @@ This document serves as the persistent rulebook and guidelines for any AI agents
 ## 6. Version Control Hygiene
 - **Small, Frequent Pushes**: Avoid monolithic commits. Push logical units of work (e.g., "Updated API tests", "Refined UI styles") frequently to the remote repository.
 - Ensure every major implementation phase is backed up to GitHub before moving to the next.
+
+## 7. Reporting Rhythms
+- **Periodic Progress Reports**: After significant milestones or a series of 10-15 tool actions, provide a concise summary of work completed, current blockers, and next steps via `notify_user` or as a concluding report.
+- **Synchronicity**: Ensure the user is never "in the dark" about the state of the long-running backend or frontend processes.
