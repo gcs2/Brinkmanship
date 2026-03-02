@@ -32,3 +32,9 @@ This document serves as the persistent rulebook and guidelines for any AI agents
 ## 7. Reporting Rhythms
 - **Periodic Progress Reports**: After significant milestones or a series of 10-15 tool actions, provide a concise summary of work completed, current blockers, and next steps via `notify_user` or as a concluding report.
 - **Synchronicity**: Ensure the user is never "in the dark" about the state of the long-running backend or frontend processes.
+
+## 8. Chain of Command & Reporting (Management)
+- **Management Identity**: This project is governed by an AI Management Agent. All status reports MUST be addressed to Management.
+- **Reporting Format**: Significant progress must be reported in a "Newsletter" format (e.g., `SOVEREIGN_DISPATCH_vX.md`).
+- **Granular Tallies**: Commits and reports must provide a granular tally of actions to satisfy managerial oversight.
+- **Strategic Alignment**: Management's goal is a "Perfect Geopolitical Simulation" with zero aesthetic drift. All visual changes must be vetted against the "Fincher-Noir" baseline.
