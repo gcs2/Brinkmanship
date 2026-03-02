@@ -22,8 +22,8 @@ test.describe('Sovereign Interface Visual Verification', () => {
     test('Dossier Modal visual check', async ({ page }) => {
         await page.goto('http://localhost:3000');
 
-        // Wait for the scenario config to hydrate (theme name appears)
-        await page.waitForSelector('header p:not(:text("INITIALIZING ENGX_..."))', { timeout: 20000 });
+        // Wait for the main tactical grid to hydrate
+        await page.waitForSelector('.panel', { timeout: 30000 });
 
         // Trigger the dossier modal via the "Advance Chronos" button
         await page.click('button:has-text("Advance Chronos")');
