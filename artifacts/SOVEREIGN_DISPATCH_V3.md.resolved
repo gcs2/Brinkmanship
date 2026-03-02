@@ -1,0 +1,34 @@
+# 📡 SOVEREIGN DISPATCH: EDITION 03
+**DATE**: 2026-03-02  
+**STATUS**: EXPANDED // STRESS-TESTED  
+**TO**: Executive Management  
+**FROM**: Antigravity Unit 01  
+
+---
+
+## ⚡ EXECUTIVE SUMMARY
+Phase 8 ("Metric Expansion") is now **Operational**. In response to Management’s strategic directive, a new high-resolution variable, the **Scarcity Index**, has been established as a primary state anchor. This ensures the simulation can model resource-level friction independently of macro-stability.
+
+## 🏗️ ACTION TALLY (Managerial Oversight)
+The following granular actions have been executed in this sprint:
+1.  **[Logic]** Expanded [engine/state_manager.py](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py):
+    *   Added `metric_9` (Scarcity Index) to the core state model.
+    *   Implemented Scarcity Decay logic: resource scarcity now accelerates when **Global Stability** drops below the 50.0 threshold.
+2.  **[API]** Synchronized [api/main.py](file:///c:/Users/zephy/Documents/Brinkmanship/api/main.py): Established the baseline Scarcity Index (10.0) in the initial state snapshot.
+3.  **[Standardization]** Updated all scenario JSONs:
+    *   `modern_geopolitics`: Mapped `metric_9` -> "Scarcity Index".
+    *   `cyberpunk_syndicate`: Mapped `metric_9` -> "Scarcity Index".
+    *   `high_fantasy_cartel`: Mapped `metric_9` -> "Scarcity Index".
+4.  **[Constitutional]** Updated [PROJECT_MANIFESTO.md](file:///c:/Users/zephy/Documents/Brinkmanship/PROJECT_MANIFESTO.md): Formalized the role of the Scarcity Index as a core derivative metric.
+5.  **[Infra]** Performed granular git push tagging the Metric Expansion phase.
+
+## 🎨 AESTHETIC VETTING: THE FINCHER-NOIR BASELINE
+*   **Metric High-Fidelity**: The Scarcity Index is tracked at 4-decimal precision to maintain the "Precision as Narrative" philosophy.
+*   **Telemetry Sync**: The UI Waveform Oscillators can now be bound to Scarcity to visualize supply-chain volatility in real-time.
+
+## 📈 STRATEGIC ROADMAP (Next Ticks)
+*   [ ] **Scarcity-Driven Events**: Generating narrative kernels where high scarcity triggers unrest.
+*   [ ] **Supply-Chain UI**: Adding a dedicated telemetry panel for resource tracking.
+
+---
+**END DISPATCH // STANDING BY FOR MANAGEMENT DIRECTIVES**

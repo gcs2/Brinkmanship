@@ -31,7 +31,42 @@ The Python backend is the "Brain"; the React frontend is the "Eyes." They commun
 
 ---
 
-## **IV. THE "PRIMARY METRIC" CONFIGURATION**
-The legacy `primary_metric_a` is now officially standardized as **Global Stability**. 
+## **IV. THE METRIC GAMEPLAY ENCYCLOPEDIA**
 
-Additionally, we have implemented the **Scarcity Index (metric_9)** as a core derivative metric. This variable tracks the availability of critical resources (Rare Earths, Mana, or Energy Credits) and is directly tied to the global fear and stability indices.
+Each variable in the Sovereign Engine is designed to create specific psychological "friction" for the player.
+
+### **1. Global Stability (metric_1) - [The Anchor]**
+*   **Meaning**: The macro-equilibrium of the world. Represents the "health" of the simulation's current timeline.
+*   **The Fun**: When this drops, the engine enters "Chronos Decay" mode. Everything breaks faster. It’s the timer that forces you to make hard, ugly choices.
+
+### **2. Approval Rating (metric_2) - [The Shield]**
+*   **Meaning**: Your political capital. Calculated as the weighted average of all demographic favor.
+*   **The Fun**: Low approval triggers a "Soft End" (Coup/Impeachment). It limits your aggressive options; you can't go to war if the people are already in the streets.
+
+### **3. CPI / Inflation (metric_3) - [The Boiling Frog]**
+*   **Meaning**: The day-to-day cost of existence for the working class.
+*   **The Fun**: It is a slow, stacking debuff. Players often ignore it until it reaches a tipping point where `demo_1` (Workers) turns violent. It forces economic trade-offs.
+
+### **4. Institutional Trust (metric_4) - [The Structural Floor]**
+*   **Meaning**: Faith in the courts, the bureaucracy, and the "Deep State." 
+*   **The Fun**: Unlike Approval, this stays low for a long time. If it breaks, your orders might be ignored or leaked. It represents the "Passive Resistance" of the government.
+
+### **5. Stock Market Index (metric_5) - [The Greed Gauge]**
+*   **Meaning**: Real-time sentiment of the elite and corporate sectors.
+*   **The Fun**: Haptic feedback. It reacts instantly to events, providing the "Juice" of the simulation. A sudden crash creates immediate panic for the player.
+
+### **6. Bond Yields (metric_6) - [The Risk Horizon]**
+*   **Meaning**: Long-term international faith in your state’s debt.
+*   **The Fun**: High yields mean you can't borrow your way out of a crisis. It turns a "Bad Year" into a "Death Spiral."
+
+### **7. Unemployment Rate (metric_7) - [The Street Pressure]**
+*   **Meaning**: Percentage of the population without meaningful labor mapping.
+*   **The Fun**: High unemployment turns every event into a riot. It’s the "Force Multiplier" for domestic unrest.
+
+### **8. Oil / Energy Price (metric_8) - [The Catalyst]**
+*   **Meaning**: The cost of global throughput.
+*   **The Fun**: A "Lever Metric." Moving this affects CPI, Stock Market, and Allies instantly. It’s the main tool for foreign policy pressure.
+
+### **9. Scarcity Index (metric_9) - [The Bottleneck]**
+*   **Meaning**: Availability of scenario-critical resources (Rare Earths / Mana / Credits).
+*   **The Fun**: It creates artificial scarcity. You might have the money (metric_5), but if the Scarcity Index is high, you can't build the solution. It’s the ultimate strategic blocker.

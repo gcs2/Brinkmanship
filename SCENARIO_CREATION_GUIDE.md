@@ -75,3 +75,25 @@ If you write `"metric_2": 15.0` in your event effect:
 3. The actual output applied to `metric_2` will be fractional (e.g., `+13.4921` or `+16.1204`), depending on how chaotic your `volatility` currently is! 
 
 This ensures that your story always feels organic and unpredictable.
+## Narrative Weight: The "Fun" Factor
+When choosing which metrics to target in your events, follow the **Narrative Weight** framework. This ensures that your scenario feels high-stakes and psychologically grounded.
+
+### 1. The Survival Anchor (Global Stability)
+*   **Designer Tip**: Use this for existential threats. If a player loses this, they lose the game's structural integrity. 
+*   **Gameplay Impact**: High tension, "Survival Mode" feeling.
+
+### 2. The Liquid Friction (Stock Market & Oil)
+*   **Designer Tip**: Use for immediate, reactive feedback. Great for making the player feel the "Pulse" of their decisions.
+*   **Gameplay Impact**: Instant gratification or panic.
+
+### 3. The Structural Drag (Institutional Trust & Bond Yields)
+*   **Designer Tip**: Use for long-term consequences. These metrics are hard to move back up. 
+*   **Gameplay Impact**: Teaches the player that "Power has a cost" that persists over years.
+
+### 4. The Bottleneck (Scarcity Index)
+*   **Designer Tip**: Use to create tactical puzzles. The player has the money, but does the Empire have the Mana?
+*   **Gameplay Impact**: Strategic limitation, forces alternative pathing.
+
+---
+## Final Compliance
+All scenarios must include a `metric_9` mapping for the **Scarcity Index** to remain compatible with the Sovereign Engine's core decay logic.
