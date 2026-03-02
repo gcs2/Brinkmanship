@@ -105,18 +105,20 @@ export default function Home() {
           <h2 className="text-xs font-mono text-slate-500 uppercase tracking-widest mb-2 border-b border-slate-700 pb-2">
             Primary Telemetry
           </h2>
-          {config?.metrics && Object.entries(config.metrics).slice(0, 4).map(([key, label], i) => (
-            <div key={key} className="panel p-4 flex flex-col gap-2 relative overflow-hidden">
-              {/* Decorative corner */}
-              <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-slate-600" />
-              <span className="text-xs text-slate-400 uppercase tracking-wider">
-                {label}
-              </span>
-              <div className="text-2xl font-mono">
-                {gameState ? gameState.metrics[key as keyof typeof gameState.metrics].toFixed(2) : "00.00"}
+          <div className="flex flex-col gap-3 overflow-y-auto max-h-[70vh] pr-2 custom-scrollbar">
+            {config?.metrics && Object.entries(config.metrics).map(([key, label], i) => (
+              <div key={key} className="panel p-4 flex flex-col gap-1 relative overflow-hidden shrink-0">
+                {/* Decorative corner */}
+                <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-slate-600" />
+                <span className="text-[10px] text-slate-500 uppercase tracking-wider">
+                  {label}
+                </span>
+                <div className="text-xl font-mono text-[#e0e0e0]">
+                  {gameState ? gameState.metrics[key as keyof typeof gameState.metrics]?.toFixed(2) : "00.00"}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Center Column: The Map & Oscilloscope */}

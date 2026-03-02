@@ -37,19 +37,19 @@ A hidden (or visible) variable that determines the stability of the system.
 * **Rule of Law:** High trust, slow response time, high legislative resistance.  
 * **Executive Will:** Instant actions, high chance of success, but triggers "Institutional Rot" and eventual civil unrest.
 
-### **2.3 The Economic "Hormuz" Model**
+### **2.3 The Sovereign Metric Model**
 
-A backend simulation calculating the **Global Supply Chain Integrity (GSCI)**.
+The engine tracks 9 high-resolution variables to calculate the world state.
 
-* **Input:** Player actions (Sanctions, Escorts, Blockades).  
-* **Output:** Real-time shifts in Economic Metrics via an organized requirements list.
-
-**Organized Requirements (Economic Metrics):**
-* **Consumer Price Index (CPI):** Base inflation and cost of civilian goods.
-* **Stock Market Index:** Reflects corporate confidence and institutional wealth.
-* **Bond Yields (10-Year Treasury):** Government borrowing costs and global faith in US debt.
-* **Consumer Confidence Index:** Immediate public reaction to economic stability.
-* **Unemployment Rate:** Drags down approval over the medium-term when high.
+* **Global Stability (metric_1):** The macro-anchor. Everything decays faster when this is low.
+* **Approval Rating (metric_2):** Weighted average of demographic favor.
+* **CPI / Inflation (metric_3):** Day-to-day cost of living; the "Boiling Frog" effect.
+* **Institutional Trust (metric_4):** Faith in the deep state and structural floor.
+* **Stock Market Index (metric_5):** Haptic, real-time corporate sentiment.
+* **Bond Yields (metric_6):** International risk horizon and borrowing costs.
+* **Unemployment Rate (metric_7):** The "Street Pressure" multiplier for unrest.
+* **Oil / Energy Price (metric_8):** The geopolitical lever affecting all economic flows.
+* **Scarcity Index (metric_9):** Strategic bottleneck for scenario-critical resources.
 
 ## ---
 
