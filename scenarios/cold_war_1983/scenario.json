@@ -1,0 +1,204 @@
+{
+    "theme_name": "Cold War (1983)",
+    "player_profile": {
+        "country": "United States",
+        "leader_name": "R. Reagan",
+        "title": "President",
+        "start_date": "1983-09-01",
+        "nuclear_stockpile": 23300
+    },
+    "great_powers": [
+        {
+            "id": "SUN",
+            "name": "Soviet Union",
+            "lat": 61.524,
+            "lon": 105.3188,
+            "base_approval": 10.0
+        },
+        {
+            "id": "CHN",
+            "name": "PRC",
+            "lat": 35.8617,
+            "lon": 104.1954,
+            "base_approval": 25.0
+        },
+        {
+            "id": "UK",
+            "name": "United Kingdom",
+            "lat": 55.3781,
+            "lon": -3.4360,
+            "base_approval": 85.0
+        },
+        {
+            "id": "FRA",
+            "name": "France",
+            "lat": 46.2276,
+            "lon": 2.2137,
+            "base_approval": 70.0
+        }
+    ],
+    "advisors": [
+        {
+            "id": "SEC_STATE",
+            "name": "G. Shultz",
+            "role": "Secretary of State",
+            "specialty": "diplomacy",
+            "base_trust": 65
+        },
+        {
+            "id": "SEC_DEF",
+            "name": "C. Weinberger",
+            "role": "Secretary of Defense",
+            "specialty": "defense",
+            "base_trust": 80
+        },
+        {
+            "id": "CIA",
+            "name": "W. Casey",
+            "role": "DCI",
+            "specialty": "defense",
+            "base_trust": 45
+        },
+        {
+            "id": "NSA",
+            "name": "W. Clark",
+            "role": "Nat. Security Advisor",
+            "specialty": "defense",
+            "base_trust": 55
+        }
+    ],
+    "mappings": {
+        "metrics": {
+            "metric_1": "Global Stability",
+            "metric_2": "Approval Rating",
+            "metric_3": "Inflation (CPI)",
+            "metric_4": "Institutional Trust",
+            "metric_5": "Dow Jones Ind.",
+            "metric_6": "Interest Rates",
+            "metric_7": "Unemployment",
+            "metric_8": "Oil Price (Barrel)",
+            "metric_9": "Uranium Access"
+        },
+        "metric_tooltips": {
+            "metric_1": "The macro-anchor. If this drops below 30, DEFCON level escalates.",
+            "metric_2": "Weighted average of demographic approval. Affects re-election chances.",
+            "metric_3": "Inflation (CPI). High inflation causes strikes and union unrest.",
+            "metric_4": "Faith in government. Dropping points here increases domestic espionage risk.",
+            "metric_5": "Dow Jones Industrial Average. The institutional elites demand growth.",
+            "metric_6": "Interest Rates. Currently fighting stagflation.",
+            "metric_7": "Unemployment Rate. The rust belt is hurting.",
+            "metric_8": "Oil Price. The Middle East dictates this.",
+            "metric_9": "Uranium & Titanium Access. The backbone of the defense buildup."
+        },
+        "demographics": {
+            "demo_1": "Blue Collar Voters",
+            "demo_2": "Wall Street Elites",
+            "demo_3": "NATO Allies"
+        }
+    },
+    "assets": {
+        "ui_context": {
+            "color_palette": "crt_phosphor",
+            "film_grain": 0.8,
+            "scanlines": true
+        }
+    },
+    "events": [
+        {
+            "id": "ABLE_ARCHER_001",
+            "title": "Able Archer 83 Escalation",
+            "description": "NATO forces launch exercise Able Archer 83. The KGB incorrectly believes this is a cover for a genuine first strike. Soviet nuclear forces have moved to high alert.",
+            "phase_requirement": 2,
+            "options": [
+                {
+                    "id": "OPT_A",
+                    "text": "Quietly Scale Back Exercises",
+                    "description": "Send back-channel assurances to Andropov and stand down strategic bombers.",
+                    "lag_time": 2,
+                    "outcomes": {
+                        "SUCCESS": {
+                            "narrative": "Tensions defused. The Soviets stand down, but hawks in the Pentagon consider this a display of weakness.",
+                            "effects": {
+                                "metric_1": 15.0,
+                                "metric_4": -5.0,
+                                "demo_3": -5.0
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "OPT_B",
+                    "text": "Proceed as Planned. Project Strength.",
+                    "description": "Maintain the exercise schedule. Do not blink.",
+                    "lag_time": 4,
+                    "outcomes": {
+                        "SUCCESS": {
+                            "narrative": "The USSR eventually realizes it is a drill. Deterrence is established, but the world holds its breath.",
+                            "effects": {
+                                "metric_4": 15.0,
+                                "demo_3": 10.0,
+                                "metric_1": -10.0
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "OPT_C",
+                    "text": "Deploy Pershing II Missiles Immediately",
+                    "description": "Accelerate the deployment of medium-range missiles to West Germany as a counter-threat.",
+                    "lag_time": 10,
+                    "outcomes": {
+                        "SUCCESS": {
+                            "narrative": "Massive anti-nuclear protests erupt in Europe. The Soviets are furious, but the military balance shifts.",
+                            "effects": {
+                                "demo_3": -15.0,
+                                "metric_4": 10.0,
+                                "metric_1": -25.0
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "KAL_007",
+            "title": "KAL Flight 007 Downed",
+            "description": "A Korean Air Lines passenger jet has been shot down by Soviet interceptors over the Sea of Japan. 269 civilians are dead, including a US Congressman.",
+            "phase_requirement": 1,
+            "options": [
+                {
+                    "id": "OPT_A",
+                    "text": "Condemn and Sanction",
+                    "description": "Suspend Aeroflot flights and push for UN condemnation.",
+                    "lag_time": 5,
+                    "outcomes": {
+                        "SUCCESS": {
+                            "narrative": "International outrage isolates Moscow. Diplomatic win.",
+                            "effects": {
+                                "metric_4": 10.0,
+                                "metric_2": 5.0,
+                                "metric_1": -5.0
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "OPT_B",
+                    "text": "Declassify Signals Intel",
+                    "description": "Release intercepted audio proving the Soviets knew it was a civilian plane.",
+                    "lag_time": 2,
+                    "outcomes": {
+                        "SUCCESS": {
+                            "narrative": "The audio shocks the world. A massive propaganda victory, though intelligence methods are compromised.",
+                            "effects": {
+                                "demo_3": 15.0,
+                                "metric_4": -5.0,
+                                "metric_1": -10.0
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

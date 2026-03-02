@@ -1,5 +1,79 @@
 {
   "theme_name": "Modern Geopolitics",
+  "player_profile": {
+    "country": "United States",
+    "leader_name": "President",
+    "title": "Commander-in-Chief",
+    "start_date": "2025-01-20",
+    "nuclear_stockpile": 5244
+  },
+  "great_powers": [
+    {
+      "id": "CHN",
+      "name": "China",
+      "lat": 35.8617,
+      "lon": 104.1954,
+      "base_approval": 30.0
+    },
+    {
+      "id": "RUS",
+      "name": "Russia",
+      "lat": 61.524,
+      "lon": 105.3188,
+      "base_approval": 15.0
+    },
+    {
+      "id": "EU",
+      "name": "European Union",
+      "lat": 50.8503,
+      "lon": 4.3517,
+      "base_approval": 75.0
+    },
+    {
+      "id": "IND",
+      "name": "India",
+      "lat": 20.5937,
+      "lon": 78.9629,
+      "base_approval": 60.0
+    },
+    {
+      "id": "IRN",
+      "name": "Iran",
+      "lat": 32.4279,
+      "lon": 53.688,
+      "base_approval": 5.0
+    }
+  ],
+  "advisors": [
+    {
+      "id": "SEC_STATE",
+      "name": "A. Blinken",
+      "role": "Secretary of State",
+      "specialty": "diplomacy",
+      "base_trust": 65
+    },
+    {
+      "id": "SEC_DEF",
+      "name": "L. Austin III",
+      "role": "Secretary of Defense",
+      "specialty": "defense",
+      "base_trust": 75
+    },
+    {
+      "id": "TREASURY",
+      "name": "J. Yellen",
+      "role": "Treasury Sec",
+      "specialty": "economic",
+      "base_trust": 45
+    },
+    {
+      "id": "NSA",
+      "name": "J. Sullivan",
+      "role": "Nat. Security Advisor",
+      "specialty": "defense",
+      "base_trust": 55
+    }
+  ],
   "mappings": {
     "metrics": {
       "metric_1": "Global Stability",

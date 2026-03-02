@@ -1,26 +1,46 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import {
     ComposableMap,
     Geographies,
     Geography,
     Sphere,
-    Graticule
+    Graticule,
+    Marker
 } from "react-simple-maps";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-interface TacticalMapProps {
-    volatility: number;
+interface Relation {
+    id: string;
+    lat: number;
+    lon: number;
+    approval: number;
+    name: string;
 }
 
-const TacticalMap = ({ volatility }: TacticalMapProps) => {
+interface TacticalMapProps {
+    volatility: number;
+    relations?: Relation[];
+}
+
+const TacticalMap = ({ volatility, relations = [] }: TacticalMapProps) => {
     const [mounted, setMounted] = React.useState(false);
 
     React.useEffect(() => {
         setMounted(true);
     }, []);
+
+    // Create a dictionary for fast color lookup by country ID (if using ISO codes instead of arbitrary coords later)
+    // For now we map pins.
+
+    // Determine pin color based on approval
+    const getPinColor = (approval: number) => {
+        if (approval >= 70) return "#10B981"; // Emerald
+        if (approval <= 30) return "#EF4444"; // Red
+        return "#F59E0B"; // Amber
+    };
 
     if (!mounted) {
         return <div className="w-full h-full bg-noir-900 border border-slate-700 rounded-sm" />;
@@ -58,11 +78,39 @@ const TacticalMap = ({ volatility }: TacticalMapProps) => {
                         ))
                     }
                 </Geographies>
+
+                {/* Draw Relation Pins */}
+                {relations.map((rel) => (
+                    <Marker key={rel.id} coordinates={[rel.lon, rel.lat]}>
+                        <g className="group cursor-pointer">
+                            <circle
+                                r={4}
+                                fill={getPinColor(rel.approval)}
+                                className="opacity-80 group-hover:opacity-100 transition-opacity"
+                            />
+                            <circle
+                                r={12}
+                                fill="transparent"
+                                stroke={getPinColor(rel.approval)}
+                                strokeWidth={0.5}
+                                className="opacity-0 group-hover:opacity-50 group-hover:animate-ping"
+                            />
+                            <text
+                                textAnchor="middle"
+                                y={-10}
+                                className="opacity-0 group-hover:opacity-100 fill-slate-300 font-mono text-[8px] uppercase tracking-wider transition-opacity"
+                            >
+                                {rel.name}: {rel.approval}%
+                            </text>
+                        </g>
+                    </Marker>
+                ))}
+
             </ComposableMap>
 
             {/* HUD Elements */}
             <div className="absolute bottom-4 left-4 font-mono text-[10px] text-slate-500 tracking-tighter uppercase">
-                Sector: B-09 // Lat: 34.05 N // Long: 118.24 W
+                Sector: GLOBAL // Volatility: {volatility.toFixed(1)}
             </div>
         </div>
     );

@@ -72,6 +72,11 @@ const DossierPane = ({ event, onSelectOption, onDismiss }: DossierPaneProps) => 
                                         <div className="font-mono text-xs uppercase text-slate-300 group-hover:text-amber-accent transition-colors">
                                             {option.label}
                                         </div>
+                                        {option.predicted_impact && (
+                                            <div className="text-[9px] text-amber-500/80 mt-1 mb-1 font-mono uppercase bg-noir-900 border border-amber-500/20 px-1 py-0.5 inline-block">
+                                                EST: {option.predicted_impact}
+                                            </div>
+                                        )}
                                         <div className="text-xs text-slate-500 mt-1 leading-normal">
                                             {option.description}
                                         </div>
