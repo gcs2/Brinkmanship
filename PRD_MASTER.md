@@ -261,6 +261,31 @@ Jarvis here—I've drafted the **Logic Architecture** and the **JSON Event Schem
 
 ---
 
+## **5. PHASE 14 OVERHAUL: THE AUTONOMOUS WORLD ENGINE (EU4-STYLE)**
+
+To evolve from a reactive environment to a true Grand Strategy simulation, we must build a system where **rivals, non-aligned states, allies, and internal terrorist/rebellion factions act autonomously**.
+
+### **5.1 The Factional Framework (14 AI Players)**
+*   **The Global Arena:** The engine will track 14 active "Great Powers" and "Critical Actors" specific to the scenario (e.g., in Cold War 1983: USA, USSR, PRC, UK, France, Mujahideen, Contras).
+*   **Autonomous Agent API:** Every Ticks cycle, an `ai_director.py` script runs on the backend. Each of the 14 actors has a hidden "Drive" (Expansionist, Diplomatic, Malicious). They roll their own stochastic checks against their targets.
+*   **Internal Factions:** Sub-actors exist *inside* the player's country. If the Working Class approval hits 0, a "Labor Rebellion" faction spawns and begins enqueuing its own destructive actions (strikes, sabotage) to the Latency Queue.
+
+### **5.2 Real Consequences: The Overton Window & Government Shifts**
+Having low/high metrics should not just trigger events; it must alter the **fundamental structure of the game**.
+*   **The Ideology Compass:** Introduce an Authoritarian—Libertarian and Planned—Free Market axis.
+*   **Shifting the Window:** Radically mismanaging metrics allows the player (or forces them) to cross thresholds.
+*   **Regime Change Mechanics:** 
+    *   *Fascistic Block:* Triggered by maintaining a high "Global Fear Index" while approval is low. The player can declare "Emergency Powers" (locking approval mechanics but accelerating rebellion events).
+    *   *Anarcho-Capitalist Secession:* Triggered by zeroing out Institutional Trust but maxing the Stock Market. The state dissolves into corporate syndicates.
+    *   *Technocracy / Communism:* Other radical transitions unlocked by manipulating the Scarcity Index or Working Class metrics.
+
+### **5.3 The "Cold War 1983" Golden Master**
+The initial testing ground for this engine will be the `cold_war_1983` scenario. 
+*   **Map Accuracy:** The 14 actors will map precisely to the 1983 geopolitical landscape (e.g., Soviet-Afghan War vectors, Central American proxy coordinates).
+*   **Goal:** A "super-fleshed out demo" showcasing the full Overton Window shift and the 14-actor AI engine.
+
+---
+
 # **PRD ADDENDUM: THE STOCHASTIC RESOLUTION ENGINE**
 
 ## **1\. THE "DICE ROLL" LOGIC**

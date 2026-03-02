@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { Activity, ShieldAlert, Zap, Save, RotateCcw, Play, Pause } from "lucide-react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { Activity, ShieldAlert, Zap, Save, RotateCcw, Play, Pause, List, ChevronDown } from "lucide-react";
 import WaveformOscillator from "./components/WaveformOscillator";
 import TacticalMap from "./components/TacticalMap";
 import DossierPane from "./components/DossierPane";
@@ -13,6 +13,8 @@ export default function Home() {
   const [gameState, setGameState] = useState<any>(null);
   const [activeEvent, setActiveEvent] = useState<any>(null);
   const [notification, setNotification] = useState<string | null>(null);
+  const [scenarios, setScenarios] = useState<string[]>([]);
+  const [showScenarioMenu, setShowScenarioMenu] = useState(false);
 
   // Autoplay logic
   const [isPlaying, setIsPlaying] = useState(false);
@@ -27,6 +29,12 @@ export default function Home() {
       if (!config) {
         const configRes = await fetch("http://localhost:8000/api/config");
         if (configRes.ok) setConfig(await configRes.json());
+
+        const scenRes = await fetch("http://localhost:8000/api/scenarios");
+        if (scenRes.ok) {
+          const scenData = await scenRes.json();
+          setScenarios(scenData.scenarios);
+        }
       }
 
       const stateRes = await fetch("http://localhost:8000/api/state");
@@ -130,6 +138,47 @@ export default function Home() {
         <div className="flex items-center gap-4">
           <button onClick={handleSave} className="px-3 py-1.5 border border-slate-700 text-slate-400 font-mono text-[10px] uppercase hover:text-slate-300 flex items-center gap-1.5"><Save className="w-3 h-3" /> Anchor</button>
           <button onClick={handleLoad} className="px-3 py-1.5 border border-slate-700 text-slate-400 font-mono text-[10px] uppercase hover:text-slate-300 flex items-center gap-1.5"><RotateCcw className="w-3 h-3" /> Recall</button>
+
+          <div className="relative">
+            <button
+              onClick={() => setShowScenarioMenu(!showScenarioMenu)}
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-700 text-slate-400 font-mono text-[10px] uppercase hover:text-slate-300 transition-colors"
+            >
+              <List className="w-3 h-3" />
+              Swap Config <ChevronDown className="w-3 h-3 opacity-50" />
+            </button>
+            {showScenarioMenu && (
+              <div className="absolute top-full right-0 mt-2 w-48 bg-noir-800 border border-slate-700 shadow-xl z-50">
+                {scenarios.map(sc => (
+                  <button
+                    key={sc}
+                    onClick={async () => {
+                      if (sc === gameState?.active_scenario) return setShowScenarioMenu(false);
+                      setIsPlaying(false);
+                      setShowScenarioMenu(false);
+                      setGameState(null);
+                      setActiveEvent(null);
+                      setConfig(null); // force config refetch
+                      try {
+                        const res = await fetch("http://localhost:8000/api/load_scenario", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ scenario_id: sc })
+                        });
+                        const data = await res.json();
+                        setGameState(data.new_state);
+                        showNotif(`INITIALIZING: ${data.theme.toUpperCase()}`);
+                        fetchData(); // pull new config mapping
+                      } catch { }
+                    }}
+                    className="w-full text-left px-4 py-3 text-[10px] font-mono uppercase text-slate-400 hover:bg-slate-700/50 hover:text-[#e0e0e0] border-b border-slate-700/50 last:border-0"
+                  >
+                    Load {sc.replace(/_/g, " ")}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           <button
             onClick={() => !activeEvent && setIsPlaying(!isPlaying)}

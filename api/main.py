@@ -271,6 +271,30 @@ def next_turn():
 
     return {"status": "success", "new_state": format_state(new_state)}
 
+@app.get("/api/scenarios")
+def list_scenarios():
+    base_path = os.path.join(os.path.dirname(__file__), '..', 'scenarios')
+    scenarios = []
+    if os.path.exists(base_path):
+        for d in os.listdir(base_path):
+            if os.path.isdir(os.path.join(base_path, d)):
+                scenarios.append(d)
+    return {"scenarios": scenarios}
+
+class ScenarioLoadRequest(BaseModel):
+    scenario_id: str
+
+@app.post("/api/load_scenario")
+def api_load_scenario(req: ScenarioLoadRequest):
+    global SCENARIO, scenario_config
+    base_path = os.path.join(os.path.dirname(__file__), '..', 'scenarios', req.scenario_id)
+    if not os.path.exists(base_path):
+        raise HTTPException(status_code=404, detail="Scenario not found")
+    
+    SCENARIO = req.scenario_id
+    load_system()
+    return {"status": "loaded", "theme": scenario_config.get("theme_name", "Unknown"), "new_state": format_state(state_history[-1])}
+
 @app.get("/api/next_event")
 def get_next_event():
     """Returns an appropriate event based on the current phase and stochastic engine, or null if nothing triggered."""
