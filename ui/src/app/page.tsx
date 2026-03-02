@@ -1,17 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GameState, ScenarioConfig, ActiveEvent } from "../../../types";
-import { Activity, ShieldAlert, Globe, Crosshair } from "lucide-react";
+import { GameState, ScenarioConfig } from "../../../types";
+import { Activity, ShieldAlert, Globe } from "lucide-react";
+import WaveformOscillator from "./components/WaveformOscillator";
 
 export default function Home() {
   const [config, setConfig] = useState<ScenarioConfig | null>(null);
   const [gameState, setGameState] = useState<GameState | null>(null);
 
   useEffect(() => {
-    // We will wire this up to the FastAPI bridge
-    // fetch('/api/config')
-    // fetch('/api/state')
+    const fetchData = async () => {
+      try {
+        const configRes = await fetch('http://localhost:8000/api/config');
+        const configData = await configRes.json();
+        setConfig(configData);
+
+        const stateRes = await fetch('http://localhost:8000/api/state');
+        const stateData = await stateRes.json();
+        setGameState(stateData);
+      } catch (error) {
+        console.error("Failed to fetch engine data:", error);
+      }
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 2000); // Polling for real-time feel
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -46,14 +61,13 @@ export default function Home() {
           <h2 className="text-xs font-mono text-slate-500 uppercase tracking-widest mb-2 border-b border-slate-700 pb-2">
             Primary Telemetry
           </h2>
-          {/* We will map the config.metrics here */}
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="panel p-4 flex flex-col gap-2">
+          {config?.metrics && Object.entries(config.metrics).slice(0, 4).map(([key, label], i) => (
+            <div key={key} className="panel p-4 flex flex-col gap-2">
               <span className="text-xs text-slate-400 uppercase tracking-wider">
-                Metric 0{i}
+                {label}
               </span>
               <div className="text-2xl font-mono">
-                {gameState ? gameState.metrics[`metric_${i}` as keyof typeof gameState.metrics].toFixed(2) : "00.00"}
+                {gameState ? gameState.metrics[key as keyof typeof gameState.metrics].toFixed(2) : "00.00"}
               </div>
             </div>
           ))}
@@ -74,9 +88,12 @@ export default function Home() {
             <div className="text-xs font-mono text-slate-500 uppercase tracking-widest absolute top-4 left-4 z-10">
               Volatility Readout
             </div>
-            {/* SVG Waveform Oscillator will go here */}
-            <div className="absolute inset-x-0 bottom-4 h-24 flex items-center justify-center border-t border-slate-700/50">
-              <span className="text-amber-accent font-mono text-sm">[WAVEFORM RENDER QUEUED]</span>
+
+            <div className="absolute inset-0 flex items-center justify-center">
+              <WaveformOscillator
+                volatility={gameState?.system.volatility || 15}
+                fearIndex={gameState?.system.fear_index || 0}
+              />
             </div>
           </div>
         </div>
@@ -86,15 +103,15 @@ export default function Home() {
           <h2 className="text-xs font-mono text-slate-500 uppercase tracking-widest mb-2 border-b border-slate-700 pb-2">
             Sector Pressures
           </h2>
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="panel p-4 flex flex-col gap-2">
+          {config?.demographics && Object.entries(config.demographics).map(([key, label], i) => (
+            <div key={key} className="panel p-4 flex flex-col gap-2">
               <span className="text-xs text-slate-400 uppercase tracking-wider">
-                Demographic 0{i}
+                {label}
               </span>
               <div className="w-full bg-slate-800 h-1 rounded-full overflow-hidden mt-1">
                 <div
                   className="bg-amber-accent h-full shadow-[0_0_10px_rgba(255,176,0,0.5)]"
-                  style={{ width: `${gameState ? gameState.demographics[`demo_${i}` as keyof typeof gameState.demographics] : 50}%` }}
+                  style={{ width: `${gameState ? gameState.demographics[key as keyof typeof gameState.demographics] : 50}%` }}
                 />
               </div>
             </div>
