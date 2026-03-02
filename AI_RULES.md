@@ -38,3 +38,7 @@ This document serves as the persistent rulebook and guidelines for any AI agents
 - **Reporting Format**: Significant progress must be reported in a "Newsletter" format (e.g., `SOVEREIGN_DISPATCH_vX.md`).
 - **Granular Tallies**: Commits and reports must provide a granular tally of actions to satisfy managerial oversight.
 - **Strategic Alignment**: Management's goal is a "Perfect Geopolitical Simulation" with zero aesthetic drift. All visual changes must be vetted against the "Fincher-Noir" baseline.
+## 9. Preservation of Intellectual Capital
+- **Non-Destructive Documentation**: Never overwrite, delete, or "clean up" existing technical sections (e.g., "How The Math Works") unless explicitly directed by Management. 
+- **Append-First Logic**: When adding new frameworks or doctrines (like "Narrative Weight"), always append them to the existing file or merge them gracefully. 
+- **Integrity Baseline**: Every documentation edit must be vetted to ensure that legacy "Technical Soul" of the project remains intact alongside new expansions.
