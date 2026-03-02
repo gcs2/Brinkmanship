@@ -16,6 +16,16 @@ interface TacticalMapProps {
 }
 
 const TacticalMap = ({ volatility }: TacticalMapProps) => {
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        return <div className="w-full h-full bg-noir-900 border border-slate-700 rounded-sm" />;
+    }
+
     return (
         <div className="w-full h-full bg-noir-900 border border-slate-700 rounded-sm overflow-hidden relative shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
             {/* Scanline Overlay */}

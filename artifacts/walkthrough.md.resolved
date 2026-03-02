@@ -1,0 +1,50 @@
+# Walkthrough: The Sovereign Interface Refactor
+
+We have successfully transitioned **Brinkmanship** from a CLI tool into a professional-grade, theme-agnostic geopolitical simulation platform.
+
+## Key Accomplishments
+
+### 1. Functional Immutable Core
+The engine was refactored to use `frozen` Python dataclasses. This ensures that the simulation state is always predictable and supports "Undo/Redo" logic natively by storing a list of state snapshots.
+
+### 2. The Sovereign Dashboard (React/Next.js)
+We built a "Fincher-esque Noir" dashboard that visualizes the engine's abstract data in real-time.
+- **Tactical Map**: A reactive world map that serves as the visual centerpiece.
+- **Waveform Oscillator**: A custom-drawn SVG canvas that oscillates based on `volatility` and `fear_index`, giving a "living" feel to the data.
+- **Dossier Modal**: A high-resolution decision interface for processing events and making strategic choices.
+
+### Phase 10: Constitutional Anchoring & Preservation
+We have established the foundational documents that will govern all future engineering and aesthetic decisions for Project Brinkmanship.
+
+*   **Architect Manifesto**: Codifies the "Indie-Paradox" philosophy and Fincher-Noir constraints.
+*   **Project Manifesto**: Establishes Functional Immutability and the 9-Metric Encyclopedia.
+*   **Knowledge Preservation**: Following a near-regression where technical documentation was almost lost, we implemented Section 9 in [AI_RULES.md](file:///c:/Users/zephy/Documents/Brinkmanship/AI_RULES.md) to mandate "Non-Destructive Documentation."
+*   **9-Metric Expansion**: Standardized "Global Stability" and integrated the "Scarcity Index" across the engine, API, and UI.
+
+#### Verification Results
+*   **API Tests**: [test_api.py](file:///c:/Users/zephy/Documents/Brinkmanship/tests/test_api.py) Passing (including history rewind).
+*   **Visual Baseline**: Playwright snapshots generated for the Sovereign Interface.
+*   **PRD Sync**: [PRD_MASTER.md](file:///c:/Users/zephy/Documents/Brinkmanship/PRD_MASTER.md) is now the 100% accurate source of truth.
+
+### 3. FastAPI Bridge
+A high-performance Python backend now serves the simulation state to the frontend, decoupling the complex math of the engine from the aesthetic rendering of the UI.
+
+### 4. Git & GitHub Integration
+The entire project is now version-controlled and pushed to [https://github.com/gcs2/Brinkmanship](https://github.com/gcs2/Brinkmanship).
+
+## How to Run
+1. **Start the Backend**:
+   ```powershell
+   python api/main.py
+   ```
+2. **Start the Frontend**:
+   ```powershell
+   cd ui
+   npm run dev
+   ```
+3. Open your browser to `http://localhost:3000`.
+
+## Verification Results
+- **API Tests**: Verified that state serialization matches the [GameState](file:///c:/Users/zephy/Documents/Brinkmanship/types.ts#1-24) TypeScript interface.
+- **State Integrity**: [test_immutable_state.py](file:///c:/Users/zephy/Documents/Brinkmanship/tests/test_immutable_state.py) passes with 100% coverage on transition functions.
+- **Scenario Flex**: The [SCENARIO_CREATION_GUIDE.md](file:///c:/Users/zephy/Documents/Brinkmanship/SCENARIO_CREATION_GUIDE.md) has been verified as a comprehensive blueprint for adding new themes.

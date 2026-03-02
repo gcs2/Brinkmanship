@@ -36,6 +36,8 @@ class GameStateSnapshot(BaseModel):
     turn_id: int
     current_date: str
     metrics: Dict[str, float]
+    demographics: Dict[str, float]
+    system: Dict[str, float]
     formatted_metrics: List[MetricState]
     active_scenario: str
     ui_context: Optional[Dict[str, Any]] = None
@@ -116,6 +118,8 @@ def format_state(state: State) -> GameStateSnapshot:
         turn_id=len(state_history),
         current_date=state.current_date.isoformat(),
         metrics=state.metrics,
+        demographics=state.demographics,
+        system=state.system,
         formatted_metrics=formatted_metrics,
         active_scenario=SCENARIO,
         ui_context=scenario_config.get("assets", {}).get("ui_context"),
@@ -194,4 +198,6 @@ def resolve_event(req: EventDecisionRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # Enabling reload=True for 'hot-restart' capability
+    # Note: Using "main:app" string format is required for reload
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
