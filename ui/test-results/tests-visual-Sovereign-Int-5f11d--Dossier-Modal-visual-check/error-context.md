@@ -1,0 +1,47 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - heading "BRINKMANSHIP" [level=1] [ref=e6]
+          - paragraph [ref=e7]: INITIALIZING ENGX_...
+        - generic [ref=e8]:
+          - button "Advance Chronos" [active] [ref=e9]:
+            - img [ref=e10]
+            - text: Advance Chronos
+          - generic [ref=e12]:
+            - generic [ref=e13]: Chronos Sync
+            - generic [ref=e14]: 2025-01-20
+          - img [ref=e15]
+      - generic [ref=e17]:
+        - heading "Primary Telemetry" [level=2] [ref=e19]
+        - generic [ref=e20]:
+          - generic [ref=e22]:
+            - img [ref=e23]
+            - generic [ref=e203]: "Sector: B-09 // Lat: 34.05 N // Long: 118.24 W"
+          - generic [ref=e205]: Volatility Readout
+        - generic [ref=e209]:
+          - heading "Sector Pressures" [level=2] [ref=e210]
+          - generic [ref=e211]:
+            - generic [ref=e212]:
+              - img [ref=e213]
+              - generic [ref=e215]: GFI Escalation
+            - generic [ref=e216]: "00.00"
+  - generic [ref=e221] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e222]:
+      - img [ref=e223]
+    - generic [ref=e226]:
+      - button "Open issues overlay" [ref=e227]:
+        - generic [ref=e228]:
+          - generic [ref=e229]: "3"
+          - generic [ref=e230]: "4"
+        - generic [ref=e231]:
+          - text: Issue
+          - generic [ref=e232]: s
+      - button "Collapse issues badge" [ref=e233]:
+        - img [ref=e234]
+  - alert [ref=e236]
+```

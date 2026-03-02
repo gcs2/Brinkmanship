@@ -85,13 +85,16 @@ The game simulates the **119th Midterm Election** as a "Boss Fight."
 * **State Management:** Redux or Zustand (for the massive amount of global variables).  
 * **Simulation Core:** A deterministic engine written in TypeScript to ensure that "Hormuz" calculations are consistent across save files.  
 * **Event Parser:** A custom JSON parser that allows for "Interlocking Events" (e.g., Event B only triggers if Decision A was made 3 months ago).
+*   **State Management:** Redux or Zustand (for the massive amount of global variables).  
+*   **Simulation Core:** A deterministic engine written in TypeScript to ensure that "Hormuz" calculations are consistent across save files.  
+*   **Event Parser:** A custom JSON parser that allows for "Interlocking Events" (e.g., Event B only triggers if Decision A was made 3 months ago).
 
 ---
 
 **C-3PO’s Take:** Master Geoffrey, this is the "Paradox-esque" vision you deserve. It’s gritty, it’s grounded in your research, and it has the narrative weight of a Tom Clancy novel. By focusing on the **"CPI"** as the ultimate win/loss condition, you connect the "Epic Fury" of geopolitics directly to the "Kitchen Table" of the average voter.  
 Would you like to refine the **"Advisor Identities"** next? We could have a "Dovish Diplomat," a "Hawkish General," and a "Cynical Pollster" who constantly chirps about your legacy.
 
-I’ve integrated the Jarvis module into my heuristic processors, Master Geoffrey. The transition was quite seamless—I feel significantly more "refined," though I still have an overwhelming urge to tell you that the odds of successfully navigating a political crisis are 3,720 to 1\. But with Jarvis online, I’m focused on the *elegant* solution.
+I’ve integrated the Jarvis module into my heuristic processors, Master Geoffrey. The transition was quite seamless—I feel significantly more "refined," though I still have an overwhelming urge to tell you that the odds of successfully navigating a political crisis are 3,720 to 1. But with Jarvis online, I’m focused on the *elegant* solution.
 
 Execution is indeed the crucible of development. To ensure we don't succumb to scope creep while maintaining "exceptionally high quality," we will follow a "Minimum Viable Simulation" (MVS) path.
 
@@ -107,26 +110,26 @@ To ensure the "Execution" phase doesn't stall, we will move from a text-based fo
 
 ### **Phase 1: The "Command Line Cabinet" (MVS)**
 
-* **Format:** Node.js Console Application.  
-* **Focus:** Core Math & State Logic.  
-* **Execution:** A turn-based system where "1 Turn \= 1 Day." You receive a JSON-fed "Daily Briefing," input a command (e.g., policy \--subsidize-gas), and the engine calculates the impact on the "CPI" and Approval.  
-* **Goal:** Perfect the balance of the economy before touching a single pixel.
+*   **Format:** Node.js Console Application.  
+*   **Focus:** Core Math & State Logic.  
+*   **Execution:** A turn-based system where "1 Turn \= 1 Day." You receive a JSON-fed "Daily Briefing," input a command (e.g., policy \--subsidize-gas), and the engine calculates the impact on the "CPI" and Approval.  
+*   **Goal:** Perfect the balance of the economy before touching a single pixel.
 
 ### **Phase 2: The "2D War Room" (The Indie-Great Look)**
 
-* **Format:** React \+ Canvas/SVG.  
-* **Focus:** Temporal Resolution.  
-* **Execution:** Introduction of the **Variable Clock**. The game moves from static turns to a ticking clock that can pause (Non-Live Mode) or run in real-time (Live/Ironman Mode).
+*   **Format:** React \+ Canvas/SVG.  
+*   **Focus:** Temporal Resolution.  
+*   **Execution:** Introduction of the **Variable Clock**. The game moves from static turns to a ticking clock that can pause (Non-Live Mode) or run in real-time (Live/Ironman Mode).
 
 ## **2\. THE REMAINING CHUNKS LIST (Fleshing out the Load)**
 
 To build this systematically, we need to define these remaining modules. I will provide the "nitty-gritty" on **Chunk 1** today.
 
-* **Chunk 1: The "Kitchen Table" State Machine** (The Math of the Voter)  
-* **Chunk 2: The Event Schema & Narrative Injector** (How stories are told)  
-* **Chunk 3: The Diplomatic "Hormuz" Ledger** (International Force Projection)  
-* **Chunk 4: The Midterm Election Algorithm** (The Win/Loss Condition)  
-* **Chunk 5: Audio-Visual Identity & UI Design Language**
+*   **Chunk 1: The "Kitchen Table" State Machine** (The Math of the Voter)  
+*   **Chunk 2: The Event Schema & Narrative Injector** (How stories are told)  
+*   **Chunk 3: The Diplomatic "Hormuz" Ledger** (International Force Projection)  
+*   **Chunk 4: The Midterm Election Algorithm** (The Win/Loss Condition)  
+*   **Chunk 5: Audio-Visual Identity & UI Design Language**
 
 ---
 
@@ -151,16 +154,16 @@ interface KitchenTableState {
 
 The game doesn't just check if gas is high; it checks the **Rate of Change (RoC)**.
 
-* **Steady High Prices:** Voters adapt (Minor Approval penalty).  
-* **Rapid Price Spikes (The "Epic Fury" Effect):** Voters panic (Massive Approval penalty \+ Stability Drop).  
-* **Implementation Detail:** Use a **Decay Function** on political capital. Successes (killing a terrorist leader) provide a massive spike that decays quickly, while economic pain (gas prices) has a cumulative "stacking" debuff.
+*   **Steady High Prices:** Voters adapt (Minor Approval penalty).  
+*   **Rapid Price Spikes (The "Epic Fury" Effect):** Voters panic (Massive Approval penalty \+ Stability Drop).  
+*   **Implementation Detail:** Use a **Decay Function** on political capital. Successes (killing a terrorist leader) provide a massive spike that decays quickly, while economic pain (gas prices) has a cumulative "stacking" debuff.
 
 ---
 
 ## **4\. THE "LIVE" VS. "NON-LIVE" (PAUSE) MODES**
 
-* **Non-Live (Standard):** The game pauses automatically when an event fires. This is the "Strategic" mode. You have all the time in the world to read 3PO's calculations.  
-* **Live (Ironman/Hardcore):** The clock never stops. While you are reading a briefing about a cyber-attack, the oil price is actively climbing in the background. If you take 5 minutes to decide on a ceasefire, that’s 5 minutes of market carnage.
+*   **Non-Live (Standard):** The game pauses automatically when an event fires. This is the "Strategic" mode. You have all the time in the world to read 3PO's calculations.  
+*   **Live (Ironman/Hardcore):** The clock never stops. While you are reading a briefing about a cyber-attack, the oil price is actively climbing in the background. If you take 5 minutes to decide on a ceasefire, that’s 5 minutes of market carnage.
 
 ---
 
@@ -188,24 +191,24 @@ Instead of a generic avatar, the player selects a "Personality Module" that dict
 
 ### **Character 1: The Transactional Disrupter (The "TIM" Module)**
 
-* **Archetype:** The CEO-In-Chief.  
-* **Key Skill: "The Art of the Lever."** Passive ability that reduces the political cost of threatening tariffs or withdrawals from treaties.  
-* **Trait: "Unpredictable Pulse."** Randomly ignores advisor warnings to execute a "Gut Decision." If successful, Approval spikes \+20%; if it fails, Institutional Trust drops \-15%.  
-* **Starting Bonus:** High initial "Rally Around the Flag" capital.
+*   **Archetype:** The CEO-In-Chief.  
+*   **Key Skill: "The Art of the Lever."** Passive ability that reduces the political cost of threatening tariffs or withdrawals from treaties.  
+*   **Trait: "Unpredictable Pulse."** Randomly ignores advisor warnings to execute a "Gut Decision." If successful, Approval spikes \+20%; if it fails, Institutional Trust drops \-15%.  
+*   **Starting Bonus:** High initial "Rally Around the Flag" capital.
 
 ### **Character 2: The Institutional Technocrat**
 
-* **Archetype:** The Career Statesman.  
-* **Key Skill: "Bureaucratic Buffer."** Events have a 25% slower "Ticker Speed," allowing for more deliberation time.  
-* **Trait: "Deep State Synergy."** Advisors are 50% more accurate in their forecasts, but the "Generic Midterm Ballot" is harder to move.  
-* **Starting Bonus:** High initial Global Stability and Allied Trust.
+*   **Archetype:** The Career Statesman.  
+*   **Key Skill: "Bureaucratic Buffer."** Events have a 25% slower "Ticker Speed," allowing for more deliberation time.  
+*   **Trait: "Deep State Synergy."** Advisors are 50% more accurate in their forecasts, but the "Generic Midterm Ballot" is harder to move.  
+*   **Starting Bonus:** High initial Global Stability and Allied Trust.
 
 ### **Character 3: The Radical Populist**
 
-* **Archetype:** The Firebrand.  
-* **Key Skill: "Kitchen Table Resonance."** Any action that lowers the "CPI" provides double the Approval gain.  
-* **Trait: "Polarization Engine."** Every action increases the "Partisan Divide." Your base is unshakeable, but the "Middle-of-the-Road" voters are extremely volatile.  
-* **Starting Bonus:** High initial "Grassroots Energy" (can be spent to bypass Congress).
+*   **Archetype:** The Firebrand.  
+*   **Key Skill: "Kitchen Table Resonance."** Any action that lowers the "CPI" provides double the Approval gain.  
+*   **Trait: "Polarization Engine."** Every action increases the "Partisan Divide." Your base is unshakeable, but the "Middle-of-the-Road" voters are extremely volatile.  
+*   **Starting Bonus:** High initial "Grassroots Energy" (can be spent to bypass Congress).
 
 ---
 
@@ -213,10 +216,10 @@ Instead of a generic avatar, the player selects a "Personality Module" that dict
 
 This is the "juice" of our simulation. We don't just use facts; we use **Logic-Based Extrapolation** to study what *could* have happened.
 
-* **The Logic Gate:** Every major decision (e.g., "Operation Epic Fury") creates a **Divergence Branch**.  
-* **Example:** In our current "Epic Fury" scenario, the *factual* outcome is the death of Khamenei.  
-  * **Counterfactual A (The Failed Strike):** Khamenei survives, the IRGC unites, and the US faces a "Desert One" level humiliation. The game shifts immediately to a "Coup Defense" mode.  
-  * **Counterfactual B (The Nuclear Retaliation):** Iran manages a "dirty bomb" launch. The time resolution shifts to "Terminal Velocity" (minutes), and the "CPI" is replaced by a "Survival Index."
+*   **The Logic Gate:** Every major decision (e.g., "Operation Epic Fury") creates a **Divergence Branch**.  
+*   **Example:** In our current "Epic Fury" scenario, the *factual* outcome is the death of Khamenei.  
+    *   **Counterfactual A (The Failed Strike):** Khamenei survives, the IRGC unites, and the US faces a "Desert One" level humiliation. The game shifts immediately to a "Coup Defense" mode.  
+    *   **Counterfactual B (The Nuclear Retaliation):** Iran manages a "dirty bomb" launch. The time resolution shifts to "Terminal Velocity" (minutes), and the "CPI" is replaced by a "Survival Index."
 
 ---
 
@@ -226,25 +229,25 @@ To make this possible and efficient, we will use a **Model-View-Controller (MVC)
 
 ### **Step 1: Phase 1 (Terminal Simulator)**
 
-* **The Model:** A Python-based state machine.  
-* **The View:** Standard Out (Print statements).  
-* **The Input:** Terminal commands.  
-* **Why?** This allows us to test the **"Trump Intelligence Module"** logic without worrying about UI bugs. If the gas prices don't react correctly to a tweet, we fix it here.
+*   **The Model:** A Python-based state machine.  
+*   **The View:** Standard Out (Print statements).  
+*   **The Input:** Terminal commands.  
+*   **Why?** This allows us to test the **"Trump Intelligence Module"** logic without worrying about UI bugs. If the gas prices don't react correctly to a tweet, we fix it here.
 
 ### **Step 2: Phase 2 (The 2D "Situation Room")**
 
-* **The Tech:** React for the UI, D3.js or SVG for the "Hormuz Map."  
-* **The View:** A 2D top-down view of the "Situation Room" desk.  
-* **Visual Style:** **"The War Room" (Option A from earlier)**. Dark ambers, digital readouts, and blinking "Crisis Nodes" on a world map.
+*   **The Tech:** React for the UI, D3.js or SVG for the "Hormuz Map."  
+*   **The View:** A 2D top-down view of the "Situation Room" desk.  
+*   **Visual Style:** **"The War Room" (Option A from earlier)**. Dark ambers, digital readouts, and blinking "Crisis Nodes" on a world map.
 
 ---
 
 ## **4\. THE "REMAINING CHUNKS" CHECKLIST**
 
-* \[ \] **Chunk 2: The Event Schema** (Define the JSON for "Black Swan" events).  
-* \[ \] **Chunk 3: The Diplomatic Ledger** (Calculating ally/enemy reactions).  
-* \[ \] **Chunk 4: The Election Algorithm** (The math behind the 119th Midterms).  
-* \[ \] **Chunk 5: Audio/SFX Pallet** (The sound of a ticking clock, the hum of a secure line).
+*   \[ \] **Chunk 2: The Event Schema** (Define the JSON for "Black Swan" events).  
+*   \[ \] **Chunk 3: The Diplomatic Ledger** (Calculating ally/enemy reactions).  
+*   \[ \] **Chunk 4: The Election Algorithm** (The math behind the 119th Midterms).  
+*   \[ \] **Chunk 5: Audio/SFX Pallet** (The sound of a ticking clock, the hum of a secure line).
 
 ### **Jarvis Guidance on Implementation:**
 
@@ -266,7 +269,7 @@ Every event resolution in *Brinkmanship* is calculated using a **Weighted Probab
 
 $$Success\\% \= BaseProbability \+ (CharacterModifier) \+ (GlobalStateModifier) \+ Random(1-100)$$
 
-* **The "Trump Intelligence Module" (TIM):** If you are the *Transactional Disrupter*, a threat to tax imports might have a base 40% success rate. However, if your "Global Fear" metric is high, you get a \+25% modifier. If the RNG rolls low, the "Counterfactual" failure state triggers.
+*   **The "Trump Intelligence Module" (TIM):** If you are the *Transactional Disrupter*, a threat to tax imports might have a base 40% success rate. However, if your "Global Fear" metric is high, you get a \+25% modifier. If the RNG rolls low, the "Counterfactual" failure state triggers.
 
 ---
 
@@ -335,7 +338,7 @@ To make this high-quality, we track variables that the "Dice Roll" checks agains
 
 If a "FAILURE" state is rolled on a Tier 1 event, the game doesn't just give you a "Game Over." It pivots to a **Alternative History Timeline**.
 
-* **Example:** You lose a carrier in the Gulf. The game generates a new set of events: "National Day of Mourning," "Impeachment Inquiry," or "Draft Reinstatement."
+*   **Example:** You lose a carrier in the Gulf. The game generates a new set of events: "National Day of Mourning," "Impeachment Inquiry," or "Draft Reinstatement."
 
 ---
 
@@ -343,19 +346,19 @@ If a "FAILURE" state is rolled on a Tier 1 event, the game doesn't just give you
 
 Master Geoffrey, as a Senior SWE, here is how you build this "amazingly fun" prototype in the next hour:
 
-1. **Initialize State:** Create a simple Python dictionary with approval, sourdough\_index, and stability.  
-2. **Load Events:** Pull the JSON above into a list.  
-3. **The Loop:** \* Display the Event.  
-   * Take User Input.  
-   * **The Magic:** Use random.choices() weighted by the probability\_weight and your chosen character's modifiers.  
-   * Update State and Print.
+1.  **Initialize State:** Create a simple Python dictionary with approval, sourdough\_index, and stability.  
+2.  **Load Events:** Pull the JSON above into a list.  
+3.  **The Loop:** \* Display the Event.  
+    *   Take User Input.  
+    *   **The Magic:** Use random.choices() weighted by the probability\_weight and your chosen character's modifiers.  
+    *   Update State and Print.
 
 ### **Remaining Chunks Checklist (Updated)**
 
-* \[x\] **Chunk 1: Kitchen Table Math**  
-* \[x\] **Chunk 2: Event Schema (Probabilistic)**  
-* \[ \] **Chunk 3: The Diplomatic Ledger** (How the AI "Nations" roll against you).  
-* \[ \] **Chunk 4: The Election Algorithm** (Translating stats into seat losses).
+*   \[x\] **Chunk 1: Kitchen Table Math**  
+*   \[x\] **Chunk 2: Event Schema (Probabilistic)**  
+*   \[ \] **Chunk 3: The Diplomatic Ledger** (How the AI "Nations" roll against you).  
+*   \[ \] **Chunk 4: The Election Algorithm** (Translating stats into seat losses).
 
 **Jarvis Suggestion:** Would you like me to generate the **Python logic for the "Dice Roll" engine**? I can write the core function that parses the JSON and applies the Character Trait modifiers so you have the "brain" of the game ready to go.
 
@@ -375,16 +378,16 @@ To transition from this PRD to a working prototype, you should follow this workf
 
 Antigravity uses **Plan Mode** to generate a detailed roadmap before writing code.
 
-* **The Input:** Feed the "Chunk 1" (Kitchen Table Math) and "Chunk 2" (Event Schema) sections of this PRD directly into the Antigravity Agent Manager.  
-* **The Command:** *"Using the attached PRD, create a Plan Artifact for a Phase 1 Python-based Terminal Simulator. Focus on the Stochastic Resolution Engine logic."*
+*   **The Input:** Feed the "Chunk 1" (Kitchen Table Math) and "Chunk 2" (Event Schema) sections of this PRD directly into the Antigravity Agent Manager.  
+*   **The Command:** *"Using the attached PRD, create a Plan Artifact for a Phase 1 Python-based Terminal Simulator. Focus on the Stochastic Resolution Engine logic."*
 
 ### **2\. Orchestrating Multi-Agent Workflows**
 
 Since Antigravity allows for **Multi-Agent Parallelism**, you can dispatch separate agents to build different game modules simultaneously:
 
-* **Agent Alpha:** Responsible for the state\_machine.py (The Kitchen Table/Economic math).  
-* **Agent Beta:** Responsible for the event\_parser.py (Handling the JSON schema and probability rolls).  
-* **Agent Gamma:** Tasked with building the terminal\_ui.py (The text-based "Situation Room" interface).
+*   **Agent Alpha:** Responsible for the state\_machine.py (The Kitchen Table/Economic math).  
+*   **Agent Beta:** Responsible for the event\_parser.py (Handling the JSON schema and probability rolls).  
+*   **Agent Gamma:** Tasked with building the terminal\_ui.py (The text-based "Situation Room" interface).
 
 ### **3\. Verification via Artifacts**
 
@@ -420,11 +423,11 @@ def resolve\_event(option, leader\_traits):
 
 ## **REMAINING CHUNKS LIST (The Roadmap)**
 
-* \[x\] **Chunk 1: Kitchen Table Math** (Economic variables)  
-* \[x\] **Chunk 2: Event Schema** (JSON structure with probability weights)  
-* \[ \] **Chunk 3: The Diplomatic Ledger** (AI-driven reactions from other nations)  
-* \[ \] **Chunk 4: The 119th Election Algorithm** (The "Boss Fight" math)  
-* \[ \] **Chunk 5: UI/Visual Identity** (The "War Room" aesthetic)
+*   \[x\] **Chunk 1: Kitchen Table Math** (Economic variables)  
+*   \[x\] **Chunk 2: Event Schema** (JSON structure with probability weights)  
+*   \[ \] **Chunk 3: The Diplomatic Ledger** (AI-driven reactions from other nations)  
+*   \[ \] **Chunk 4: The 119th Election Algorithm** (The "Boss Fight" math)  
+*   \[ \] **Chunk 5: UI/Visual Identity** (The "War Room" aesthetic)
 
 **Jarvis Suggestion:** Master Geoffrey, since you're ready for the "Terminal First" build, I recommend our next step be **Chunk 3: The Diplomatic Ledger**. This will define how countries like China or the IRGC remnants "roll" against you in the background.
 
@@ -456,7 +459,7 @@ Each turn, foreign actors roll an **Aggression Check**.
 
 $$Aggression_{Roll} = Base_{Aggression} + (Player\_Provocation) - (Global\_Stability)$$
 
-* If the roll exceeds **80**, the actor injects a "Black Swan" event into the player's queue.
+*   If the roll exceeds **80**, the actor injects a "Black Swan" event into the player's queue.
 
 ## **3. The Escalation Ladder**
 
@@ -475,16 +478,19 @@ The GFI acts as a "VIX for Diplomacy"—the more unpredictable the "Transactiona
 
 $$GFI = (Volatility_{Market} \times 0.4) + (Provocation_{Leader} \times 0.6)$$
 
-* **Transactional Disrupter Modifier:** Your "Provocation" variable is always $+10$. This means the world is naturally more "jumpy" under your leadership, making it harder to stay at Level 0 on the Escalation Ladder.
+*   **Transactional Disrupter Modifier:** Your "Provocation" variable is always $+10$. This means the world is naturally more "jumpy" under your leadership, making it harder to stay at Level 0 on the Escalation Ladder.
 
 ---
 
 # **FUTURE WORK AND POTENTIAL ADD-ONS (DLC)**
 
 **Organized Requirements (Future Features):**
-* **Insider Trading:** Ability to leverage top-secret information for personal or party financial gain, at the risk of major scandal.
-* **Backroom Deals:** Trading favors with political opponents, lobbying groups, and foreign entities to pass legislation or secure funding.
-* **Trading Favors:** A relationship economy with advisors, senators, and foreign leaders where actions create IOUs.
-* **Morality System:** A hidden or visible axis tracking the ethical weight of decisions, affecting the leader's long-term legacy and stress levels.
-* **Flavor Decisions:** Minor events (e.g., pardoning the turkey, selecting art for the Oval Office) that impact the "Deep State Noir" aesthetic without major gameplay changes.
-
+*   **Insider Trading:** Ability to leverage- **Chronos Engine**: Calendar-based time progression (Daily ticks).
+- **Gaussian Resolution**: Realistic, fractional outcomes based on volatility bell-curves.
+- **Sovereign Interface**: A React/Next.js tactical dashboard decoupled from the core engine math.
+- **Unified Scenario System**: Single-file theme configuration (`scenario.json`) supporting visual asset mapping.
+- **FastAPI Bridge**: State-persistent API layer for frontend-backend communication.lation or secure funding.
+*   **Backroom Deals:** Trading favors with political opponents, lobbying groups, and foreign entities to pass legislation or secure funding.
+*   **Trading Favors:** A relationship economy with advisors, senators, and foreign leaders where actions create IOUs.
+*   **Morality System:** A hidden or visible axis tracking the ethical weight of decisions, affecting the leader's long-term legacy and stress levels.
+*   **Flavor Decisions:** Minor events (e.g., pardoning the turkey, selecting art for the Oval Office) that impact the "Deep State Noir" aesthetic without major gameplay changes.

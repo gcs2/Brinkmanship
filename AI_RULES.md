@@ -14,6 +14,7 @@ This document serves as the persistent rulebook and guidelines for any AI agents
 
 ## 3. "Trust but Verify" Principle
 - If creating a new complex mechanic (like the Escalation Ladder), always construct the matching test files (e.g., `test_escalation.py`) and ensure they pass before declaring the feature complete.
+- **Visual Audits (Scuba)**: Perform visual snapshot tests for UI changes to ensure aesthetic consistency (Fincher-Noir). Verify no overflows or `NaN` errors in telemetry.
 - Verify any UI changes (like Terminal ANSI outputs) handle the new state changes gracefully without overflowing or producing `NaN` errors.
 
 ## 4. Phase-Based Execution
