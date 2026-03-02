@@ -1,0 +1,18 @@
+# AUDIT REPORT V2: VOLATILITY "SINE WAVE" ILLUSION
+**DATE**: 2026-03-02
+**TARGET**: [ui/src/app/components/WaveformOscillator.tsx](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/components/WaveformOscillator.tsx) and [engine/state_manager.py](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py)
+
+## 1. Executive Summary
+A "Technical Skepticism" audit was performed against the current volatility visualization and backend logic. The current implementation violates the "AAA weight" constraint by behaving as a vanity element rather than a true telemetry readout.
+
+## 2. Findings (Structural Shortcomings)
+* **The "Sine Wave" Vanity Illusion**: The frontend [WaveformOscillator](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/components/WaveformOscillator.tsx#10-71) currently uses a hardcoded looping SVG path. It oscillates based on a `Math.sin(time)` function regardless of real geopolitical friction. This provides immediate, but false, gratification.
+* **Static Volatility Backend**: The `state.system.volatility` variable does not naturally decay or respond dynamically to "Peacetime Success." It acts as a static modifier, failing to reflect the true friction of recent events.
+
+## 3. Recommended Remediation (The Dynamic ECS Fix)
+1. **Frontend Refactor (ECG Logic)**: The SVG path must be calculated based strictly on a time-series array of the last N historical `volatility` values passed from the backend. During "Incremental Growth", the line should be nearly flat and perfectly stable. 
+2. **Backend Decay (The Gravity Mechanic)**: `volatility` must implement a continuous daily decay towards `0` during peaceful ticks.
+3. **Shock Pulses**: When a major event occurs (or when action delay resolves), it injects a massive spike (`+50.0`) into the volatility stream, causing the frontend to violently oscillate before slowly decaying back to stability.
+
+## 4. Trust Verification
+* **Consistency**: By decoupling the animation from the frontend loop and binding it purely to backend array snapshots, the Waveform becomes a genuine un-cheesable instrument of systemic health.

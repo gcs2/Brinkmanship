@@ -1,0 +1,27 @@
+# IMPLEMENTATION PLAN V6: ENGINE REFACTOR (4+ DECISIONS & PHASES)
+
+## Goal Description
+Refactor the Sovereign Engine to support "Open World" complexity. The simulation will transition away from binary events into a Phase-Based engine featuring 4+ option decision trees, delayed consequences, and stochastic ambient tension.
+
+## Proposed Changes
+
+### [MODIFY] [engine/event_processor.py](file:///c:/Users/zephy/Documents/Brinkmanship/engine/event_processor.py)
+* **Phase-Trigger Scaling**: Modify `processor.load_event_from_json()` to filter the active event pool based on `state.active_phase`.
+* **Outcomes Overhaul**: The `options` array parser must now handle 4-6 choices per event. 
+* **The "Open World" Hook**: Introduce a `fetch_background_events()` function. This will roll for random "Flavor Events" (diplomatic gaffes, minor trade disputes) during the "Incremental Growth" phase to prevent the game from feeling static.
+
+### [MODIFY] [engine/state_manager.py](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py)
+* **Latency Queue (Temporal Friction)**: 
+  * Add `pending_actions: List[Dict]` to the [State](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py#6-34) dataclass.
+  * When an action is submitted, it enters the queue with a `resolve_turn = state.turn_id + action.lag_time`.
+* **Phase Progressor**: [update_turn()](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py#35-84) will check conditions to upgrade the `active_phase` from Phase 1 (Incremental Growth) -> Phase 2 (Building Tensions) -> Phase 3 (Flashpoints).
+
+### [MODIFY] [scenarios/modern_geopolitics/scenario.json](file:///c:/Users/zephy/Documents/Brinkmanship/scenarios/modern_geopolitics/scenario.json)
+* **JSON Schema Upgrade**: Update the dictionary structure to include:
+  * `phase_requirements: int` for events.
+  * 4+ options for the "EVT-CHINA-EMBARGO" event.
+  * `lag_time: int` (in days) appended to every option to reflect realistic bureaucratic delay.
+
+## Verification Plan
+* Ensure `test_high_res.py` and [test_escalation.py](file:///c:/Users/zephy/Documents/Brinkmanship/tests/test_escalation.py) can handle actions that resolve 5 turns *after* selection.
+* Validate that actions properly sit in the `pending_actions` queue without altering metrics until their target date.

@@ -494,3 +494,33 @@ $$GFI = (Volatility_{Market} \times 0.4) + (Provocation_{Leader} \times 0.6)$$
 *   **Trading Favors:** A relationship economy with advisors, senators, and foreign leaders where actions create IOUs.
 *   **Morality System:** A hidden or visible axis tracking the ethical weight of decisions, affecting the leader's long-term legacy and stress levels.
 *   **Flavor Decisions:** Minor events (e.g., pardoning the turkey, selecting art for the Oval Office) that impact the "Deep State Noir" aesthetic without major gameplay changes.
+
+---
+
+# **PRD ADDENDUM: THE "FRICTION & FOG" EXPANSION (PHASE 6 / LUXURY UX)**
+
+To eliminate "immediate gratification" and solve architectural shortcomings, we transition to a **Latency-Driven Engine**.
+
+## **1. The Latency Queue (Temporal Friction)**
+Decisions do not occur instantly. Every action possesses a `lag_time` (measured in Chronos Engine daily ticks). 
+* When selected, the action enters a `pending_actions` queue.
+* The frontend reads out "Op Sentinel resolving in 5 days" rather than showing immediate metric shifts.
+
+## **2. The Non-Blocking Unbroken War Room**
+The Sovereign Interface must never block the telemetry.
+* Removing full-screen "jarring" modals.
+* Interactions are pane-based or side-drawer based.
+* **Chronos Sweep**: Time progresses via a subtle 1px visual scanning line to indicate background simulation processing.
+
+## **3. Dynamic Volatility (The ECG Model)**
+Volatility is no longer an ambient sine wave. The UI `WaveformOscillator` acts as an ECG: perfectly flat during "Incremental Growth" / peacetime, and spiking violently upon action resolution or flashpoints.
+
+## **4. Persistent Context (Snapshot Save/Load)**
+Implemented via the API Bridge, players can capture specific snapshots of their state history into JSON structures, allowing them to freeze and recall their specific "Noir" timelines seamlessly.
+
+## **5. Open World Scenario Logic**
+* **4+ Option Complexity**: Binary choices are removed. Events (like a semiconductor blockade) now feature a minimum of 4 nuanced, heavily stochastic decisions.
+* **Phase Progression**: Scenarios follow a structural path logic in `scenario.json`:
+  1. **Phase 1: Incremental Growth** (Low variance, high mundane consistency).
+  2. **Phase 2: Building Tensions** (Metric decay accelerates, Gaussian noise expands).
+  3. **Phase 3: Flashpoints & War** (Binary triggers for total systemic collapse).

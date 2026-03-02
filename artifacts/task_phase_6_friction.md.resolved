@@ -1,0 +1,28 @@
+# TASK PHASE 6: FRICTION & FOG IMPLEMENTATION
+
+## Overall Objective
+Implement the "Latency-Driven Engine" where actions have delayed consequences and the UI provides an Unbroken War Room context. Eliminate full-screen modals ("immediate gratification") in favor of background progression.
+
+## Execute Phase 6 (The "Friction & Fog" Expansion)
+
+### Backend: The Latency Queue
+- [ ] Add `pending_tasks` to the [State](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py#6-34) schema ([api/main.py](file:///c:/Users/zephy/Documents/Brinkmanship/api/main.py)) allowing complex objects.
+- [ ] Add `pending_actions` queue to [State](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py#6-34) in [engine/state_manager.py](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py).
+- [ ] Modify `/api/action` to push an action to the `pending_actions` queue (with `lag_time_days` based on the option) rather than immediately resolving it.
+- [ ] Update [update_turn()](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py#35-84) to scan the queue: if `current_turn >= resolve_turn`, execute the metric impact and push a string to a new `action_logs` array.
+- [ ] Ensure that "Lag Time" correctly scales with the 1-day tick rate (e.g., bureaucratic actions take 15 ticks, kinetic actions take 1 tick).
+
+### Persistence: Save/Load Architecture
+- [ ] Create `api/routers` or just endpoints `/api/save` and `/api/load` in [main.py](file:///c:/Users/zephy/Documents/Brinkmanship/main.py).
+- [ ] Write logic to serialize `state_history` to `saves/current_run.json`.
+- [ ] Ensure the frontend can hot-reload this specific snapshot string.
+
+### Frontend: Non-Blocking HUD & Intel Feed
+- [ ] Remove [DossierModal.tsx](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/components/DossierModal.tsx) full-screen popup behavior.
+- [ ] Replace "Advance Chronos" button with a background "Chronos Sweep" interval (auto-advancing the turn every 2-3 seconds visually with a 1px scanline).
+- [ ] Create `IntelFeed.tsx` (scrolling Action Log) on the left or bottom panel to read out completed operations from the backend `action_logs`.
+- [ ] Update [WaveformOscillator.tsx](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/components/WaveformOscillator.tsx) to read an array of values rather than an independent Sine loop, ensuring actual flatness during Peacetime.
+
+### Content Expansion
+- [ ] Overhaul [scenario.json](file:///c:/Users/zephy/Documents/Brinkmanship/scenarios/modern_geopolitics/scenario.json) to include 4+ decisions per event.
+- [ ] Append the required `lag_time` property to each decision option in JSON.

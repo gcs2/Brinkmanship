@@ -12,74 +12,485 @@
       "metric_8": "Oil Price",
       "metric_9": "Scarcity Index"
     },
+    "metric_tooltips": {
+      "metric_1": "The macro-anchor of the simulation. When this drops below 45, the world enters Building Tensions phase. Below 70, decay accelerates across all other metrics.",
+      "metric_2": "Weighted average of demographic approval. Derived from Working Class, Institutional Elites, and Global Allies. Hard to move quickly.",
+      "metric_3": "Consumer Price Index. Tracks inflation and cost of living. High CPI destroys Working Class approval. The 'Boiling Frog' metric.",
+      "metric_4": "Faith in state institutions (judiciary, intelligence, legislature). Hard to rebuild once lost. Determines legislative success rates.",
+      "metric_5": "The Dow Jones equivalent. Reactive to nearly everything. Institutional Elites are extremely sensitive to this. High volatility periods see rapid swings.",
+      "metric_6": "10-Year Treasury Bond Yields. High yields signal that international markets see the U.S. as a risky borrower. Hard to reduce once elevated.",
+      "metric_7": "Unemployment Rate. A lagging indicator — reacts slowly to decisions but has compounding political effects on Working Class approval over time.",
+      "metric_8": "Global oil and energy price benchmark. The lever that connects most geopolitical events to domestic economic pain. Affects CPI directly.",
+      "metric_9": "Scarcity Index. The strategic bottleneck. Reflects critical resource availability. High scarcity forces alternative policy paths regardless of other metrics."
+    },
     "demographics": {
       "demo_1": "Working Class",
       "demo_2": "Institutional Elites",
       "demo_3": "Global Allies"
     },
     "system": {
-      "volatility": "Stock Market Volatility",
+      "volatility": "Market Volatility",
       "fear_index": "Global Fear Index",
       "provocation": "Leader Provocation"
     }
   },
+  "phases": {
+    "1": {
+      "name": "Incremental Growth",
+      "description": "Peacetime. Decisions involve mundane policy and slow-burn development.",
+      "stability_range": [
+        70,
+        100
+      ],
+      "gaussian_noise_multiplier": 0.5
+    },
+    "2": {
+      "name": "Building Tensions",
+      "description": "Geopolitical friction accelerates. Decay rates double. Allies grow nervous.",
+      "stability_range": [
+        45,
+        70
+      ],
+      "gaussian_noise_multiplier": 1.5
+    },
+    "3": {
+      "name": "Flashpoint",
+      "description": "Binary triggers become active. Systemic collapse is possible each turn.",
+      "stability_range": [
+        0,
+        45
+      ],
+      "gaussian_noise_multiplier": 3.0
+    }
+  },
   "events": [
     {
-      "event_id": "CHINA_EMBARGO_001",
-      "title": "The Silicon Shield Drops",
-      "actor_origin": "CHINA",
-      "trigger_condition": {
-        "oil_price": ">120",
-        "global_stability": "<40"
-      },
-      "description": "Beijing has announced an 'Environmental Audit' on all semiconductor exports to the U.S. Supply chains are freezing.",
+      "event_id": "MUNDANE_BUDGET_001",
+      "title": "The Annual Budget Hearing",
+      "phase_requirement": 1,
+      "actor_origin": "DOMESTIC",
+      "description": "The Congressional Budget Office projects a modest 1.2% deficit overage. The OMB director wants direction before the floor vote.",
       "options": [
         {
           "id": "OPT_A",
-          "text": "File WTO Complaint & Subsidize Domestic Chips",
-          "requirements": {
-            "party_funds": 50
-          },
-          "threshold": 50,
+          "text": "Fiscal Hawk: Force spending cuts across discretionary programs",
+          "category": "fiscal",
+          "threshold": 55,
+          "lag_time": 10,
           "outcomes": {
             "SUCCESS": {
-              "description": "The markets stabilize slightly, but the cost of bread (and phones) just went up.",
+              "description": "Markets approve. Bond yields tighten. But the working class feels the pinch.",
               "effects": {
-                "stock_market_index": -5,
-                "bond_yields": 1.5,
-                "consumer_price_index": 2.0
+                "metric_6": -0.2,
+                "metric_5": 8.0,
+                "demo_1": -3.0
               }
             },
             "FAILURE": {
-              "description": "Silicon Valley is in freefall. Retailers report empty shelves. The base is restless.",
+              "description": "The coalition falls apart. The vote fails publicly. A perception of dysfunction spreads.",
               "effects": {
-                "stock_market_index": -20,
-                "unemployment_rate": 2.5,
-                "approval": -15
+                "metric_4": -5.0,
+                "demo_2": -4.0
               }
             }
           }
         },
         {
           "id": "OPT_B",
-          "text": "Transactional Pivot: Offer Tariff Rollbacks",
-          "category": "diplomacy",
-          "threshold": 40,
+          "text": "Stimulus Package: Approve emergency infrastructure spending",
+          "category": "fiscal",
+          "threshold": 45,
+          "lag_time": 14,
           "outcomes": {
             "SUCCESS": {
-              "description": "A 'Great Deal' is struck. You traded agricultural dominance for tech stability. It works... for now.",
+              "description": "The stimulus lands. Unemployment ticks down. CPI creeps up slightly.",
               "effects": {
-                "global_stability": 15,
-                "china_aggression": -30,
-                "stock_market_index": 10
+                "metric_7": -0.5,
+                "metric_3": 1.2,
+                "demo_1": 5.0
               }
             },
             "FAILURE": {
-              "description": "They rejected the deal and leaked the transcripts. You look weak.",
+              "description": "Supply chain bottlenecks absorb the funds. Scarcity paradox: more money, less goods.",
               "effects": {
-                "approval": -10,
-                "institutional_trust": -10,
-                "global_stability": -5
+                "metric_9": 6.0,
+                "metric_3": 3.0
+              }
+            }
+          }
+        },
+        {
+          "id": "OPT_C",
+          "text": "Defer & Investigate: Commission an independent audit",
+          "category": "institutional",
+          "threshold": 35,
+          "lag_time": 20,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "The audit reveals inefficiencies you can now champion publicly. Institutional trust ticks up.",
+              "effects": {
+                "metric_4": 4.0,
+                "demo_2": 2.0
+              }
+            },
+            "FAILURE": {
+              "description": "The audit leaks. It looks like you were hiding something. Trust collapses.",
+              "effects": {
+                "metric_4": -12.0,
+                "metric_1": -3.0
+              }
+            }
+          }
+        },
+        {
+          "id": "OPT_D",
+          "text": "Signal to Markets: Informal guidance on rate expectations",
+          "category": "economic",
+          "threshold": 60,
+          "lag_time": 3,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "The Fed signals in kind. Bond market stabilizes with barely a ripple.",
+              "effects": {
+                "metric_6": -0.1,
+                "metric_5": 5.0
+              }
+            },
+            "FAILURE": {
+              "description": "Traders interpret the signal as dovish. CPI expectations jump.",
+              "effects": {
+                "metric_3": 2.0,
+                "metric_6": 0.3
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "CHINA_EMBARGO_001",
+      "title": "The Silicon Shield Drops",
+      "phase_requirement": 2,
+      "actor_origin": "CHINA",
+      "trigger_condition": {
+        "metric_8": ">100",
+        "metric_1": "<60"
+      },
+      "description": "Beijing has announced an 'Environmental Audit' on all semiconductor exports. Supply chains are freezing. The White House Situation Room is lit up.",
+      "options": [
+        {
+          "id": "OPT_A",
+          "text": "File WTO Complaint & Subsidize Domestic Chip Fabrication",
+          "category": "economic",
+          "threshold": 50,
+          "lag_time": 15,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "Markets stabilize. TSMC's Arizona plant gets fast-tracked. But the cost of everything digital just went up.",
+              "effects": {
+                "metric_5": -5.0,
+                "metric_6": 1.5,
+                "metric_3": 2.0
+              }
+            },
+            "FAILURE": {
+              "description": "The WTO complaint is dismissed. Silicon Valley is in freefall. The working class can't afford a laptop.",
+              "effects": {
+                "metric_5": -20.0,
+                "metric_7": 2.5,
+                "metric_2": -15.0
+              }
+            }
+          }
+        },
+        {
+          "id": "OPT_B",
+          "text": "Transactional Pivot: Offer Tariff Rollbacks on Agricultural Goods",
+          "category": "diplomacy",
+          "threshold": 40,
+          "lag_time": 7,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "A deal is struck. You traded corn for silicon. Markets breathe. Allies raise an eyebrow.",
+              "effects": {
+                "metric_1": 15.0,
+                "metric_5": 10.0,
+                "demo_3": -5.0
+              }
+            },
+            "FAILURE": {
+              "description": "They rejected the deal and leaked the transcripts. You look weak and desperate.",
+              "effects": {
+                "metric_2": -10.0,
+                "metric_4": -10.0,
+                "metric_1": -5.0
+              }
+            }
+          }
+        },
+        {
+          "id": "OPT_C",
+          "text": "Rally Allies: Coordinate a G7 Counter-Response",
+          "category": "diplomatic",
+          "threshold": 55,
+          "lag_time": 21,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "The G7 presents a unified front. China pauses the audit. Global Stability recovers slightly.",
+              "effects": {
+                "metric_1": 10.0,
+                "demo_3": 8.0,
+                "metric_4": 3.0
+              }
+            },
+            "FAILURE": {
+              "description": "Germany and France break ranks. The united front collapses in a press conference. Embarrassing.",
+              "effects": {
+                "metric_1": -8.0,
+                "demo_3": -12.0
+              }
+            }
+          }
+        },
+        {
+          "id": "OPT_D",
+          "text": "Activate Strategic Reserve: Release rare earth stockpiles to industry",
+          "category": "economic",
+          "threshold": 45,
+          "lag_time": 5,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "The reserve buys 18 months. Industry stabilizes. You bought time, not a solution.",
+              "effects": {
+                "metric_9": -15.0,
+                "metric_5": 6.0
+              }
+            },
+            "FAILURE": {
+              "description": "The reserve is smaller than classified documents suggested. Industry panics when the numbers leak.",
+              "effects": {
+                "metric_9": 10.0,
+                "metric_5": -12.0,
+                "metric_4": -8.0
+              }
+            }
+          }
+        },
+        {
+          "id": "OPT_E",
+          "text": "Escalate: Place targeted sanctions on Chinese semiconductor firms",
+          "category": "kinetic_economic",
+          "threshold": 65,
+          "lag_time": 3,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "The sanctions bite. Huawei's supply chain staggers. But oil prices jump as Beijing retaliates in energy markets.",
+              "effects": {
+                "metric_8": 12.0,
+                "metric_9": 5.0,
+                "metric_1": -5.0
+              }
+            },
+            "FAILURE": {
+              "description": "The sanctions are porous. Chinese firms reroute through Malaysia. You've created friction with allies and accomplished nothing.",
+              "effects": {
+                "metric_4": -7.0,
+                "demo_3": -9.0,
+                "metric_1": -10.0
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "FLASHPOINT_HORMUZ_001",
+      "title": "The Strait Goes Dark",
+      "phase_requirement": 3,
+      "actor_origin": "IRGC",
+      "description": "IRGC remnants have mined the Strait of Hormuz. 3 tankers are dead in the water. Oil futures hit $145 in after-hours trading. The 5th Fleet is requesting orders.",
+      "options": [
+        {
+          "id": "OPT_A",
+          "text": "Full Military Escort: Deploy carrier group to clear shipping lanes",
+          "category": "kinetic",
+          "threshold": 60,
+          "lag_time": 2,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "The Navy clears the path in 48 hours. Markets recover. You look decisive. The IRGC retreats but isn't finished.",
+              "effects": {
+                "metric_8": -20.0,
+                "metric_5": 15.0,
+                "metric_2": 8.0,
+                "metric_1": 5.0
+              }
+            },
+            "FAILURE": {
+              "description": "A destroyer is hit by a drone swarm. 12 sailors KIA. The world is watching. Markets vanish.",
+              "effects": {
+                "metric_5": -40.0,
+                "metric_1": -25.0,
+                "metric_2": -20.0,
+                "metric_6": 2.0
+              }
+            }
+          }
+        },
+        {
+          "id": "OPT_B",
+          "text": "Call Beijing: Request China lean on the IRGC remnants",
+          "category": "diplomacy",
+          "threshold": 35,
+          "lag_time": 4,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "An unlikely back-channel works. The mines are removed, but China now has leverage over the Middle East architecture.",
+              "effects": {
+                "metric_8": -15.0,
+                "metric_1": 8.0,
+                "demo_3": -6.0
+              }
+            },
+            "FAILURE": {
+              "description": "China demands too high a price. You hang up. The world sees it. The Strait stays dark.",
+              "effects": {
+                "metric_8": 8.0,
+                "metric_1": -10.0
+              }
+            }
+          }
+        },
+        {
+          "id": "OPT_C",
+          "text": "Emergency Price Controls: Cap domestic gas prices by executive order",
+          "category": "domestic_economic",
+          "threshold": 40,
+          "lag_time": 1,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "Panic at the pump is averted. The working class gets a temporary break. Institutionalists hate it.",
+              "effects": {
+                "metric_3": -3.0,
+                "demo_1": 10.0,
+                "demo_2": -8.0,
+                "metric_4": -5.0
+              }
+            },
+            "FAILURE": {
+              "description": "Companies hoard supply before the cap kicks in. Shortages emerge within 72 hours. Worse than before.",
+              "effects": {
+                "metric_9": 20.0,
+                "metric_3": 5.0,
+                "demo_1": -12.0
+              }
+            }
+          }
+        },
+        {
+          "id": "OPT_D",
+          "text": "Surgical Strike: Target IRGC mine-laying infrastructure",
+          "category": "kinetic",
+          "threshold": 70,
+          "lag_time": 1,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "Precision munitions destroy the mine-laying vessels. The Strait reopens by morning. Allies rally. Adversaries recalculate.",
+              "effects": {
+                "metric_1": 12.0,
+                "metric_8": -18.0,
+                "metric_2": 10.0,
+                "demo_3": 5.0
+              }
+            },
+            "FAILURE": {
+              "description": "Collateral damage hits a civilian structure. The UN Security Council is activated. You've handed Iran a propaganda gift.",
+              "effects": {
+                "metric_1": -20.0,
+                "metric_4": -15.0,
+                "demo_3": -20.0,
+                "metric_2": -15.0
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "AMBIENT_TRADE_001",
+      "title": "WTO Dispute: Steel Tariff Challenge",
+      "phase_requirement": 1,
+      "actor_origin": "EU",
+      "description": "The European Commission has filed a formal WTO challenge against existing U.S. steel tariffs. Brussels wants a response before the committee vote.",
+      "options": [
+        {
+          "id": "OPT_A",
+          "text": "Negotiate: Offer a bilateral steel quota arrangement",
+          "category": "diplomacy",
+          "threshold": 45,
+          "lag_time": 18,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "A quiet deal is struck. Steel workers keep their jobs. European allies maintain the relationship.",
+              "effects": {
+                "metric_1": 3.0,
+                "demo_3": 4.0,
+                "demo_1": 3.0
+              }
+            },
+            "FAILURE": {
+              "description": "European negotiators reject the quota as insufficient. The WTO process resumes.",
+              "effects": {
+                "metric_4": -3.0
+              }
+            }
+          }
+        },
+        {
+          "id": "OPT_B",
+          "text": "Stand Firm: Defend the tariffs as a national security measure",
+          "category": "institutional",
+          "threshold": 55,
+          "lag_time": 5,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "The national security justification holds at the WTO. Precedent is set. Allies are frustrated but respect the resolve.",
+              "effects": {
+                "metric_4": 5.0,
+                "demo_2": 3.0,
+                "demo_3": -4.0
+              }
+            },
+            "FAILURE": {
+              "description": "The WTO panel rules against you. Retaliatory tariffs on bourbon and motorcycles are approved.",
+              "effects": {
+                "metric_3": 2.0,
+                "demo_1": -5.0,
+                "demo_3": -8.0
+              }
+            }
+          }
+        },
+        {
+          "id": "OPT_C",
+          "text": "Concede: Accept the challenge and phase out the tariffs over 3 years",
+          "category": "diplomatic",
+          "threshold": 30,
+          "lag_time": 30,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "The orderly phase-out is praised as pragmatic leadership. Transatlantic relations warm noticeably.",
+              "effects": {
+                "demo_3": 10.0,
+                "metric_4": 4.0,
+                "metric_1": 5.0
+              }
+            },
+            "FAILURE": {
+              "description": "Steel union endorsements evaporate overnight. The working class sees this as capitulation.",
+              "effects": {
+                "demo_1": -10.0,
+                "metric_2": -8.0
               }
             }
           }
