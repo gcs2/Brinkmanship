@@ -549,3 +549,36 @@ Implemented via the API Bridge, players can capture specific snapshots of their 
   1. **Phase 1: Incremental Growth** (Low variance, high mundane consistency).
   2. **Phase 2: Building Tensions** (Metric decay accelerates, Gaussian noise expands).
   3. **Phase 3: Flashpoints & War** (Binary triggers for total systemic collapse).
+
+---
+
+## **6. IDENTITY, ADVISORS, & DIPLOMATIC IMMERSION**
+
+To deepen simulation depth, the Sovereign Engine incorporates player identity markers and internal cabinet logic.
+
+### **6.1 Player Profile**
+The `State` includes a `player_profile` definition (defined in `scenario.json`):
+- **Leader Name:** Narrative identity (e.g., "President Jordan").
+- **Legal Title:** Formal address.
+- **Nuclear Stockpile:** Tracks strategic arsenal count.
+- **Executive Stress:** A numeric gauge (0-100) reflecting system-wide volatility and approval low-points.
+
+### **6.2 Inner Circle (Advisors)**
+Advisors provide narrative context and specialty-based trust metrics:
+- **Trust Metric:** Tied to `Institutional Elites` demographic support.
+- **Specialties:** Diplomacy, Defense, Economic.
+- **Narrative Role:** Advisors serve as the primary mouthpiece for Intel resolution logs.
+
+### **6.3 Diplomatic Relations Map**
+The `TacticalMap` serves as a visual ledger for foreign relations:
+- **Geospatial Pins:** Defined by exact Latitude/Longitude in the scenario.
+- **Approval Spectrum:** Pins are color-coded (Green/Amber/Red) representing the bilateral relation status.
+
+## **7. SCENARIO HOT-SWAPPING (DATA-DRIVEN CORE)**
+
+The simulation is built on an **Agnostic State Pipeline**. 
+- **Scenario Discovery:** The API scans the `/scenarios` directory to index available themes.
+- **Hot-Swap Protocol:** The UI can invoke `/api/load_scenario`, causing a total reset of the session with a new identity, metric map, and event pool without requiring a software rebuild.
+
+---
+

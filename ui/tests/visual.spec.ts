@@ -21,19 +21,39 @@ test.describe('Sovereign Interface Visual Verification', () => {
 
     test('Dossier Modal visual check', async ({ page }) => {
         await page.goto('http://localhost:3000');
-
-        // Wait for the main tactical grid to hydrate
         await page.waitForSelector('.panel', { timeout: 30000 });
-
-        // Trigger the dossier modal via the "Advance Chronos" button
         await page.click('button:has-text("Advance Chronos")');
-
-        // Wait for modal transition with longer timeout
         await page.waitForSelector('h3:has-text("Priority Dossier")', { timeout: 10000 });
 
-        // Take snapshot of the high-stakes decision UI
-        const modal = page.locator('.panel').filter({ hasText: 'Priority Dossier' });
+        const modal = page.locator('.fixed.right-0'); // Select the sliding pane
         await expect(modal).toBeVisible();
-        await expect(modal).toHaveScreenshot('dossier-modal.png');
+        await expect(modal).toHaveScreenshot('dossier-pane.png');
+    });
+
+    test('Identity Panel & Advisors check', async ({ page }) => {
+        await page.goto('http://localhost:3000');
+        await page.waitForSelector('.panel');
+
+        const identity = page.locator('.col-span-3').first(); // Left column contains Identity
+        await expect(identity).toHaveScreenshot('identity-panel.png');
+    });
+
+    test('Intel Feed and Metric Readout check', async ({ page }) => {
+        await page.goto('http://localhost:3000');
+        await page.waitForSelector('.panel');
+
+        const intel = page.locator('.col-span-6 .panel').last(); // Bottom center is Intel
+        await expect(intel).toHaveScreenshot('intel-feed.png');
+    });
+
+    test('Scenario Selector menu check', async ({ page }) => {
+        await page.goto('http://localhost:3000');
+        await page.waitForSelector('button:has-text("Swap Config")');
+
+        await page.click('button:has-text("Swap Config")');
+        const menu = page.locator('.absolute.top-full.right-0');
+        await expect(menu).toBeVisible();
+        await expect(menu).toHaveScreenshot('scenario-menu.png');
     });
 });
+

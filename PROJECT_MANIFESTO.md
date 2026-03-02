@@ -70,3 +70,16 @@ Each variable in the Sovereign Engine is designed to create specific psychologic
 ### **9. Scarcity Index (metric_9) - [The Bottleneck]**
 *   **Meaning**: Availability of scenario-critical resources (Rare Earths / Mana / Credits).
 *   **The Fun**: It creates artificial scarcity. You might have the money (metric_5), but if the Scarcity Index is high, you can't build the solution. It’s the ultimate strategic blocker.
+
+---
+
+## **V. THE DATA-DRIVEN DOCTRINE**
+
+Brinkmanship is not a game; it is an **Engine for Geopolitical Scenarios**. To preserve architectural integrity, there must be no "ad-hoc" solutions in the codebase.
+
+1. **Total Configuration**: If a feature requires a specific UI element (like a "Nuclear Stockpile" readout or a "Great Power" pin), it must be defined in the `scenario.json` and parsed by the frontend.
+2. **Theme Agnosticism**: The engine makes zero assumptions about the timeline. A "Modern" scenario and a "Fantasy" scenario use the same React components, differing only in their JSON payloads.
+3. **The Sovereign Dispatch**: Major architectural shifts must be reported to Management to ensure compliance with the "Fincher-Noir" aesthetic and functional immutability.
+
+---
+
