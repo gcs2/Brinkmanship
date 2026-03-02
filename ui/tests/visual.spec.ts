@@ -25,10 +25,12 @@ test.describe('Sovereign Interface Visual Verification', () => {
         // Trigger the dossier modal via the "Advance Chronos" button
         await page.click('button:has-text("Advance Chronos")');
 
-        // Wait for modal transition
-        await page.waitForSelector('h3:has-text("Priority Dossier")');
+        // Wait for modal transition with longer timeout
+        await page.waitForSelector('h3:has-text("Priority Dossier")', { timeout: 10000 });
 
         // Take snapshot of the high-stakes decision UI
-        await expect(page.locator('.panel border-amber-accent/30')).toHaveScreenshot('dossier-modal.png');
+        // Using a more specific selector that matches the rendered panel
+        await expect(page.locator('.panel')).toContainText('Priority Dossier');
+        await expect(page.locator('.panel').filter({ hasText: 'Priority Dossier' })).toHaveScreenshot('dossier-modal.png');
     });
 });

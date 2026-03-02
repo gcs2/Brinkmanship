@@ -24,3 +24,7 @@ This document serves as the persistent rulebook and guidelines for any AI agents
 ## 5. Artifact generation
 - For complex tasks, output `task.md`, `implementation_plan.md`, and `walkthrough.md` to cleanly separate the intent, step tracking, and results for the user's review.
 - For audit steps, produce an `audit_report.md` artifact detailing findings objectively.
+
+## 6. Version Control Hygiene
+- **Small, Frequent Pushes**: Avoid monolithic commits. Push logical units of work (e.g., "Updated API tests", "Refined UI styles") frequently to the remote repository.
+- Ensure every major implementation phase is backed up to GitHub before moving to the next.
