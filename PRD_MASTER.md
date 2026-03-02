@@ -247,7 +247,7 @@ To make this possible and efficient, we will use a **Model-View-Controller (MVC)
 *   \[ \] **Chunk 2: The Event Schema** (Define the JSON for "Black Swan" events).  
 *   \[ \] **Chunk 3: The Diplomatic Ledger** (Calculating ally/enemy reactions).  
 *   \[ \] **Chunk 4: The Election Algorithm** (The math behind the 119th Midterms).  
-*   \[ \] **Chunk 5: Audio/SFX Pallet** (The sound of a ticking clock, the hum of a secure line).
+*   \[X\] **Chunk 5: Identity & Immersion Schema** (Player Profile, Advisors, Great Powers JSON blocks).
 
 ### **Jarvis Guidance on Implementation:**
 

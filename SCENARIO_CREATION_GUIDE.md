@@ -22,6 +22,20 @@ The `scenario.json` file contains **everything** the game needs to run:
     "tactical_map_tint": "#00FFCC"
   },
   
+  "player_profile": {
+    "country": "Megacorp Arasaka",
+    "leader_name": "Saburo",
+    "title": "CEO"
+  },
+  
+  "great_powers": [
+    { "id": "MIL", "name": "Militech", "lat": 40.7128, "lon": -74.0060, "base_approval": 10.0 }
+  ],
+  
+  "advisors": [
+    { "id": "HEAD_SEC", "name": "Adam S.", "role": "Head of Security", "specialty": "defense", "base_trust": 85 }
+  ],
+  
   "mappings": {
     "metrics": {
       "metric_1": "Grid Stability",
