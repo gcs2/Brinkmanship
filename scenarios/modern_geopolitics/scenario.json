@@ -88,6 +88,15 @@
   ],
   "assets": {
     "background_image": "/assets/modern_geopolitics/bg.webp",
-    "dossier_modal_bg": "/assets/modern_geopolitics/modal.webp"
+    "dossier_modal_bg": "/assets/modern_geopolitics/modal.webp",
+    "ui_context": {
+      "noir_filter": "amber",
+      "scanline_opacity": 0.15
+    },
+    "audio_texture": {
+      "ambient_loop": "analog_stress_v3",
+      "click_relay": "heavy_mechanical_relay",
+      "interface_hum": "secure_line_low_freq"
+    }
   }
 }

@@ -5,7 +5,7 @@ import os
 import json
 import datetime
 from pydantic import BaseModel
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 # Add engine path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'engine'))
@@ -17,16 +17,42 @@ app = FastAPI(title="Sovereign API Bridge")
 # Enable CORS for React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust for production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Global State Management
+# --- Schemas (Manifesto Compliant) ---
+
+class MetricState(BaseModel):
+    id: str
+    label: str
+    value: float
+    volatility: float
+    trend: List[float]
+
+class GameStateSnapshot(BaseModel):
+    turn_id: int
+    current_date: str
+    metrics: Dict[str, float]
+    formatted_metrics: List[MetricState]
+    active_scenario: str
+    ui_context: Optional[Dict[str, Any]] = None
+    audio_texture: Optional[Dict[str, Any]] = None
+
+class ActionRequest(BaseModel):
+    action_type: str
+    target: str
+    amount: float
+
+class EventDecisionRequest(BaseModel):
+    event_id: str
+    option_id: str
+
+# --- Persistence Stack ---
 SCENARIO = "modern_geopolitics"
-state_history = []
-current_state = None
+state_history: List[State] = []
 processor = None
 scenario_config = {}
 
@@ -56,7 +82,7 @@ def get_initial_state() -> State:
     )
 
 def load_system():
-    global current_state, processor, scenario_config, state_history
+    global processor, scenario_config, state_history
     processor = EventProcessor(SCENARIO)
     
     config_path = os.path.join(os.path.dirname(__file__), '..', 'scenarios', SCENARIO, 'scenario.json')
@@ -66,32 +92,40 @@ def load_system():
     except FileNotFoundError:
         scenario_config = {}
         
-    current_state = get_initial_state()
-    state_history = [current_state]
+    initial_state = get_initial_state()
+    state_history = [initial_state]
 
 load_system()
 
-# Request Models
-class ActionRequest(BaseModel):
-    action_type: str
-    target: str
-    amount: float
+def format_state(state: State) -> GameStateSnapshot:
+    """Translates engine State to UI-ready Snapshot"""
+    formatted_metrics = []
+    mappings = scenario_config.get("mappings", {}).get("metrics", {})
+    
+    for mid, val in state.metrics.items():
+        formatted_metrics.append(MetricState(
+            id=mid,
+            label=mappings.get(mid, mid),
+            value=val,
+            volatility=state.system.get("volatility", 0.0),
+            trend=[] # In the future, this would be sliced from state_history
+        ))
+        
+    return GameStateSnapshot(
+        turn_id=len(state_history),
+        current_date=state.current_date.isoformat(),
+        metrics=state.metrics,
+        formatted_metrics=formatted_metrics,
+        active_scenario=SCENARIO,
+        ui_context=scenario_config.get("assets", {}).get("ui_context"),
+        audio_texture=scenario_config.get("assets", {}).get("audio_texture")
+    )
 
-class EventDecisionRequest(BaseModel):
-    event_id: str
-    option_id: str
-
-@app.get("/api/state")
+@app.get("/api/state", response_model=GameStateSnapshot)
 def get_state():
-    if current_state is None:
-        raise HTTPException(status_code=500, detail="State not initialized")
-    return {
-        "current_date": current_state.current_date.isoformat(),
-        "metrics": current_state.metrics,
-        "demographics": current_state.demographics,
-        "system": current_state.system,
-        "turn": len(state_history)
-    }
+    if not state_history:
+        raise HTTPException(status_code=500, detail="State history empty")
+    return format_state(state_history[-1])
 
 @app.get("/api/config")
 def get_config():
@@ -99,23 +133,42 @@ def get_config():
 
 @app.post("/api/action")
 def submit_action(req: ActionRequest):
-    global current_state
+    global state_history
+    current_state = state_history[-1]
     
     action = {"type": req.action_type, "target": req.target, "amount": req.amount}
-    current_state = apply_action(current_state, action)
+    new_state = apply_action(current_state, action)
     
-    return {"status": "success", "new_state": get_state()}
+    # In a real action, we might push to history, but usually turns push to history
+    # For now, we update the head of the current turn
+    state_history[-1] = new_state
+    return {"status": "success", "new_state": format_state(new_state)}
 
 @app.post("/api/turn")
 def next_turn():
-    global current_state
-    current_state = update_turn(current_state)
-    state_history.append(current_state)
-    return {"status": "success", "new_state": get_state()}
+    global state_history
+    new_state = update_turn(state_history[-1])
+    state_history.append(new_state)
+    
+    # Cap history at 50 snapshots (Manifesto Requirement)
+    if len(state_history) > 50:
+        state_history.pop(0)
+        
+    return {"status": "success", "new_state": format_state(new_state)}
+
+@app.post("/api/rewind")
+async def rewind_simulation():
+    global state_history
+    if len(state_history) > 1:
+        state_history.pop()
+        return {"status": "rewound", "new_state": format_state(state_history[-1])}
+    return {"status": "at_origin", "new_state": format_state(state_history[-1])}
 
 @app.post("/api/resolve_event")
 def resolve_event(req: EventDecisionRequest):
-    global current_state
+    global state_history
+    current_state = state_history[-1]
+    
     event = processor.load_event_from_json(req.event_id)
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -126,14 +179,16 @@ def resolve_event(req: EventDecisionRequest):
         
     outcome_key, actions, narrative = processor.resolve_event(option, current_state)
     
+    new_state = current_state
     for action in actions:
-        current_state = apply_action(current_state, action)
-        
+        new_state = apply_action(new_state, action)
+    
+    state_history[-1] = new_state
     return {
         "status": "success",
         "outcome": outcome_key,
         "narrative": narrative,
-        "state": get_state()
+        "state": format_state(new_state)
     }
 
 if __name__ == "__main__":

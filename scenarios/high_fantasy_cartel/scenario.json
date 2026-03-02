@@ -2,7 +2,7 @@
   "theme_name": "High Fantasy Cartel",
   "mappings": {
     "metrics": {
-      "metric_1": "Realm Stability",
+      "metric_1": "Global Stability",
       "metric_2": "Guild Favor",
       "metric_3": "Mana Inflation",
       "metric_4": "Arcane Trust",
@@ -88,6 +88,15 @@
   ],
   "assets": {
     "background_image": "/assets/high_fantasy_cartel/bg.webp",
-    "dossier_modal_bg": "/assets/high_fantasy_cartel/modal.webp"
+    "dossier_modal_bg": "/assets/high_fantasy_cartel/modal.webp",
+    "ui_context": {
+      "noir_filter": "green",
+      "scanline_opacity": 0.08
+    },
+    "audio_texture": {
+      "ambient_loop": "resonant_shadows_v1",
+      "click_relay": "tempered_glass_ring",
+      "interface_hum": "subsonic_choral_drone"
+    }
   }
 }

@@ -2,7 +2,7 @@
   "theme_name": "Cyberpunk Syndicate",
   "mappings": {
     "metrics": {
-      "metric_1": "Grid Stability",
+      "metric_1": "Global Stability",
       "metric_2": "Street Cred",
       "metric_3": "CredChip Inflation",
       "metric_4": "Corp Trust",
@@ -88,6 +88,15 @@
   ],
   "assets": {
     "background_image": "/assets/cyberpunk_syndicate/bg.webp",
-    "dossier_modal_bg": "/assets/cyberpunk_syndicate/modal.webp"
+    "dossier_modal_bg": "/assets/cyberpunk_syndicate/modal.webp",
+    "ui_context": {
+      "noir_filter": "blue",
+      "scanline_opacity": 0.25
+    },
+    "audio_texture": {
+      "ambient_loop": "data_friction_v1",
+      "click_relay": "neural_handshake_chirp",
+      "interface_hum": "cooling_system_pulse"
+    }
   }
 }
