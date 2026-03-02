@@ -2,14 +2,15 @@
   "theme_name": "Cyberpunk Syndicate",
   "mappings": {
     "metrics": {
-      "metric_1": "Global Stability",
+      "metric_1": "Grid Stability",
       "metric_2": "Street Cred",
       "metric_3": "CredChip Inflation",
       "metric_4": "Corp Trust",
       "metric_5": "Neuro-Net Integrity",
       "metric_6": "Cyberware Costs",
       "metric_7": "Meatspace Unrest",
-      "metric_8": "Energy Credits"
+      "metric_8": "Energy Credits",
+      "metric_9": "Scarcity Index"
     },
     "demographics": {
       "demo_1": "Street Punks & Edgerunners",

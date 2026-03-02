@@ -16,7 +16,7 @@ class State:
         if key in new_metrics:
             new_metrics[key] = round(new_metrics[key] + value, 4)
             # Bounds checking for percentages and specific metrics
-            if key in ('metric_1', 'metric_2', 'metric_4'):
+            if key in ('metric_1', 'metric_2', 'metric_4', 'metric_9'):
                 new_metrics[key] = max(0.0, min(100.0, new_metrics[key]))
         return State(self.current_date, new_metrics, self.demographics, self.system)
 
@@ -55,6 +55,7 @@ def update_turn(state: State) -> State:
         new_metrics["metric_6"] += (decay_factor * 0.01)  # Bond yield equivalent
         new_metrics["metric_7"] += (decay_factor * 0.005) # Unemployment equivalent
         new_metrics["metric_8"] += (decay_factor * 0.5)   # Oil equivalent
+        new_metrics["metric_9"] += (decay_factor * 1.2)   # Scarcity equivalent
         new_sys["volatility"] += (decay_factor * 0.2)
 
     # GFI Calculation: (Volatility * 0.4) + (Provocation * 0.6)

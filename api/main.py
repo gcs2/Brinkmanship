@@ -68,6 +68,7 @@ def get_initial_state() -> State:
             "metric_6": 4.5,
             "metric_7": 4.0,
             "metric_8": 75.0,
+            "metric_9": 10.0,
         },
         demographics={
             "demo_1": 50.0,

@@ -32,4 +32,6 @@ The Python backend is the "Brain"; the React frontend is the "Eyes." They commun
 ---
 
 ## **IV. THE "PRIMARY METRIC" CONFIGURATION**
-The legacy `primary_metric_a` is now officially standardized as **Global Stability**. This metric acts as the Core Volatility Anchor across all scenario skins, representing the macro-level equilibrium of the simulation.
+The legacy `primary_metric_a` is now officially standardized as **Global Stability**. 
+
+Additionally, we have implemented the **Scarcity Index (metric_9)** as a core derivative metric. This variable tracks the availability of critical resources (Rare Earths, Mana, or Energy Credits) and is directly tied to the global fear and stability indices.
