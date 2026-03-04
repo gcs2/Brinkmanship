@@ -1,0 +1,64 @@
+# **LOCAL TESTING & BUILD PROTOCOL**
+
+This document provides instructions for Management to execute and verify the **Sovereign Engine** locally.
+
+---
+
+## **I. PREREQUISITES**
+
+- **Node.js**: v18+ (Required for the `ui/` React environment).
+- **Python**: 3.9+ (Required for the `engine/` and [api/](file:///c:/Users/zephy/Documents/Brinkmanship/api/main.py#287-297) layers).
+- **PowerShell**: Execution Policy must allow script runs (e.g., `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`).
+
+---
+
+## **II. THE "ONE-CLICK" BUILD**
+
+We have delivered a unified script to handle dependency installation, verification, and launch.
+
+### **Command:**
+```powershell
+./build_app.ps1
+```
+
+### **What it does:**
+1. Installs Node.js dependencies in the `ui/` directory.
+2. Runs the **Playwright Visual Verification** suite.
+3. Kills any stale processes on ports 3000 and 8000.
+4. Launches the **Sovereign API Bridge** (port 8000).
+5. Launches the **Sovereign Interface Telemetry** (port 3000).
+
+---
+
+## **III. MANUAL VERIFICATION STEPS**
+
+If you prefer to run components individually:
+
+### **1. Launch the Backend API**
+```powershell
+python api/main.py
+```
+*Verification: Navigate to `http://localhost:8000/api/config` to see the JSON scenario payload.*
+
+### **2. Launch the UI Interface**
+```powershell
+cd ui
+npm.cmd run dev
+```
+*Verification: Navigate to `http://localhost:3000` to access the War Room.*
+
+### **3. Hot-Swap Test**
+1. Locate the **"Swap Config"** button in the top right of the UI.
+2. Select **"Load COLD WAR 1983"**.
+3. Confirm the header subtext and internal metrics (e.g., "Nuclear Arsenal") update to the 1983 baseline.
+
+---
+
+## **IV. THE FUTURE WORKS AUDIT**
+
+To review the roadmap for the Grand Strategy expansion:
+- Refer to **[FUTURE_WORKS.md](file:///C:/Users/zephy/.gemini/antigravity/brain/62d1a7c0-c33c-4c22-a2e9-e96acc9f6342/FUTURE_WORKS.md)** for Feature IDs (e.g., `ECO-001`, `MIL-001`).
+- Refer to **[walkthrough.md](file:///C:/Users/zephy/.gemini/antigravity/brain/62d1a7c0-c33c-4c22-a2e9-e96acc9f6342/walkthrough.md)** for the final session summary.
+
+---
+**Status**: Environment Partitioned. Systems Ready.

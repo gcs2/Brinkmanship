@@ -6,7 +6,7 @@ Write-Host "--- INITIALIZING SOVEREIGN BUILD CYCLE ---" -ForegroundColor Cyan
 # 1. Dependency Check
 Write-Host "Verifying Node.js and Python dependencies..." -ForegroundColor Gray
 Set-Location -Path "$PSScriptRoot\ui"
-& npm.cmd install --quiet
+& npm.cmd install --quiet --legacy-peer-deps
 Set-Location -Path "$PSScriptRoot"
 # Assuming pip requirements are static for now, or add: pip install -r requirements.txt
 

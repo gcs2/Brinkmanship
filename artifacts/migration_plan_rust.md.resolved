@@ -1,0 +1,57 @@
+# MIGRATION PLAN: THE RUST PIVOT (PHASE 0)
+
+## ⚡ EXECUTIVE SUMMARY
+To support the intensive CPU requirements of the Phase 14 "Multi-Agent Autonomous Simulator" (where 50+ AI actors will iteratively clone game state for decision calculus), the backend will be completely rewritten from **Python (FastAPI)** to **Rust (Axum)**.
+
+This migration relies on an **ECS-Lite** (Entity-Component-System) structure tailored for a REST API. It maintains strict immutability but flattens the State object into highly performant HashMaps, eliminating the "Player-Centric" bottleneck identified in the Architecture Audit.
+
+---
+
+## 🛠️ ARCHITECTURAL STACK
+
+1. **Web Framework**: **Axum** 
+   - *Why:* Built on top of `tokio` and `hyper`, it offers macro-free routing, immense concurrency, and seamless integration with the Rust async ecosystem. Highly performant for JSON serialization via `serde`.
+2. **State Management**: **Immutable Structs**
+   - *Why:* We will maintain the purely functional [update_turn(state) -> State](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py#83-201) paradigm, but struct cloning in Rust is orders of magnitude faster and memory-safe compared to Python's `copy.deepcopy()`.
+3. **Architecture Pattern**: **Headless ECS-Lite**
+   - *Why:* Instead of nested monolithic objects, game data is stored in isolated component HashMaps keyed by an `EntityId` (e.g., "USA", "RUS", "PLAYER").
+
+---
+
+## 🗺️ MIGRATION ROADMAP
+
+### [Phase 0.1]: Skeleton & Schema Definition
+- Initialize Cargo workspace (`brinkmanship_engine`).
+- Add core dependencies: `axum`, `tokio`, `serde`, `serde_json`, `uuid`, `rand`.
+- Define the Rust variants of the [State](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py#27-72), [PendingAction](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py#16-26), and `Entity` structs.
+
+### [Phase 0.2]: The Engine Port (`state_manager` -> `src/chronos.rs`)
+- Port the Gaussian decay calculus.
+- Port the [apply_action](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py#227-238) and `resolve_on_turn` logic to a Rust `ChronosEngine` trait/implementation.
+- Immutability check: `fn tick(current: &State) -> State`.
+
+### [Phase 0.3]: The Reactor Port (`event_processor` -> `src/reactor.rs`)
+- Port [scenario.json](file:///c:/Users/zephy/Documents/Brinkmanship/scenarios/cold_war_1983/scenario.json) deserialization.
+- Re-implement the Gaussian Success/Failure determination (`random.gauss` equivalent using the `rand_distr` crate).
+
+### [Phase 0.4]: API Bridge & Parity ([api/main.py](file:///c:/Users/zephy/Documents/Brinkmanship/api/main.py) -> `src/main.rs`)
+- Stand up Axum routes mapping precisely to existing UI fetch calls:
+  - `GET /api/state`
+  - `GET /api/config`
+  - `GET /api/scenarios`
+  - `POST /api/turn`
+  - `POST /api/resolve_event`
+  - `POST /api/load_scenario`
+- **UI Contract**: The React frontend must not require a single line of code altered to connect to the Rust backend.
+
+---
+
+## ✅ VERIFICATION PLAN
+
+### Concept Proof
+- The UI's `START CHRONOS` button must trigger the Axum `/api/turn` route and render the timeline without breaking shape.
+
+### Automated Testing
+- Leverage `cargo test`.
+- Write unit tests for `chronos::tick` asserting that a single tick processes actions exactly as Python did.
+- Use the existing Playwright suite ([tests/visual.spec.ts](file:///c:/Users/zephy/Documents/Brinkmanship/ui/tests/visual.spec.ts)) against the Rust server on Port 8000. If the snapshots match, the migration is mathematically identical.
