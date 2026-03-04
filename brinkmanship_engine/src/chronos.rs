@@ -1,4 +1,4 @@
-use crate::state::{State, MetricsComponent, DemographicsComponent, SystemComponent, IdeologyComponent};
+use crate::state::{State, PendingAction};
 use rand::prelude::*;
 use rand_distr::Normal;
 use chrono::{NaiveDate, Duration};
@@ -26,7 +26,7 @@ impl Chronos {
         let mut next_demographics = state.demographics.clone();
         let mut next_system_states = state.system_states.clone();
         let mut new_action_logs = state.action_logs.clone();
-        let mut still_pending = Vec::new();
+        let mut still_pending: Vec<PendingAction> = Vec::new();
 
         // 1. Resolve Pending Actions
         for pa in &state.pending_actions {
@@ -242,5 +242,46 @@ mod tests {
         assert_eq!(next_state.turn_id, 1);
         assert_eq!(next_state.current_date, "2025-01-21");
         assert_eq!(state.turn_id, 0);
+        assert_eq!(state.metrics.get("PLAYER").unwrap().stability, 80.0);
+    }
+
+    #[test]
+    fn test_action_resolution() {
+        let chronos = Chronos;
+        let mut state = create_mock_state();
+        
+        state.pending_actions.push(PendingAction {
+            action_id: "test_1".to_string(),
+            source_entity: "PLAYER".to_string(),
+            target_entity: "PLAYER".to_string(),
+            option_label: "Investment".to_string(),
+            resolve_on_turn: 1,
+            action_type: "metric".to_string(),
+            target: "metric_1".to_string(), // stability
+            amount: 5.0,
+        });
+
+        let next_state = chronos.tick(&state);
+        
+        let player_metrics = next_state.metrics.get("PLAYER").unwrap();
+        // Stability should have increased
+        assert!(player_metrics.stability > 80.0);
+        assert_eq!(next_state.pending_actions.len(), 0);
+    }
+
+    #[test]
+    fn test_phase_transition() {
+        let chronos = Chronos;
+        let mut state = create_mock_state();
+        
+        // Force low stability
+        state.metrics = state.metrics.alter(|m| {
+            let mut m = m.unwrap_or_default();
+            m.stability = 30.0;
+            Some(m)
+        }, "PLAYER".to_string());
+        
+        let next_state = chronos.tick(&state);
+        assert_eq!(next_state.active_phase, PHASE_FLASHPOINT);
     }
 }

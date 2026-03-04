@@ -39,7 +39,7 @@ A hidden (or visible) variable that determines the stability of the system.
 
 ### **2.3 The Sovereign Metric Model**
 
-The engine tracks 9 high-resolution variables to calculate the world state.
+The engine tracks 11 high-resolution variables to calculate the world state.
 
 * **Global Stability (metric_1):** The macro-anchor. Everything decays faster when this is low.
 * **Approval Rating (metric_2):** Weighted average of demographic favor.
@@ -50,6 +50,8 @@ The engine tracks 9 high-resolution variables to calculate the world state.
 * **Unemployment Rate (metric_7):** The "Street Pressure" multiplier for unrest.
 * **Oil / Energy Price (metric_8):** The geopolitical lever affecting all economic flows.
 * **Scarcity Index (metric_9):** Strategic bottleneck for scenario-critical resources.
+* **Ideology Component:** An Authoritarian-Libertarian and Planned-Market axis tracking the systemic drift of each entity.
+* **Intel Feed:** A narrative repository for non-interactive event logs and background simulation feedback.
 
 ## ---
 
@@ -84,7 +86,7 @@ The game simulates the **119th Midterm Election** as a "Boss Fight."
 
 * **Backend Engine**: **Rust** (2021 Edition).
 * **Web Framework**: **Axum** (Asynchronous, High-Performance).
-* **State Management**: Functional Immutable State with **Structural Sharing** (`im` crate).
+* **State Management**: Functional Immutable State with **O(1) Structural Sharing** via the `im` crate.
 * **Frontend UI**: React / Next.js with **Zustand** (for global telemetry).
 * **Event Parser**: Deterministic Gaussian Resolution Engine (Rust Port).
 

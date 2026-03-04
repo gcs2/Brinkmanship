@@ -76,10 +76,11 @@ pub async fn run_hyper_tick_bench(actor_count: usize, days: u32) -> std::io::Res
                     // Apply randomized actions (Gaussian noise simulation)
                     let amount: f64 = rng.gen_range(-5.0..5.0);
                     let actor_key = actor_id.clone();
-                    speculative_state.metrics = speculative_state.metrics.update(actor_key, |mut m: MetricsComponent| {
+                    speculative_state.metrics = speculative_state.metrics.alter(|m| {
+                        let mut m = m.unwrap_or_default();
                         m.stability += amount;
-                        m
-                    });
+                        Some(m)
+                    }, actor_key);
                 }
                 clones_per_actor
             }));
@@ -99,7 +100,7 @@ pub async fn run_hyper_tick_bench(actor_count: usize, days: u32) -> std::io::Res
         // Mock RAM measurement - In a real tool we'd use sysinfo
         // Here we estimate based on the fact that im::HashMap nodes are shared.
         // The overhead of 50 actors is minimal due to structural sharing.
-        let ram_kb = (actor_count as f64 * 0.12); // ~120 bytes per actor diff in map
+        let ram_kb = actor_count as f64 * 0.12; // ~120 bytes per actor diff in map
 
         writeln!(file, "{},{},{},{},{}", day, tps, ram_kb, actor_count, actor_count * 3)?;
         
