@@ -23,3 +23,8 @@ uuid = { version = "1.0", features = ["v4", "serde"] }
 
 # Immutable & Structurally Shared Collections for O(1) cloning
 im = { version = "15.1", features = ["serde"] }
+
+# HTTP Utilities for Axum
+tower-http = { version = "0.5", features = ["cors", "fs"] }
+serde_with = "3.0"
+chrono = { version = "0.4", features = ["serde"] }
