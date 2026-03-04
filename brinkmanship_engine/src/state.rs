@@ -24,8 +24,9 @@ pub struct DemographicsComponent {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct IdeologyComponent {
-    pub authoritarian_axis: f64,
-    pub economic_axis: f64,
+    pub authoritarian_libertarian: f64, // -1.0 to 1.0
+    pub planned_market: f64,            // -1.0 to 1.0
+    pub overton_radius: f64,            // The current "Acceptable" zone
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
@@ -47,7 +48,7 @@ pub struct PendingAction {
     pub amount: f64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct State {
     pub turn_id: u32,
     pub current_date: String,
@@ -60,6 +61,7 @@ pub struct State {
 
     pub pending_actions: Vec<PendingAction>,
     pub action_logs: Vec<String>,
+    pub intel_feed: Vec<String>,
     pub volatility_history: Vec<f64>,
 }
 

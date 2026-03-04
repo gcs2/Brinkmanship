@@ -1,0 +1,43 @@
+# Phase 14: Autonomous World Engine
+
+## Goal Description
+Management has mandated the transition of the Brinkmanship engine from a reactive state to an active, multi-agent environment. Before implementing the full AI Director, we must empirically validate the O(1) cloning architecture via a "Clone Collision" stress test. Following this, we will execute the "Ideology & Diplomacy Refactor" to introduce the Overton Window and Regional Event Decks, finalizing the infrastructure for the "Ayatollah Succession" scenario.
+
+## User Review Required
+> [!CAUTION]
+> **Stress Test Saturation**: The Stress Test involves spawning 50+ concurrent Tokio threads performing high-frequency Gaussian math and state cloning. This will aggressively saturate the local CPU. The [test_rust_engine.ps1](file:///c:/Users/zephy/Documents/Brinkmanship/test_rust_engine.ps1) runner will be used to ensure OS-level stability during execution.
+
+## Proposed Changes
+
+### Phase 14.1: Sovereign Stress Test (Directive A)
+- **Implement `ai_director_stress.rs`**: Create a module that spawns 50 concurrent tasks representing ghost factions. Each faction will perform 3-5 speculative state clones per tick and apply randomized actions using the `Chaos_Modifier`.
+- **Benchmarking Suite**: Create a specialized test to run a 365-day internal loop, bypassing the Axum bridge to measure pure engine throughput.
+- **Metrics Export**: Develop logic to output `benchmarks/stress_test_v1.csv` tracking TPS, RAM per batch, and max concurrent clones.
+
+### Phase 14.2: Ideology & The Overton Vector (Directive B.1)
+- **State Expansion**: Modify [src/state.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs) to include [IdeologyComponent](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs#26-30) containing `authoritarian_libertarian`, `planned_market`, and `overton_radius`.
+- **Default Implementations**: Update the initialization logic to securely inject these default values into the ECS-Lite HashMaps.
+
+### Phase 14.3: UX/UI Build - Ideology Compass (Directive B.3)
+- **Component Creation**: Construct `IdeologyCompass.tsx` in the React frontend.
+- **Design Aesthetic**: Adhere to the "Fincher-Noir Baseline" (Slate Grays/Amber, Brutalist Grid).
+- **Visualization**: Plot the player's ideological coordinates and visualize the `overton_radius` as a shifting boundary.
+
+### Phase 14.4: Deck Aggregation & Regionality (Directive B.2)
+- **JSON Structure**: Split [scenario.json](file:///c:/Users/zephy/Documents/Brinkmanship/scenarios/cold_war_1983/scenario.json) events into regional decks (e.g., `events_global.json`, `events_iran.json`).
+- **Reactor Refactor**: Update [src/reactor.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/reactor.rs) to aggregate these decks upon initialization and filter the draw pool based on the `EntityId` currently active.
+
+### Phase 14.5: The Intelligence Briefing & Lagged Actions (Directive B.4/Management Feedback)
+- **Action Queueing**: Refactor [src/chronos.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/chronos.rs) to process actions over $N$ turns based on a new `lag_time` attribute.
+- **Intel Feed API**: Update the Axum `/api/state` or a new `/api/intel` endpoint to return an `intel_feed` array showing resolving actions.
+- **The Chronos Sweep**: Implement the 1px vertical scanning line in the React HUD to visually signal turn advancement, replacing the jarring modals.
+
+## Verification Plan
+
+### Automated Tests
+- Run the 365-day "Hyper-Tick" benchmark test.
+- Verify `stress_test_v1.csv` proves TPS > 60 and RAM overhead scaling sub-linearly with cloned entities.
+
+### Manual Verification
+- Review the React UI to ensure the Ideology Compass accurately reflects the backend state.
+- Trigger a lagged action via the UI and perform a "Chronos Sweep" to visually verify the action resolving after $N$ turns in the Intel Feed.

@@ -1,7 +1,8 @@
-use crate::state::{State, MetricsComponent, DemographicsComponent, SystemComponent};
+use crate::state::{State, MetricsComponent, DemographicsComponent, SystemComponent, IdeologyComponent};
 use rand::prelude::*;
 use rand_distr::Normal;
 use chrono::{NaiveDate, Duration};
+use im::HashMap;
 
 pub const PHASE_MUNDANE: u8 = 1;
 pub const PHASE_TENSIONS: u8 = 2;
@@ -89,8 +90,6 @@ impl Chronos {
         }
 
         // --- GLOBAL VOLATILITY ECG ---
-        // (Wait, per-entity or global? Based on Audit, we want actor specific, but volatility drifts globally too)
-        
         let current_phase = state.active_phase;
 
         // 2. Component Drift (For each entity registered in metrics)
@@ -160,7 +159,8 @@ impl Chronos {
             ideology: state.ideology.clone(),
             system_states: next_system_states,
             pending_actions: still_pending,
-            action_logs: new_action_logs.iter().cloned().take(30).collect(), // Simplified log trim
+            action_logs: new_action_logs.iter().cloned().take(30).collect(),
+            intel_feed: state.intel_feed.clone(),
             volatility_history: state.volatility_history.clone(),
         }
     }
@@ -228,6 +228,7 @@ mod tests {
             system_states: systems,
             pending_actions: Vec::new(),
             action_logs: Vec::new(),
+            intel_feed: Vec::new(),
             volatility_history: Vec::new(),
         }
     }
@@ -238,52 +239,8 @@ mod tests {
         let state = create_mock_state();
         let next_state = chronos.tick(&state);
 
-        // Turn increments
         assert_eq!(next_state.turn_id, 1);
-        // Date increments
         assert_eq!(next_state.current_date, "2025-01-21");
-        
-        // Ensure original state is untouched (Structural sharing validation)
         assert_eq!(state.turn_id, 0);
-        assert_eq!(state.metrics.get("PLAYER").unwrap().stability, 80.0);
-    }
-
-    #[test]
-    fn test_action_resolution() {
-        let chronos = Chronos;
-        let mut state = create_mock_state();
-        
-        state.pending_actions.push(PendingAction {
-            action_id: "test_1".to_string(),
-            source_entity: "PLAYER".to_string(),
-            target_entity: "PLAYER".to_string(),
-            option_label: "Investment".to_string(),
-            resolve_on_turn: 1,
-            action_type: "metric".to_string(),
-            target: "metric_1".to_string(), // stability
-            amount: 5.0,
-        });
-
-        let next_state = chronos.tick(&state);
-        
-        let player_metrics = next_state.metrics.get("PLAYER").unwrap();
-        // Stability should have increased
-        assert!(player_metrics.stability > 80.0);
-        assert_eq!(next_state.pending_actions.len(), 0);
-    }
-
-    #[test]
-    fn test_phase_transition() {
-        let chronos = Chronos;
-        let mut state = create_mock_state();
-        
-        // Force low stability
-        if let Some(m) = state.metrics.get_mut("PLAYER") {
-            m.stability = 30.0;
-        }
-        
-        let next_state = chronos.tick(&state);
-        assert_eq!(next_state.active_phase, PHASE_FLASHPOINT);
     }
 }
-

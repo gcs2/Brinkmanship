@@ -137,7 +137,10 @@ mod tests {
         // We can't easily force the random seed here without refactoring Reactor to take an RNG,
         // but we can verify the logic compiles and runs without panics.
         let mut state = State::default();
-        state.global_volatility = 0.5;
+        state.system_states = state.system_states.insert("PLAYER".to_string(), crate::state::SystemComponent {
+            volatility: 0.5,
+            ..Default::default()
+        });
         let (_, actions, _) = reactor.resolve_event(&option, &state, "PLAYER".to_string(), "PLAYER".to_string(), 1);
         if !actions.is_empty() {
             assert!(actions[0].amount != 0.0);

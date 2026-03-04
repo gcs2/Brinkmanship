@@ -1,6 +1,7 @@
 pub mod state;
 pub mod chronos;
 pub mod reactor;
+pub mod ai_director_stress;
 
 use axum::{
     extract::State as AxumState,
@@ -159,6 +160,7 @@ async fn load_scenario(
         system_states: initial_systems,
         pending_actions: Vec::new(),
         action_logs: Vec::new(),
+        intel_feed: Vec::new(),
         volatility_history: Vec::new(),
     };
 
