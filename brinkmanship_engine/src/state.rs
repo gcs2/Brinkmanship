@@ -36,6 +36,18 @@ pub struct SystemComponent {
     pub fear_index: f64,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+pub struct IndustryComponent {
+    pub resources: HashMap<String, f64>, // e.g., "Steel" -> 100.0, "Oil" -> 50.0
+    pub production_efficiency: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+pub struct DiplomaticLedger {
+    pub relations: HashMap<EntityId, f64>, // -100 to 100
+    pub trade_agreements: Vec<String>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct PendingAction {
     pub action_id: String,
@@ -58,6 +70,8 @@ pub struct State {
     pub demographics: HashMap<EntityId, DemographicsComponent>,
     pub ideology: HashMap<EntityId, IdeologyComponent>,
     pub system_states: HashMap<EntityId, SystemComponent>,
+    pub industry: HashMap<EntityId, IndustryComponent>,
+    pub diplomatic_ledgers: HashMap<EntityId, DiplomaticLedger>,
 
     pub pending_actions: Vec<PendingAction>,
     pub action_logs: Vec<String>,

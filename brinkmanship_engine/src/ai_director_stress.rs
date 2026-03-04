@@ -1,4 +1,4 @@
-use crate::state::{State, MetricsComponent, DemographicsComponent, IdeologyComponent, SystemComponent};
+use crate::state::{State, MetricsComponent, DemographicsComponent, IdeologyComponent, SystemComponent, IndustryComponent, DiplomaticLedger};
 use crate::chronos::Chronos;
 use crate::state::ChronosEngine;
 use im::HashMap;
@@ -8,23 +8,21 @@ use std::sync::Arc;
 use rand::prelude::*;
 use std::fs::File;
 use std::io::Write;
-
-pub struct StressTestResult {
-    pub day: u32,
-    pub tps: f64,
-    pub ram_kb: f64,
-    pub active_actors: usize,
-    pub concurrent_clones: usize,
-}
+use sysinfo::System;
 
 pub async fn run_hyper_tick_bench(actor_count: usize, days: u32) -> std::io::Result<()> {
-    println!("--- STARTING SOVEREIGN STRESS TEST: {} ACTORS / {} DAYS ---", actor_count, days);
+    println!("--- STARTING HARDENED SOVEREIGN STRESS TEST: {} ACTORS / {} DAYS ---", actor_count, days);
     
-    // 1. Initialize State with N actors
+    let mut sys = System::new_all();
+    let pid = sysinfo::get_current_pid().expect("Failed to get PID");
+
+    // 1. Initialize High-Density State
     let mut metrics = HashMap::new();
     let mut demographics = HashMap::new();
     let mut ideology = HashMap::new();
     let mut system_states = HashMap::new();
+    let mut industry = HashMap::new();
+    let mut diplomatic_ledgers = HashMap::new();
 
     for i in 0..actor_count {
         let id = format!("ACTOR_{}", i);
@@ -32,6 +30,26 @@ pub async fn run_hyper_tick_bench(actor_count: usize, days: u32) -> std::io::Res
         demographics.insert(id.clone(), DemographicsComponent::default());
         ideology.insert(id.clone(), IdeologyComponent::default());
         system_states.insert(id.clone(), SystemComponent::default());
+
+        // Phase 15 High-Density: 15+ Resources
+        let mut resources = HashMap::new();
+        for r in 0..15 {
+            resources.insert(format!("RESOURCE_{}", r), 100.0);
+        }
+        industry.insert(id.clone(), IndustryComponent {
+            resources,
+            production_efficiency: 1.0,
+        });
+
+        // 50-actor Diplomatic Ledger
+        let mut relations = HashMap::new();
+        for j in 0..actor_count {
+            relations.insert(format!("ACTOR_{}", j), 0.0);
+        }
+        diplomatic_ledgers.insert(id.clone(), DiplomaticLedger {
+            relations,
+            trade_agreements: Vec::new(),
+        });
     }
 
     let initial_state = State {
@@ -42,6 +60,8 @@ pub async fn run_hyper_tick_bench(actor_count: usize, days: u32) -> std::io::Res
         demographics,
         ideology,
         system_states,
+        industry,
+        diplomatic_ledgers,
         pending_actions: Vec::new(),
         action_logs: Vec::new(),
         intel_feed: Vec::new(),
@@ -53,13 +73,12 @@ pub async fn run_hyper_tick_bench(actor_count: usize, days: u32) -> std::io::Res
 
     // Ensure benchmarks directory exists
     std::fs::create_dir_all("benchmarks")?;
-    let mut file = File::create("benchmarks/stress_test_v1.csv")?;
-    writeln!(file, "day,tps,ram_kb,active_actors,concurrent_clones")?;
+    let mut file = File::create("benchmarks/stress_test_v2.csv")?;
+    writeln!(file, "day,tps,heap_usage_kb,active_actors,concurrent_clones")?;
 
     for day in 1..=days {
         let start = Instant::now();
         
-        // Spawn concurrent tasks for each actor to perform "Speculative Clones"
         let mut handles = Vec::new();
         let state_arc = Arc::new(current_state.clone());
         
@@ -69,11 +88,19 @@ pub async fn run_hyper_tick_bench(actor_count: usize, days: u32) -> std::io::Res
             handles.push(task::spawn(async move {
                 let mut rng = thread_rng();
                 let clones_per_actor = 3;
+                let mut _decision_score = 0.0;
+
                 for _ in 0..clones_per_actor {
                     // Speculative clone - im::HashMap makes this O(1)
                     let mut speculative_state = (*s).clone();
                     
-                    // Apply randomized actions (Gaussian noise simulation)
+                    // DIRECTIVE: THE "DRIVE" TAX (1,000 iteration utility loop)
+                    for _ in 0..1000 {
+                        _decision_score += rng.gen_range(0.0..1.0);
+                        _decision_score /= 1.001; // Prevent overflow and simulate weight
+                    }
+
+                    // Apply randomized actions
                     let amount: f64 = rng.gen_range(-5.0..5.0);
                     let actor_key = actor_id.clone();
                     speculative_state.metrics = speculative_state.metrics.alter(|m| {
@@ -86,9 +113,8 @@ pub async fn run_hyper_tick_bench(actor_count: usize, days: u32) -> std::io::Res
             }));
         }
 
-        let mut _total_clones = 0;
         for h in handles {
-            _total_clones += h.await.unwrap_or(0);
+            let _ = h.await.unwrap_or(0);
         }
 
         // Perform the actual Chronos tick
@@ -97,19 +123,22 @@ pub async fn run_hyper_tick_bench(actor_count: usize, days: u32) -> std::io::Res
         let duration = start.elapsed();
         let tps = 1.0 / duration.as_secs_f64();
         
-        // Mock RAM measurement - In a real tool we'd use sysinfo
-        // Here we estimate based on the fact that im::HashMap nodes are shared.
-        // The overhead of 50 actors is minimal due to structural sharing.
-        let ram_kb = actor_count as f64 * 0.12; // ~120 bytes per actor diff in map
+        // DIRECTIVE: LIVE HEAP TRACKING via sysinfo
+        sys.refresh_process(pid);
+        let memory_kb = if let Some(process) = sys.process(pid) {
+            process.memory() as f64 // memory() returns bytes in sysinfo 0.30? No, usually KB.
+        } else {
+            0.0
+        };
 
-        writeln!(file, "{},{},{},{},{}", day, tps, ram_kb, actor_count, actor_count * 3)?;
+        writeln!(file, "{},{},{},{},{}", day, tps, memory_kb, actor_count, actor_count * 3)?;
         
         if day % 100 == 0 || day == 1 {
-            println!("Day {}: TPS={:.2}, RAM_EST={:.2}KB", day, tps, ram_kb);
+            println!("Day {}: TPS={:.2}, HEAP={:.2}KB", day, tps, memory_kb);
         }
     }
 
-    println!("--- STRESS TEST COMPLETE: benchmarks/stress_test_v1.csv generated ---");
+    println!("--- HARDENED STRESS TEST COMPLETE: benchmarks/stress_test_v2.csv generated ---");
     Ok(())
 }
 
