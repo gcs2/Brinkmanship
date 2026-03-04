@@ -63,6 +63,38 @@ pub struct State {
     pub volatility_history: Vec<f64>,
 }
 
+// --- Scenario & Event Schema for Deserialization ---
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Scenario {
+    pub theme_name: String,
+    pub events: Vec<Event>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Event {
+    pub event_id: String,
+    pub title: String,
+    pub description: String,
+    pub phase_requirement: u8,
+    pub options: Vec<EventOption>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EventOption {
+    pub id: String,
+    pub text: String,
+    pub threshold: f64,
+    pub lag_time: u32,
+    pub outcomes: HashMap<String, EventOutcome>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EventOutcome {
+    pub description: String,
+    pub effects: HashMap<String, f64>,
+}
+
 /// The Core Chronos Engine Trait
 pub trait ChronosEngine {
     /// Pure, mathematically immutable tick. 

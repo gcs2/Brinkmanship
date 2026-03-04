@@ -1,5 +1,6 @@
 pub mod state;
 pub mod chronos;
+pub mod reactor;
 
 use crate::state::State;
 use crate::chronos::{Chronos, ChronosEngine};
