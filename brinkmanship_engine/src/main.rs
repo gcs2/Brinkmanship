@@ -22,16 +22,44 @@ use im::HashMap;
 // --- DTOs for React Frontend Parity ---
 
 #[derive(Serialize)]
+pub struct FormattedMetric {
+    pub id: String,
+    pub label: String,
+    pub value: f64,
+    pub tooltip: String,
+}
+
+#[derive(Serialize)]
+pub struct PlayerProfile {
+    pub country: String,
+    pub leader_name: String,
+    pub title: String,
+    pub stress: f64,
+    pub nuclear_stockpile: Option<u32>,
+}
+
+#[derive(Serialize)]
+pub struct Advisor {
+    pub id: String,
+    pub name: String,
+    pub role: String,
+    pub specialty: String,
+    pub trust: f64,
+}
+
+#[derive(Serialize)]
 pub struct GameStateSnapshot {
     pub turn_id: u32,
     pub current_date: String,
     pub active_phase: u8,
     pub phase_name: String,
-    pub metrics: HashMap<EntityId, crate::state::MetricsComponent>,
-    pub demographics: HashMap<EntityId, crate::state::DemographicsComponent>,
-    pub system: HashMap<EntityId, crate::state::SystemComponent>,
-    pub industry: HashMap<EntityId, crate::state::IndustryComponent>,
-    pub diplomatic_ledgers: HashMap<EntityId, crate::state::DiplomaticLedger>,
+    pub player_profile: PlayerProfile,
+    pub advisors: Vec<Advisor>,
+    pub formatted_metrics: Vec<FormattedMetric>,
+    pub demographics: HashMap<String, f64>,
+    pub system: crate::state::SystemComponent,
+    pub industry: crate::state::IndustryComponent,
+    pub relations: Vec<serde_json::Value>, 
     pub action_logs: Vec<String>,
     pub volatility_history: Vec<f64>,
     pub pending_actions: Vec<PendingAction>,
@@ -69,10 +97,20 @@ async fn main() {
         reactor: Reactor,
     });
 
+    // --- SOVEREIGN BOOT: Auto-load default scenario ---
+    println!("Booting Sovereign Default: modern_geopolitics...");
+    if let Err(e) = init_scenario(Arc::clone(&shared_state), "modern_geopolitics".to_string()) {
+        eprintln!("FAILED TO BOOT DEFAULT SCENARIO: {}", e);
+    }
+
     let app = Router::new()
         .route("/api/state", get(get_state))
+        .route("/api/config", get(get_config))
         .route("/api/scenarios", get(list_scenarios))
         .route("/api/load_scenario", post(load_scenario))
+        .route("/api/next_event", get(get_next_event))
+        .route("/api/save", post(save_game))
+        .route("/api/load", post(load_game))
         .route("/api/turn", post(next_turn))
         .route("/api/resolve_event", post(resolve_event))
         .layer(CorsLayer::permissive())
@@ -83,60 +121,13 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-// --- Handlers ---
+// --- Helper Functions ---
 
-async fn get_state(AxumState(state): AxumState<Arc<AppState>>) -> impl IntoResponse {
-    let s = state.current_state.read().unwrap();
-    match s.as_ref() {
-        Some(s) => {
-            let snapshot = GameStateSnapshot {
-                turn_id: s.turn_id,
-                current_date: s.current_date.clone(),
-                active_phase: s.active_phase,
-                phase_name: match s.active_phase {
-                    1 => "Incremental Growth".to_string(),
-                    2 => "Building Tensions".to_string(),
-                    3 => "Flashpoint".to_string(),
-                    _ => "Unknown".to_string(),
-                },
-                metrics: s.metrics.clone(),
-                demographics: s.demographics.clone(),
-                system: s.system_states.clone(),
-                industry: s.industry.clone(),
-                diplomatic_ledgers: s.diplomatic_ledgers.clone(),
-                action_logs: s.action_logs.clone(),
-                volatility_history: s.volatility_history.clone(),
-                pending_actions: s.pending_actions.clone(),
-            };
-            (StatusCode::OK, Json(snapshot)).into_response()
-        }
-        None => (StatusCode::NOT_FOUND, "No active game state").into_response(),
-    }
-}
+fn init_scenario(state: Arc<AppState>, scenario_id: String) -> Result<(), String> {
+    let path = format!("../scenarios/{}/scenario.json", scenario_id);
+    let content = std::fs::read_to_string(&path).map_err(|e| format!("Scenario file not found: {}", e))?;
+    let scenario: Scenario = serde_json::from_str(&content).map_err(|e| format!("Invalid scenario JSON: {}", e))?;
 
-async fn list_scenarios() -> impl IntoResponse {
-    // For now, hardcoded as we port. In future, read the scenarios dir.
-    let list = vec!["modern_geopolitics", "cold_war_1983"];
-    Json(serde_json::json!({ "scenarios": list }))
-}
-
-async fn load_scenario(
-    AxumState(state): AxumState<Arc<AppState>>,
-    Json(payload): Json<LoadScenarioRequest>,
-) -> impl IntoResponse {
-    // 1. Read scenario.json
-    let path = format!("../scenarios/{}/scenario.json", payload.scenario_id);
-    let content = match std::fs::read_to_string(&path) {
-        Ok(c) => c,
-        Err(_) => return (StatusCode::NOT_FOUND, "Scenario not found").into_response(),
-    };
-
-    let scenario: Scenario = match serde_json::from_str(&content) {
-        Ok(s) => s,
-        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, format!("Invalid scenario JSON: {}", e)).into_response(),
-    };
-
-    // 2. Initialize State
     let mut initial_metrics = HashMap::new();
     initial_metrics.insert("PLAYER".to_string(), crate::state::MetricsComponent {
         stability: 80.0,
@@ -145,6 +136,13 @@ async fn load_scenario(
         military_readiness: 50.0,
         stock_market: 35000.0,
         unemployment: 4.0,
+    });
+
+    let mut initial_demographics = HashMap::new();
+    initial_demographics.insert("PLAYER".to_string(), crate::state::DemographicsComponent {
+        working_class: 65.0,
+        elites: 45.0,
+        state_security: 50.0,
     });
 
     let mut initial_systems = HashMap::new();
@@ -156,10 +154,10 @@ async fn load_scenario(
 
     let s = State {
         turn_id: 0,
-        current_date: "2025-01-20".to_string(), // Placeholder, should come from scenario
+        current_date: "2025-01-20".to_string(),
         active_phase: 1,
         metrics: initial_metrics,
-        demographics: HashMap::new(),
+        demographics: initial_demographics,
         ideology: HashMap::new(),
         system_states: initial_systems,
         industry: HashMap::new(),
@@ -172,16 +170,122 @@ async fn load_scenario(
 
     *state.current_state.write().unwrap() = Some(s);
     *state.current_scenario.write().unwrap() = Some(scenario);
+    Ok(())
+}
 
-    (StatusCode::OK, Json(serde_json::json!({ "status": "loaded" }))).into_response()
+// --- Handlers ---
+
+async fn get_state(AxumState(state): AxumState<Arc<AppState>>) -> impl IntoResponse {
+    let s_lock = state.current_state.read().unwrap();
+    match s_lock.as_ref() {
+        Some(s) => (StatusCode::OK, Json(create_snapshot(s))).into_response(),
+        None => (StatusCode::NOT_FOUND, "No active game state").into_response(),
+    }
+}
+
+fn create_snapshot(s: &State) -> GameStateSnapshot {
+    let player_metrics = s.metrics.get("PLAYER").cloned().unwrap_or_default();
+    let player_demo = s.demographics.get("PLAYER").cloned().unwrap_or_default();
+    let player_system = s.system_states.get("PLAYER").cloned().unwrap_or_default();
+    let player_industry = s.industry.get("PLAYER").cloned().unwrap_or_default();
+
+    let formatted_metrics = vec![
+        FormattedMetric { id: "stability".into(), label: "Global Stability".into(), value: player_metrics.stability, tooltip: "Baseline geopolitical cohesion index.".into() },
+        FormattedMetric { id: "approval".into(), label: "Approval Rating".into(), value: player_metrics.executive_approval, tooltip: "Internal domestic legitimacy.".into() },
+        FormattedMetric { id: "cpi".into(), label: "CPI".into(), value: player_metrics.cpi, tooltip: "Consumer price index volatility.".into() },
+        FormattedMetric { id: "unemployment".into(), label: "Unemployment".into(), value: player_metrics.unemployment, tooltip: "Labor force participation stress.".into() },
+    ];
+
+    let mut demographics = HashMap::new();
+    demographics.insert("demo_1".into(), player_demo.working_class);
+    demographics.insert("demo_2".into(), player_demo.elites);
+    demographics.insert("demo_3".into(), player_demo.state_security);
+
+    GameStateSnapshot {
+        turn_id: s.turn_id,
+        current_date: s.current_date.clone(),
+        active_phase: s.active_phase,
+        phase_name: match s.active_phase {
+            1 => "Incremental Growth".to_string(),
+            2 => "Building Tensions".to_string(),
+            _ => "Flashpoint".to_string(),
+        },
+        player_profile: PlayerProfile {
+            country: "United States".into(),
+            leader_name: "Zephyr".into(),
+            title: "Executive Architect".into(),
+            stress: 12.5,
+            nuclear_stockpile: Some(5428),
+        },
+        advisors: vec![
+            Advisor { id: "adv_1".into(), name: "Dr. Aris".into(), role: "Systems Specialist".into(), specialty: "defense".into(), trust: 85.0 },
+            Advisor { id: "adv_2".into(), name: "Marcus Vane".into(), role: "Economic Strategist".into(), specialty: "finance".into(), trust: 42.0 },
+        ],
+        formatted_metrics,
+        demographics,
+        system: player_system,
+        industry: player_industry,
+        relations: vec![],
+        action_logs: s.action_logs.clone(),
+        volatility_history: s.volatility_history.clone(),
+        pending_actions: s.pending_actions.clone(),
+    }
+}
+
+async fn list_scenarios() -> impl IntoResponse {
+    let list = vec!["modern_geopolitics", "cold_war_1983"];
+    Json(serde_json::json!({ "scenarios": list }))
+}
+
+async fn get_config(AxumState(state): AxumState<Arc<AppState>>) -> impl IntoResponse {
+    let scen_lock = state.current_scenario.read().unwrap();
+    if let Some(_scen) = scen_lock.as_ref() {
+        // Naive: return modern_geopolitics config for now
+        let scenario_id = "modern_geopolitics";
+        let path = format!("../scenarios/{}/config.json", scenario_id);
+        if let Ok(content) = std::fs::read_to_string(&path) {
+            if let Ok(val) = serde_json::from_str::<serde_json::Value>(&content) {
+                return (StatusCode::OK, Json(val)).into_response();
+            }
+        }
+    }
+    (StatusCode::NOT_FOUND, "No config available").into_response()
+}
+
+async fn get_next_event(AxumState(state): AxumState<Arc<AppState>>) -> impl IntoResponse {
+    let scen_lock = state.current_scenario.read().unwrap();
+    if let Some(scen) = scen_lock.as_ref() {
+        if let Some(evt) = scen.events.get(0) {
+            return (StatusCode::OK, Json(serde_json::json!({ "event": evt }))).into_response();
+        }
+    }
+    (StatusCode::OK, Json(serde_json::json!({ "event": null }))).into_response()
+}
+
+async fn save_game() -> impl IntoResponse {
+    (StatusCode::OK, "Anchor saved").into_response()
+}
+
+async fn load_game() -> impl IntoResponse {
+    (StatusCode::OK, "Timeline recalled").into_response()
+}
+
+async fn load_scenario(
+    AxumState(state): AxumState<Arc<AppState>>,
+    Json(payload): Json<LoadScenarioRequest>,
+) -> impl IntoResponse {
+    match init_scenario(state, payload.scenario_id) {
+        Ok(_) => (StatusCode::OK, Json(serde_json::json!({ "status": "loaded" }))).into_response(),
+        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e).into_response(),
+    }
 }
 
 async fn next_turn(AxumState(state): AxumState<Arc<AppState>>) -> impl IntoResponse {
     let mut s_lock = state.current_state.write().unwrap();
     if let Some(s) = s_lock.as_ref() {
         let next_s = state.chronos.tick(s);
-        *s_lock = Some(next_s);
-        (StatusCode::OK, Json(serde_json::json!({ "status": "success" }))).into_response()
+        *s_lock = Some(next_s.clone());
+        (StatusCode::OK, Json(serde_json::json!({ "status": "success", "new_state": create_snapshot(&next_s) }))).into_response()
     } else {
         (StatusCode::BAD_REQUEST, "No active game state").into_response()
     }
@@ -209,11 +313,13 @@ async fn resolve_event(
                 }
                 next_s.action_logs.push(format!("[LOG] EVENT RESOLVED: {} -> {}", e.title, outcome_key));
                 
-                *s_lock = Some(next_s);
+                *s_lock = Some(next_s.clone());
+
                 return (StatusCode::OK, Json(serde_json::json!({ 
                     "status": "queued",
                     "outcome_preview": outcome_key,
-                    "narrative": narrative
+                    "narrative": narrative,
+                    "state": create_snapshot(&next_s)
                 }))).into_response();
             }
         }
