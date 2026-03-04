@@ -47,12 +47,12 @@ export const IdentityPanel = ({ profile, advisors }: IdentityPanelProps) => {
                         <div className="bg-red-500 h-full" style={{ width: `${profile.stress}%` }} />
                     </div>
 
-                    {profile.nuclear_stockpile !== undefined && (
+                    {profile.nuclear_stockpile !== undefined && profile.nuclear_stockpile !== null && (
                         <div className="mt-2 flex justify-between items-center border-t border-slate-800 pt-2">
                             <span className="text-[9px] font-mono text-amber-500 uppercase flex items-center gap-1">
                                 <Globe className="w-3 h-3" /> Arsenal
                             </span>
-                            <span className="text-[10px] font-mono text-slate-300">{profile.nuclear_stockpile.toLocaleString()} Warheads</span>
+                            <span className="text-[10px] font-mono text-slate-300">{(profile.nuclear_stockpile).toLocaleString()} Warheads</span>
                         </div>
                     )}
                 </div>

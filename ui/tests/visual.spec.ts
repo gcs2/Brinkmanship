@@ -22,8 +22,12 @@ test.describe('Sovereign Interface Visual Verification', () => {
     test('Dossier Modal visual check', async ({ page }) => {
         await page.goto('http://localhost:3000');
         await page.waitForSelector('.panel', { timeout: 30000 });
-        await page.click('button:has-text("Advance Chronos")');
-        await page.waitForSelector('h3:has-text("Priority Dossier")', { timeout: 10000 });
+
+        // In the autoplay system, we click START CHRONOS and wait for an event
+        await page.click('button:has-text("START CHRONOS")');
+
+        // Wait for an event to trigger (may take a few seconds of ticks)
+        await page.waitForSelector('h3:has-text("Priority Dossier")', { timeout: 45000 });
 
         const modal = page.locator('.fixed.right-0'); // Select the sliding pane
         await expect(modal).toBeVisible();

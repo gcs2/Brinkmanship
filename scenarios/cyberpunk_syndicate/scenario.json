@@ -1,5 +1,44 @@
 {
   "theme_name": "Cyberpunk Syndicate",
+  "player_profile": {
+    "country": "Night City",
+    "leader_name": "Executive V",
+    "title": "Director of Operatives",
+    "start_date": "2077-10-12",
+    "nuclear_stockpile": 0
+  },
+  "great_powers": [
+    {
+      "id": "ARA",
+      "name": "Arasaka",
+      "lat": 35.6762,
+      "lon": 139.6503,
+      "base_approval": 15.0
+    },
+    {
+      "id": "MIL",
+      "name": "Militech",
+      "lat": 40.7128,
+      "lon": -74.0060,
+      "base_approval": 25.0
+    }
+  ],
+  "advisors": [
+    {
+      "id": "FIX",
+      "name": "Dexter D.",
+      "role": "Head fixer",
+      "specialty": "diplomacy",
+      "base_trust": 40
+    },
+    {
+      "id": "SOL",
+      "name": "Jackie W.",
+      "role": "Lead Solo",
+      "specialty": "defense",
+      "base_trust": 95
+    }
+  ],
   "mappings": {
     "metrics": {
       "metric_1": "Grid Stability",

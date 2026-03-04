@@ -24,9 +24,9 @@ export default function Home() {
     setTimeout(() => setNotification(null), 4000);
   };
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (force = false) => {
     try {
-      if (!config) {
+      if (!config || force) {
         const configRes = await fetch("http://localhost:8000/api/config");
         if (configRes.ok) setConfig(await configRes.json());
 
@@ -168,7 +168,7 @@ export default function Home() {
                         const data = await res.json();
                         setGameState(data.new_state);
                         showNotif(`INITIALIZING: ${data.theme.toUpperCase()}`);
-                        fetchData(); // pull new config mapping
+                        fetchData(true); // pull new config mapping
                       } catch { }
                     }}
                     className="w-full text-left px-4 py-3 text-[10px] font-mono uppercase text-slate-400 hover:bg-slate-700/50 hover:text-[#e0e0e0] border-b border-slate-700/50 last:border-0"

@@ -1,0 +1,43 @@
+# PHASE 14 OVERHAUL: THE AUTONOMOUS WORLD ENGINE
+
+## ⚡ EXECUTIVE SUMMARY
+The Sovereign Engine currently simulates a single actor against a reactive, probabilistic environment. To achieve a true "Grand Strategy" (EU4-style) simulation, the engine must pivot from a "Player vs. World" model to a **"Multi-Agent Autonomous Simulator."**
+
+The goal is to introduce independent AI actors (other nations, internal factions) that take their own actions, country-specific disaster systems, and a dynamic political framework where the "Overton Window" can shift radically, allowing for extreme government transitions (Fascism, Technocracy, Anarcho-Capitalism).
+
+---
+
+## 🏗️ 1. THE AI ACTOR SYSTEM (EU4-STYLE AI)
+
+Currently, Great Powers are just static coordinates with an "Approval" metric. 
+**The Overhaul:**
+- **Agent Profiles:** Every great power gets an AI profile with defined "Drives" (e.g., Expansionist, Diplomatic, Isolationist) and "Resources."
+- **Autonomous Action Table:** The AI can independently select and execute operations from a generalized action library (e.g., "Fund Proxy War," "Sanction Rival," "Sign Trade Deal").
+- **Chronos Resolution:** The API backend will process an "AI Turn" alongside the player turn. During a `Tick`, an AI might enqueue an action. When it resolves, it hits the global event feed.
+
+## ⚖️ 2. THE OVERTON WINDOW & GOVERNMENT SHIFTS
+
+The current system assumes the player is a generic executive. 
+**The Overhaul:**
+- **Ideology Axis:** Introduce a new metric grid: `Authoritarian <-> Libertarian` and `Planned Economy <-> Free Market`.
+- **The Overton Window:** A localized zone on the axis representing "acceptable" policies. Player actions slowly drag the window.
+- **Radical Transitions:** If the Overton Window shifts far enough, new policy trees unlock. Players can intentionally mismanage metrics to farm "Chaos" and radically change the government:
+  - **Technocratic Override:** Suspend elections during High Scarcity.
+  - **Executive Emergency Powers (Fascistic):** Triggered by maxing the Global Fear Index (GFI).
+  - **Anarcho-Capitalist Secession:** Triggered by zeroing out Institutional Trust but maxing the Dow Jones.
+  - **Communist Revolution:** Triggered by maxing Working Class approval while zeroing Elite Trust.
+
+## 🌪️ 3. COUNTRY-SPECIFIC DISASTERS & EVENTS
+
+Instead of a single global event JSON, the system will feature localized logic.
+**The Overhaul:**
+- **Regional Event Decks:** Separate `events_russia.json`, `events_us.json`. The engine pulls from the player's active deck.
+- **The Disaster Mechanism:** Hidden counters that tick up when certain conditions are met (e.g., "Hyperinflation Crisis" ticks up +1 per day CPI > 90). When it reaches 100, the Disaster triggers, forcing a unique chain of high-stakes events.
+
+## 📈 4. ARCHITECTURAL REQUIREMENTS
+
+To build this, the following architecture must be implemented:
+1. **The Diplomatic AI Service:** A new backend module (`ai_director.py`) that evaluates the global state and selects AI actions.
+2. **The Ideology Matrix:** Expand [state_manager.py](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py) to include a 2D vector for government type and Overton positioning.
+3. **Multi-Deck Scenario Loader:** Refactor `processor` to load multiple JSON files (Global, Player Country, AI Aggressors).
+4. **The UI Pivot:** The UI must display the Ideology Compass and live notifications of *other* countries' actions (e.g., "USSR has sanctioned NATO").
