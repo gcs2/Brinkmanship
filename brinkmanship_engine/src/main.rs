@@ -3,7 +3,7 @@ pub mod chronos;
 pub mod reactor;
 
 use axum::{
-    extract::{Path, State as AxumState},
+    extract::State as AxumState,
     http::StatusCode,
     response::IntoResponse,
     routing::{get, post},
@@ -13,9 +13,9 @@ use std::sync::{Arc, RwLock};
 use tower_http::cors::CorsLayer;
 use serde::{Deserialize, Serialize};
 use crate::state::{State, Scenario, PendingAction, EntityId};
-use crate::chronos::{Chronos, ChronosEngine};
+use crate::chronos::Chronos;
 use crate::reactor::Reactor;
-use std::collections::HashMap as StdHashMap;
+// use std::collections::HashMap as StdHashMap;
 use im::HashMap;
 
 // --- DTOs for React Frontend Parity ---

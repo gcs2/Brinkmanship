@@ -107,11 +107,11 @@ Here is the **Implementation Addendum** and the **Remaining Chunks List** for ou
 
 To ensure the "Execution" phase doesn't stall, we will move from a text-based foundation to a visual one.
 
-### **Phase 1: The "Command Line Cabinet" (MVS)**
+### **Phase 1: The "Command Line Cabinet" (Rust MVS)**
 
-*   **Format:** Node.js Console Application.  
-*   **Focus:** Core Math & State Logic.  
-*   **Execution:** A turn-based system where "1 Turn \= 1 Day." You receive a JSON-fed "Daily Briefing," input a command (e.g., policy \--subsidize-gas), and the engine calculates the impact on the "CPI" and Approval.  
+*   **Format:** Rust Cargo Binary (`brinkmanship_engine`).  
+*   **Focus:** Core Math & State Logic (Chronos & Reactor).  
+*   **Execution:** A turn-based system where "1 Turn \= 1 Day." The engine calculates the impact on the "CPI" and Approval using Gaussian noise and magnitude scaling.  
 *   **Goal:** Perfect the balance of the economy before touching a single pixel.
 
 ### **Phase 2: The "2D War Room" (The Indie-Great Look)**
@@ -228,10 +228,10 @@ To make this possible and efficient, we will use a **Model-View-Controller (MVC)
 
 ### **Step 1: Phase 1 (Terminal Simulator)**
 
-*   **The Model:** A Python-based state machine.  
-*   **The View:** Standard Out (Print statements).  
-*   **The Input:** Terminal commands.  
-*   **Why?** This allows us to test the **"Trump Intelligence Module"** logic without worrying about UI bugs. If the gas prices don't react correctly to a tweet, we fix it here.
+*   **The Model:** A Rust-based ECS-Lite state machine with Structural Sharing (`im::HashMap`).  
+*   **The View:** Standard Out / Axum REST API.  
+*   **The Input:** Terminal commands / HTTP POST requests.  
+*   **Why?** This allows us to test the **"Trump Intelligence Module"** logic without worrying about UI bugs. If the gas prices don't react correctly to a tweet, we fix it here using the high-performance Rust core.
 
 ### **Step 2: Phase 2 (The 2D "Situation Room")**
 
@@ -366,16 +366,17 @@ If a "FAILURE" state is rolled on a Tier 1 event, the game doesn't just give you
 
 ---
 
-## **5\. EXECUTION GUIDANCE: PHASE 1 (CONSOLE)**
+### **5. EXECUTION GUIDANCE: PHASE 1 (RUST CORE)**
 
-Master Geoffrey, as a Senior SWE, here is how you build this "amazingly fun" prototype in the next hour:
+Master Geoffrey, as a Senior SWE, here is how we've built this "amazingly fun" prototype:
 
-1.  **Initialize State:** Create a simple Python dictionary with approval, sourdough\_index, and stability.  
-2.  **Load Events:** Pull the JSON above into a list.  
-3.  **The Loop:** \* Display the Event.  
-    *   Take User Input.  
-    *   **The Magic:** Use random.choices() weighted by the probability\_weight and your chosen character's modifiers.  
-    *   Update State and Print.
+1.  **ECS-Lite State:** A Rust `State` struct utilizing `im::HashMap` for O(1) cloning.  
+2.  **Scenario Deserialization:** `serde_json` pulls the `scenario.json` into typed Rust structs.  
+3.  **The Loop (Chronos):** 
+    *   `tick(&State) -> State` pure transition function.
+    *   Calculates daily drift, volatility decay, and applies pending actions.
+    *   **The Magic:** Gaussian resolution weighted by $GFI$ and character traits.  
+4.  **The Reactor:** Injects stochastic outcomes during even resolution using `rand_distr`.
 
 ### **Remaining Chunks Checklist (Updated)**
 

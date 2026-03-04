@@ -95,9 +95,9 @@ impl Chronos {
 
         // 2. Component Drift (For each entity registered in metrics)
         for entity_id in next_metrics.keys().cloned().collect::<Vec<_>>() {
-            let mut m = next_metrics.get(&entity_id).unwrap().cloned();
-            let mut s = next_system_states.get(&entity_id).unwrap().cloned();
-            let mut d = next_demographics.get(&entity_id).unwrap_or(&DemographicsComponent::default()).cloned();
+            let mut m = next_metrics.get(&entity_id).unwrap().clone();
+            let mut s = next_system_states.get(&entity_id).unwrap().clone();
+            let mut d = next_demographics.get(&entity_id).cloned().unwrap_or_default();
             
             let stability = m.stability;
             let phase = self.calculate_phase(stability, current_phase);

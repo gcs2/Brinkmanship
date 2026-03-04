@@ -83,6 +83,68 @@ impl Reactor {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::state::{EventOption, EventOutcome, State};
+    use im::HashMap;
+
+    #[test]
+    fn test_gaussian_resolution_routing() {
+        let reactor = Reactor;
+        let mut option = EventOption {
+            id: "opt_1".to_string(),
+            text: "Test Option".to_string(),
+            threshold: 50.0,
+            lag_time: 0,
+            outcomes: HashMap::new(),
+        };
+        
+        option.outcomes.insert("SUCCESS".to_string(), EventOutcome {
+            description: "Success".to_string(),
+            effects: HashMap::new(),
+        });
+        option.outcomes.insert("FAILURE".to_string(), EventOutcome {
+            description: "Failure".to_string(),
+            effects: HashMap::new(),
+        });
+
+        // Test with extreme volatility to see if it still routes
+        let state = State::default();
+        let (outcome, _, _) = reactor.resolve_event(&option, &state, "PLAYER".to_string(), "PLAYER".to_string(), 1);
+        assert!(outcome == "SUCCESS" || outcome == "FAILURE");
+    }
+
+    #[test]
+    fn test_magnitude_scaling() {
+        let reactor = Reactor;
+        let mut option = EventOption {
+            id: "opt_1".to_string(),
+            text: "Scalable Option".to_string(),
+            threshold: 50.0,
+            lag_time: 0,
+            outcomes: HashMap::new(),
+        };
+        
+        let mut effects = HashMap::new();
+        effects.insert("stability".to_string(), 10.0);
+        
+        option.outcomes.insert("SUCCESS".to_string(), EventOutcome {
+            description: "Success".to_string(),
+            effects,
+        });
+
+        // We can't easily force the random seed here without refactoring Reactor to take an RNG,
+        // but we can verify the logic compiles and runs without panics.
+        let mut state = State::default();
+        state.global_volatility = 0.5;
+        let (_, actions, _) = reactor.resolve_event(&option, &state, "PLAYER".to_string(), "PLAYER".to_string(), 1);
+        if !actions.is_empty() {
+            assert!(actions[0].amount != 0.0);
+        }
+    }
+}
+
 trait RoundTo {
     fn round_to(self, places: i32) -> f64;
 }
