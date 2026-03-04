@@ -80,14 +80,13 @@ The game simulates the **119th Midterm Election** as a "Boss Fight."
 
 ## ---
 
-**5\. TECHNICAL STACK (Software Engineer Perspective)**
+**5\. TECHNICAL STACK (The Sovereign Pivot)**
 
-* **State Management:** Redux or Zustand (for the massive amount of global variables).  
-* **Simulation Core:** A deterministic engine written in TypeScript to ensure that "Hormuz" calculations are consistent across save files.  
-* **Event Parser:** A custom JSON parser that allows for "Interlocking Events" (e.g., Event B only triggers if Decision A was made 3 months ago).
-*   **State Management:** Redux or Zustand (for the massive amount of global variables).  
-*   **Simulation Core:** A deterministic engine written in TypeScript to ensure that "Hormuz" calculations are consistent across save files.  
-*   **Event Parser:** A custom JSON parser that allows for "Interlocking Events" (e.g., Event B only triggers if Decision A was made 3 months ago).
+* **Backend Engine**: **Rust** (2021 Edition).
+* **Web Framework**: **Axum** (Asynchronous, High-Performance).
+* **State Management**: Functional Immutable State with **Structural Sharing** (`im` crate).
+* **Frontend UI**: React / Next.js with **Zustand** (for global telemetry).
+* **Event Parser**: Deterministic Gaussian Resolution Engine (Rust Port).
 
 ---
 

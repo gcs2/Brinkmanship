@@ -11,8 +11,8 @@ This migration relies on an **ECS-Lite** (Entity-Component-System) structure tai
 
 1. **Web Framework**: **Axum** 
    - *Why:* Built on top of `tokio` and `hyper`, it offers macro-free routing, immense concurrency, and seamless integration with the Rust async ecosystem. Highly performant for JSON serialization via `serde`.
-2. **State Management**: **Immutable Structs**
-   - *Why:* We will maintain the purely functional [update_turn(state) -> State](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py#83-201) paradigm, but struct cloning in Rust is orders of magnitude faster and memory-safe compared to Python's `copy.deepcopy()`.
+2. **State Management**: **Immutable Structs with Structural Sharing**
+   - *Why:* We will maintain the purely functional [update_turn(state) -> State](file:///c:/Users/zephy/Documents/Brinkmanship/engine/state_manager.py#83-201) paradigm. To solve the O(N) cloning bottleneck identified by Management, we utilize the **`im` crate** (`im::HashMap`). This enables **Structural Sharing**, making state cloning an O(1) operation (pointer increment) rather than a deep copy.
 3. **Architecture Pattern**: **Headless ECS-Lite**
    - *Why:* Instead of nested monolithic objects, game data is stored in isolated component HashMaps keyed by an `EntityId` (e.g., "USA", "RUS", "PLAYER").
 
@@ -42,7 +42,10 @@ This migration relies on an **ECS-Lite** (Entity-Component-System) structure tai
   - `POST /api/turn`
   - `POST /api/resolve_event`
   - `POST /api/load_scenario`
-- **UI Contract**: The React frontend must not require a single line of code altered to connect to the Rust backend.
+### [Phase 0.5]: Verification & Cutover
+- Run Side-by-Side verification: Compare Python vs Rust state outputs for identical inputs.
+- Once parity is 100% verified via Playwright/Snapshot testing, the `engine/` and `api/` Python directories will be **DELETED**.
+- Update `build_app.ps1` to trigger the Rust binary instead of the Python Uvicorn server.
 
 ---
 
