@@ -2,6 +2,7 @@ pub mod state;
 pub mod chronos;
 pub mod reactor;
 pub mod ai_director_stress;
+pub mod ideology_matrix;
 
 use axum::{
     extract::State as AxumState,
@@ -159,6 +160,10 @@ fn init_scenario(state: Arc<AppState>, scenario_id: String) -> Result<(), String
         spread: 0.20,
         position: (0.0, 0.0),
         flavor_label: "Liberalism".to_string(),
+        position_velocity: (0.0, 0.0),
+        position_history: Vec::new(),
+        perceived_position: (0.0, 0.0),
+        perceived_flavor_label: "Liberalism".to_string(),
     });
 
     let s = State {

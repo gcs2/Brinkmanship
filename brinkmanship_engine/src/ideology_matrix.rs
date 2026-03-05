@@ -208,6 +208,61 @@ pub fn check_zone_gates(pos: (f64, f64)) -> Vec<ZoneGate> {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
+// PHASE 16: PERCEPTION FILTER
+// ────────────────────────────────────────────────────────────────────────────
+
+/// Maximum allowable Euclidean gap between the sovereign's real `position` and
+/// their publicly `perceived_position` before the Veil Shatters.
+///
+/// If `euclidean_distance(position, perceived_position) > VEIL_COLLAPSE_THRESHOLD`,
+/// `perception_maintenance_cost()` returns `None` — the engine fires a Veil Shatter event.
+///
+/// Cross-ref: `docs/METRIC_DEFINITIONS.md §13`
+pub const VEIL_COLLAPSE_THRESHOLD: f64 = 3.5;
+
+/// Computes the per-tick Authority cost to maintain a Perception Filter.
+///
+/// The further the sovereign's real position is from their publicly projected
+/// position, the higher the Authority drain per tick.
+///
+/// # Returns
+/// - `Some(cost)` — The AUT cost to sustain the projection this tick.
+/// - `None` — The gap exceeds `VEIL_COLLAPSE_THRESHOLD`: the Veil Shatters.
+///             The caller (chronos.rs) must fire the Stability collapse event.
+///
+/// # Formula
+/// `cost = base_cost * euclidean_distance(real_pos, perceived_pos) * 0.5`
+///
+/// # Examples
+/// ```
+/// use brinkmanship_engine::ideology_matrix::{perception_maintenance_cost, VEIL_COLLAPSE_THRESHOLD};
+///
+/// // Small gap: affordable maintenance
+/// let cost = perception_maintenance_cost((1.0, 0.0), (0.0, 0.0), 10.0);
+/// assert!(cost.is_some());
+///
+/// // Gap below threshold
+/// let cost = perception_maintenance_cost((0.0, 0.0), (3.4, 0.0), 10.0);
+/// assert!(cost.is_some());
+///
+/// // Gap at/above threshold: Veil Shatters
+/// let cost = perception_maintenance_cost((0.0, 0.0), (4.0, 0.0), 10.0);
+/// assert!(cost.is_none());
+/// ```
+pub fn perception_maintenance_cost(
+    real_pos: (f64, f64),
+    perceived_pos: (f64, f64),
+    base_cost: f64,
+) -> Option<f64> {
+    let gap = euclidean_distance(real_pos, perceived_pos);
+    if gap > VEIL_COLLAPSE_THRESHOLD {
+        None // Veil Shatters — caller must fire stability collapse
+    } else {
+        Some(base_cost * gap * 0.5)
+    }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
 // UNIT TESTS
 // ────────────────────────────────────────────────────────────────────────────
 #[cfg(test)]
@@ -356,5 +411,57 @@ mod tests {
         // However, it IS in the Illiberal/Directed zone (-3 to 0, 1 to +3)
         // auth_y = 4 > 3, so NOT in zone 3 either
         assert!(!gates.contains(&ZoneGate::StateChampionSubsidy));
+    }
+
+    // ── Phase 16: Perception Filter Tests ─────────────────────────────────
+    #[test]
+    fn test_perception_cost_zero_gap() {
+        // Same real and perceived position: maintenance cost should be 0.0
+        let cost = perception_maintenance_cost((0.0, 0.0), (0.0, 0.0), 10.0);
+        assert_eq!(cost, Some(0.0));
+    }
+
+    #[test]
+    fn test_perception_cost_small_gap() {
+        // Real = (1, 0), Perceived = (0, 0): gap = 1.0, cost = 10 * 1.0 * 0.5 = 5.0
+        let cost = perception_maintenance_cost((1.0, 0.0), (0.0, 0.0), 10.0);
+        assert!(cost.is_some());
+        assert!((cost.unwrap() - 5.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_perception_cost_below_threshold() {
+        // Gap = 3.4 (just below VEIL_COLLAPSE_THRESHOLD = 3.5): should return Some
+        let cost = perception_maintenance_cost((0.0, 0.0), (3.4, 0.0), 10.0);
+        assert!(cost.is_some(), "Gap below threshold should not shatter veil");
+    }
+
+    #[test]
+    fn test_perception_cost_exactly_at_threshold_ok() {
+        // Gap = 3.5 is NOT above threshold (strict >), should still return Some
+        let cost = perception_maintenance_cost((0.0, 0.0), (3.5, 0.0), 10.0);
+        assert!(cost.is_some(), "Gap at exactly threshold should not shatter veil");
+    }
+
+    #[test]
+    fn test_perception_cost_above_threshold_shatters_veil() {
+        // Gap = 4.0 > 3.5: Veil Shatters, returns None
+        let cost = perception_maintenance_cost((0.0, 0.0), (4.0, 0.0), 10.0);
+        assert!(cost.is_none(), "Gap above threshold must trigger Veil Shatter (None)");
+    }
+
+    #[test]
+    fn test_perception_cost_corner_to_corner_shatters() {
+        // Maximum possible gap on the grid: ~14.14. Always shatters.
+        let cost = perception_maintenance_cost((-5.0, -5.0), (5.0, 5.0), 10.0);
+        assert!(cost.is_none(), "Corner-to-corner gap must always shatter veil");
+    }
+
+    #[test]
+    fn test_perception_cost_scales_with_base_cost() {
+        // Gap = 1.0, cost should = base_cost * 1.0 * 0.5
+        let cost_10 = perception_maintenance_cost((1.0, 0.0), (0.0, 0.0), 10.0).unwrap();
+        let cost_20 = perception_maintenance_cost((1.0, 0.0), (0.0, 0.0), 20.0).unwrap();
+        assert!((cost_20 - cost_10 * 2.0).abs() < 0.001);
     }
 }

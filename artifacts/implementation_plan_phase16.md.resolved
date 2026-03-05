@@ -1,0 +1,206 @@
+# Phase 16: The Living Constraint System
+
+## Goal
+Implement the three engine constraints that transform `position` from a cosmetic label into a system with physical weight: **Rubber Band Effect (IDX-006)**, **Glacial Shift (IDX-007)**, and the **Temporal Simulation Harness** (the 10-tick headless loop test). Simultaneously introduce the new management-approved mechanics: Estate Velocity Memory, Perception Filter, and the ScenarioDef struct.
+
+## Background & Management Ratification
+
+Management has approved Phase 16 via RE: SOVEREIGN_DISPATCH_v16 (2026-03-04). All 8 injections accepted. Key architectural clarifications:
+
+> *"Ensure the snap-back is handled as a velocity/vector force in chronos.rs, not a hard teleport. The rubber band should apply a massive gravitational pull back toward the center (Overton Window), bleeding Authority every turn they fight the current."*
+
+> *"Store a historical array of the last 10 position coordinates and render a breadcrumb trail on the UI matrix."*
+
+> *"If a Capitalist Estate sees the player moving Left by 0.1 points per tick, they grumble. If the player forces a 2.0 point jump Left in a single turn, the Capitalist Estate should immediately trigger a Capital Flight event."*
+
+> *"Introduce a Perception Filter metric. The player might be orchestrating actions at (+3, -2) but spending Authority to keep the flavor_label anchored at (0, 0). If the Euclidean distance between Reality and Perception gets too wide, the illusion shatters."*
+
+---
+
+## Proposed Changes
+
+### 1. [state.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs) — IdeologyComponent Extended
+
+#### [MODIFY] [state.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs)
+
+Add to [IdeologyComponent](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs#26-51):
+```rust
+/// The last 10 governing positions, oldest first. Used for breadcrumb UI trail
+/// and for computing position_velocity. Updated each tick by chronos.rs.
+pub position_history: Vec<(f64, f64)>,
+
+/// Velocity vector: current_pos - prev_pos from last tick.
+/// Used by Estate Velocity Memory to detect sudden acceleration events.
+/// A jump of > 1.5 units/tick is treated as a "shock" by Estates.
+pub position_velocity: (f64, f64),
+
+/// The publicly projected position — what the sovereign *claims* to be.
+/// Distinct from `position` (actual governing track record).
+/// Spending Authority maintains the gap. If euclidean_distance(position, perceived_position)
+/// exceeds a threshold, the Veil Shatters (Stability collapse event).
+/// Cross-ref: METRIC_DEFINITIONS.md §12 (Perception Filter)
+pub perceived_position: (f64, f64),
+
+/// The flavor label for the *perceived* position — publicly broadcasted title.
+/// May differ from flavor_label (actual) when Perception Filter is active.
+pub perceived_flavor_label: String,
+```
+
+---
+
+### 2. [chronos.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/chronos.rs) — Rubber Band & Glacial Shift
+
+#### [MODIFY] [chronos.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/chronos.rs)
+
+**IDX-006: Rubber Band Effect (Gravitational Pull)**
+
+On each tick, if `position` is outside the Overton Window Spread:
+```
+tension = euclidean_distance(position, center)
+if tension > spread:
+    pull_force = (tension - spread) * GRAVITY_CONSTANT   // e.g. 0.05
+    position += normalize(center - position) * pull_force
+    authority.current -= pull_force * AUTHORITY_BLEED     // e.g. 3.0 per unit
+```
+
+Key: this is **not a teleport**. It's a per-tick drift toward the center. The player pays Authority bleed every tick they hold an "unnatural" position. If they run out of AUT, the bleed converts to Stability loss.
+
+**IDX-007: Glacial Shift**
+
+Each tick, `position` drifts slightly toward [center](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs#344-349) proportional to Estate influence momentum:
+```
+drift_rate = 0.01 * (sum of estate influence shifts this tick)
+position += normalize(center - position) * drift_rate
+```
+
+This means sustained Estate manipulation (e.g., slowly bleeding out the Labor Estate) produces gradual position movement without any Authority cost — it's the "earned" form of political drift.
+
+**Estate Velocity Shock Detection:**
+
+After computing `position_velocity` (delta from last tick):
+```rust
+let speed = euclidean_distance(prev_position, current_position);
+if speed > 1.5 {
+    // Inject Estate shock: trigger Capital Flight or equivalent zone gate
+    // even if absolute position doesn't warrant it
+}
+```
+
+**Position History Update:**
+
+```rust
+// Keep last 10 positions (shift window)
+ideology.position_history.push(prev_position);
+if ideology.position_history.len() > 10 {
+    ideology.position_history.remove(0);
+}
+```
+
+---
+
+### 3. [ideology_matrix.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs) — Perception Filter Cost
+
+#### [MODIFY] [ideology_matrix.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs)
+
+Add:
+```rust
+/// Computes the per-tick Authority cost to maintain a Perception Filter.
+/// Cost scales with the Euclidean distance between real and perceived position.
+/// At distance > VEIL_COLLAPSE_THRESHOLD, returns None (Veil shatters).
+pub fn perception_maintenance_cost(
+    real_pos: (f64, f64),
+    perceived_pos: (f64, f64),
+    base_cost: f64,
+) -> Option<f64>
+
+pub const VEIL_COLLAPSE_THRESHOLD: f64 = 3.5;
+```
+
+If [euclidean_distance(real, perceived) > VEIL_COLLAPSE_THRESHOLD](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs#124-137), return `None` — the engine fires a "Veil Shatters" event, causing Stability collapse. The reactor handles the event.
+
+---
+
+### 4. New `scenario.rs` — ScenarioDef Struct
+
+#### [NEW] [scenario.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/scenario.rs)
+
+Strictly typed scenario definition. Invalid files panic at engine boot, not during gameplay.
+
+```rust
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ScenarioDef {
+    pub id: String,
+    pub name: String,
+    pub start_date: String,
+    pub actors: HashMap<EntityId, ActorDef>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ActorDef {
+    pub starting_position: (f64, f64),    // validated: clamped to [-5, +5]
+    pub factions: Vec<FactionDef>,
+    pub estates: Vec<EstateDef>,
+    pub authority_start: f64,
+}
+```
+
+Validation at load time:
+- `starting_position` coordinates must be in `[-5.0, +5.0]` — panic if not
+- `faction.influence` values must sum to ~100 (within 1.0) — panic if not
+- `estate.influence` values must sum to ~100 — panic if not
+
+---
+
+### 5. [tests/journey_tests.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/tests/journey_tests.rs) — Temporal Simulation Harness
+
+#### [MODIFY] [journey_tests.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/tests/journey_tests.rs)
+
+New test: `test_journey_temporal_harness_usa_radicalization`
+
+Per Management directive (RE: V16, §II):
+
+```
+1. Init USA archetype at (+1, 0). Overton center near (0, 0).
+2. Run chronos.tick() × 10.
+3. At tick 3: inject radical leftward policy (attempt shift to -2 on X-axis).
+4. Assert tick 4: Authority drops, Ideological Tension spikes.
+5. Assert tick 5-6: Rubber Band pull is active (position drifting back).
+6. Assert tick 10: Either position has stabilized (AUT/STB paid) or Estate rebellion fired.
+```
+
+This is the capstone Journey Test for Phase 16 and the game's primary difficulty balance tool.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+```powershell
+cargo test --manifest-path brinkmanship_engine/Cargo.toml
+```
+
+**New tests to add:**
+- `test_rubber_band_gradual_pull` — verifies position drifts toward center over ticks, not teleports
+- `test_rubber_band_authority_bleed` — verifies AUT drains per tick when outside spread
+- `test_glacial_shift_slow_drift` — verifies position moves slowly from estate momentum
+- `test_estate_velocity_shock` — verifies Capital Flight triggers on fast acceleration
+- `test_perception_filter_veil_shatters` — verifies None returned beyond collapse threshold
+- `test_journey_temporal_harness_usa_radicalization` — the 10-tick headless loop test
+
+### Dependency Order
+```
+IdeologyComponent fields (state.rs)
+    ├── Rubber Band + Glacial Shift (chronos.rs)  [IDX-006, IDX-007]
+    ├── Estate Velocity Shock (chronos.rs)
+    ├── Perception Filter cost (ideology_matrix.rs)
+    └── Temporal Harness Test (journey_tests.rs)
+ScenarioDef (scenario.rs)  [independent]
+flavor_label UI wire (IdeologyCompass.tsx)  [independent]
+```
+
+---
+
+## Items Deferred to Phase 17
+- `DIP-002` AI Parity (requires IDX-006/007 to exist first)
+- `NAR-001` Tutorial (requires ScenarioDef to be implemented first)
+- Breadcrumb trail rendering in [IdeologyCompass.tsx](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/components/IdeologyCompass.tsx) (requires `position_history` in state, which is Phase 16 — UI work follows)

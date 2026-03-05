@@ -47,6 +47,38 @@ pub struct IdeologyComponent {
     ///
     /// Cross-ref: `artifacts/SOVEREIGN_DISPATCH_V15_THE_STRUCTURAL_MATRIX.md`
     pub flavor_label: String,
+
+    // ── Phase 16 fields ────────────────────────────────────────────────────
+
+    /// Velocity vector: `current_position - prev_position` from the last tick.
+    /// Magnitude > 1.5 units/tick triggers an Estate Velocity Shock (IDX-009):
+    /// Capital Flight or equivalent Zone Gate event fires even if absolute
+    /// position is not yet in a danger zone. "Panic is caused by acceleration, not location."
+    ///
+    /// Cross-ref: `docs/METRIC_DEFINITIONS.md §12`
+    pub position_velocity: (f64, f64),
+
+    /// Ring buffer of the last 10 governing positions, oldest-first.
+    /// Updated each tick by `chronos.rs`. Used for:
+    ///   1. Breadcrumb trail rendering on `IdeologyCompass.tsx` (IDX-011)
+    ///   2. Trend-based event triggers ("5+ ticks of leftward drift")
+    ///
+    /// Cross-ref: `docs/METRIC_DEFINITIONS.md §14`
+    pub position_history: Vec<(f64, f64)>,
+
+    /// The publicly projected sovereign position — what citizens and rivals observe.
+    /// Distinct from `position` (actual governing track record).
+    /// Spending Authority per tick maintains the gap (Perception Filter, IDX-010).
+    /// If `euclidean_distance(position, perceived_position) > VEIL_COLLAPSE_THRESHOLD`,
+    /// the Veil Shatters: catastrophic Stability loss, flavor labels snap to reality.
+    ///
+    /// Cross-ref: `docs/METRIC_DEFINITIONS.md §13`, `ideology_matrix::perception_maintenance_cost()`
+    pub perceived_position: (f64, f64),
+
+    /// The publicly broadcasted flavor label for `perceived_position`.
+    /// May differ from `flavor_label` when Perception Filter is active.
+    /// e.g., sovereign governs at (+3,-2) "Oligarchic" but broadcasts "Liberalism".
+    pub perceived_flavor_label: String,
 }
 
 impl Default for IdeologyComponent {
@@ -56,6 +88,10 @@ impl Default for IdeologyComponent {
             spread: 0.0,
             position: (0.0, 0.0),
             flavor_label: "Liberalism".to_string(),
+            position_velocity: (0.0, 0.0),
+            position_history: Vec::new(),
+            perceived_position: (0.0, 0.0),
+            perceived_flavor_label: "Liberalism".to_string(),
         }
     }
 }

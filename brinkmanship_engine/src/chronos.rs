@@ -1,4 +1,5 @@
 use crate::state::{State, PendingAction};
+use crate::ideology_matrix;
 use rand::prelude::*;
 use rand_distr::Normal;
 use chrono::{NaiveDate, Duration};
@@ -141,7 +142,7 @@ impl Chronos {
             d.state_security = (d.state_security - (s.fear_index * 0.01)).clamp(0.0, 100.0);
 
 
-            // A. DERIVE OVERTON WINDOW (From Factions)
+            // A. DERIVE OVERTON WINDOW (From Factions) + Phase 16 Matrix Physics
             if let Some(factions) = state.factions.get(&entity_id) {
                 if !factions.is_empty() {
                     let total_influence: f64 = factions.values().map(|f| f.influence).sum();
@@ -165,6 +166,129 @@ impl Chronos {
                         let mut ideology = state.ideology.get(&entity_id).cloned().unwrap_or_default();
                         ideology.center = (center_x, center_y);
                         ideology.spread = spread;
+
+                        // ── Phase 16: IDX-006 — Rubber Band Gravitational Pull ──────────────
+                        // If position is outside the Overton Spread, apply a gravitational
+                        // force pulling position toward center. NOT a teleport — velocity-based.
+                        // Bleeds Authority each tick the sovereign fights the current.
+                        // Ref: METRIC_DEFINITIONS.md §12, implementation_plan_phase16.md
+                        const GRAVITY_CONSTANT: f64 = 0.05;
+                        const AUTHORITY_BLEED_PER_UNIT: f64 = 3.0;
+
+                        let tension = ideology_matrix::euclidean_distance(
+                            ideology.position,
+                            (center_x, center_y)
+                        );
+
+                        if tension > spread {
+                            // Direction vector from position toward center
+                            let dx = center_x - ideology.position.0;
+                            let dy = center_y - ideology.position.1;
+                            let dist = tension.max(f64::EPSILON); // avoid divide-by-zero
+                            let pull = (tension - spread) * GRAVITY_CONSTANT;
+
+                            ideology.position.0 += (dx / dist) * pull;
+                            ideology.position.1 += (dy / dist) * pull;
+                            ideology.position.0 = ideology.position.0.clamp(-5.0, 5.0);
+                            ideology.position.1 = ideology.position.1.clamp(-5.0, 5.0);
+
+                            // Authority bleed: drain AUT proportional to pull magnitude
+                            if let Some(mut aut) = next_authority.get(&entity_id).cloned() {
+                                let bleed = pull * AUTHORITY_BLEED_PER_UNIT;
+                                if aut.current >= bleed {
+                                    aut.current = (aut.current - bleed).round_to(4);
+                                } else {
+                                    // AUT exhausted → bleed converts to Stability loss
+                                    let stability_cost = (bleed - aut.current) * 0.5;
+                                    aut.current = 0.0;
+                                    m.stability = (m.stability - stability_cost).clamp(0.0, 100.0);
+                                }
+                                next_authority = next_authority.update(entity_id.clone(), aut);
+                            }
+                        }
+
+                        // ── Phase 16: IDX-007 — Glacial Shift ───────────────────────────────
+                        // Position drifts slowly toward center proportional to estate
+                        // influence momentum (not AUT spend). Earned, organic drift.
+                        // Rate is intentionally tiny — 0.01 per unit of estate influence.
+                        const GLACIAL_DRIFT_RATE: f64 = 0.01;
+                        let estate_momentum = if let Some(estates) = state.estates.get(&entity_id) {
+                            estates.values().map(|e| e.influence).sum::<f64>() / 100.0
+                        } else {
+                            0.0
+                        };
+
+                        let drift_dx = center_x - ideology.position.0;
+                        let drift_dy = center_y - ideology.position.1;
+                        let drift_dist = (drift_dx * drift_dx + drift_dy * drift_dy).sqrt().max(f64::EPSILON);
+                        let glacial_pull = GLACIAL_DRIFT_RATE * estate_momentum;
+
+                        ideology.position.0 += (drift_dx / drift_dist) * glacial_pull;
+                        ideology.position.1 += (drift_dy / drift_dist) * glacial_pull;
+                        ideology.position.0 = ideology.position.0.clamp(-5.0, 5.0);
+                        ideology.position.1 = ideology.position.1.clamp(-5.0, 5.0);
+
+                        // ── Phase 16: IDX-009 — Estate Velocity Memory ───────────────────────
+                        // Compute velocity (delta from previous position). If magnitude > 1.5
+                        // units/tick, log a Political Shock event to the action log.
+                        // "Panic is caused by acceleration, not location." — V16
+                        const SHOCK_THRESHOLD: f64 = 1.5;
+                        let prev_pos = state.ideology.get(&entity_id)
+                            .map(|i| i.position)
+                            .unwrap_or((0.0, 0.0));
+                        let vel_x = ideology.position.0 - prev_pos.0;
+                        let vel_y = ideology.position.1 - prev_pos.1;
+                        let speed = (vel_x * vel_x + vel_y * vel_y).sqrt();
+                        ideology.position_velocity = (vel_x, vel_y);
+
+                        if speed > SHOCK_THRESHOLD {
+                            new_action_logs.push(format!(
+                                "[Day {}] ⚡ VELOCITY SHOCK — {}: position acceleration {:.3} units/tick exceeds threshold ({:.1}). Capital Flight risk elevated.",
+                                new_date, entity_id, speed, SHOCK_THRESHOLD
+                            ));
+                            // Spike volatility in system state to surface shock in ECG
+                            s.volatility = (s.volatility + speed * 2.0).round_to(4);
+                        }
+
+                        // ── Phase 16: IDX-011 — Position History (Breadcrumb Trail) ─────────
+                        // Append previous position, cap at 10 entries (oldest-first ring buffer).
+                        let mut history = ideology.position_history.clone();
+                        history.push(prev_pos);
+                        if history.len() > 10 {
+                            history.remove(0);
+                        }
+                        ideology.position_history = history;
+
+                        // Update flavor label from new position
+                        ideology.flavor_label = ideology_matrix::resolve_flavor_label(
+                            ideology.position.0, ideology.position.1
+                        ).to_string();
+
+                        // ── Phase 16: IDX-010 — Perception Filter ───────────────────────────
+                        // Update perceived_flavor_label from perceived_position.
+                        // Check if Veil Shatters (gap > VEIL_COLLAPSE_THRESHOLD).
+                        const VEIL_COLLAPSE_THRESHOLD: f64 = 3.5;
+                        let perception_gap = ideology_matrix::euclidean_distance(
+                            ideology.position,
+                            ideology.perceived_position
+                        );
+                        if perception_gap > VEIL_COLLAPSE_THRESHOLD {
+                            // Veil Shatters: snap perceived to real, apply stability collapse
+                            ideology.perceived_position = ideology.position;
+                            ideology.perceived_flavor_label = ideology.flavor_label.clone();
+                            m.stability = (m.stability - 20.0).clamp(0.0, 100.0);
+                            new_action_logs.push(format!(
+                                "[Day {}] 🔴 VEIL SHATTERS — {}: reality gap {:.2} exceeded threshold {:.1}. Public perceives '{}'. Stability -20.",
+                                new_date, entity_id, perception_gap, VEIL_COLLAPSE_THRESHOLD,
+                                ideology.flavor_label
+                            ));
+                        } else {
+                            // Normal: update perceived label from perceived_position
+                            ideology.perceived_flavor_label = ideology_matrix::resolve_flavor_label(
+                                ideology.perceived_position.0, ideology.perceived_position.1
+                            ).to_string();
+                        }
+
                         next_ideology = next_ideology.update(entity_id.clone(), ideology);
                     }
                 }
