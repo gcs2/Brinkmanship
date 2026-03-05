@@ -55,18 +55,26 @@ The UI must visually distinguish **Public Truth** (perceived state) from **Deep 
 
 ## III. The Ideology Grid Color System
 
-The 11×11 grid uses quadrant hues that **saturate toward corners and desaturate to `#374151` (dark gray) at center.**
+The 11×11 grid uses **bilinear RGB interpolation** between 4 corner colors, blending continuously into charcoal `rgb(33,33,33)` at the center. No discrete quadrant boundaries — every cell's color is a weighted average of all four corners.
 
 ```
-Formula:
-  dist = √(x² + y²)              // Euclidean distance from (0,0)
-  saturation = (dist / 7.07) × 100  // 7.07 = max corner distance
-  hue = quadrant_base_hue        // Assigned per quadrant (see table above)
-  cell_color = hsl(hue, saturation%, 40%)
+Corner colors (vivid dark-tone RGB):
+  Auth-Planned  (top-left):   rgb(185,  35,  35)  — Dark Red
+  Auth-Market   (top-right):  rgb( 28,  58, 195)  — Dark Blue
+  Lib-Planned   (bottom-left): rgb( 33, 150,  48)  — Dark Green
+  Lib-Market    (bottom-right): rgb(158, 130,  22)  — Dark Gold
+
+Formula per cell (x,y) ∈ [-5,5]²:
+  nx = (x + 5) / 10                  // 0 = Planned, 1 = Market
+  ny = (y + 5) / 10                  // 0 = Lib, 1 = Auth
+  t  = min(√(x²+y²) / 7.071, 1.0)  // 0 = center (gray), 1 = corner (vivid)
+
+  color_bilinear = blerp(C_tl, C_tr, C_bl, C_br, nx, ny)
+  final_color    = lerp(gray, color_bilinear, t)   // fades to charcoal at center
 ```
 
-- Center cells `(dist < 1.0)` always render as dark gray to communicate "ideological neutrality"
-- Hover state: `box-shadow: 0 0 12px rgba(255,255,255,0.6)` — white glow, not colored, to stay neutral
+- Quadrant borders disappear: Blue → Purple → Red (top edge), Green → Chartreuse → Gold (bottom edge)
+- Hover state: `outline: 1px solid rgba(255,255,255,0.55)` — white glow, neutral, not quadrant-colored
 
 ---
 

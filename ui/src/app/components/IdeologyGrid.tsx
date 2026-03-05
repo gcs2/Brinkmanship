@@ -15,20 +15,44 @@ interface IdeologyGridProps {
 }
 
 // ── Color math (per UI_PRINCIPLES.md §III) ────────────────────────────────────
+// Bilinear RGB interpolation between 4 corner colors.
+// No discrete quadrant assignment — colors blend continuously across all borders.
 
 const MAX_DIST = Math.sqrt(50); // √(5²+5²) = 7.071
 
+// Corner colors in RGB (vivid dark-tone)       [r,   g,   b]
+const C_AUTH_LEFT = [185, 35, 35] as const;  // Auth-Planned:  Dark Red
+const C_AUTH_RIGHT = [28, 58, 195] as const;  // Auth-Market:   Dark Blue
+const C_LIB_LEFT = [33, 150, 48] as const;  // Lib-Planned:   Dark Green
+const C_LIB_RIGHT = [158, 130, 22] as const;  // Lib-Market:    Dark Gold
+const C_GRAY = [33, 33, 33] as const;  // Center:        Charcoal
+
 function getCellColor(x: number, y: number): string {
     const dist = Math.sqrt(x * x + y * y);
-    const sat = Math.min((dist / MAX_DIST) * 100, 100);
-    // Center → dark gray
-    if (dist < 0.9) return "hsl(0,0%,13%)";
-    // Quadrant hues: Auth-Right=215 Blue, Auth-Left=2 Red, Lib-Left=125 Green, Lib-Right=48 Yellow
-    let hue = 215;
-    if (x < 0 && y >= 0) hue = 2;
-    if (x < 0 && y < 0) hue = 125;
-    if (x >= 0 && y < 0) hue = 48;
-    return `hsl(${hue},${sat.toFixed(0)}%,32%)`;
+    // t: 0 = center (gray), 1 = extreme corner (full color)
+    const t = Math.min(dist / MAX_DIST, 1.0);
+
+    // Normalized position: nx 0=Planned(-5)→1=Market(+5), ny 0=Lib(-5)→1=Auth(+5)
+    const nx = (x + 5) / 10;
+    const ny = (y + 5) / 10;
+
+    // Bilinear blend of the 4 corner colors
+    const blerp = (tl: number, tr: number, bl: number, br: number) =>
+        (1 - nx) * (1 - ny) * bl +
+        nx * (1 - ny) * br +
+        (1 - nx) * ny * tl +
+        nx * ny * tr;
+
+    const cr = blerp(C_AUTH_LEFT[0], C_AUTH_RIGHT[0], C_LIB_LEFT[0], C_LIB_RIGHT[0]);
+    const cg = blerp(C_AUTH_LEFT[1], C_AUTH_RIGHT[1], C_LIB_LEFT[1], C_LIB_RIGHT[1]);
+    const cb = blerp(C_AUTH_LEFT[2], C_AUTH_RIGHT[2], C_LIB_LEFT[2], C_LIB_RIGHT[2]);
+
+    // Blend from gray (center) → vivid corner color (edge)
+    const r = Math.round(C_GRAY[0] + t * (cr - C_GRAY[0]));
+    const g = Math.round(C_GRAY[1] + t * (cg - C_GRAY[1]));
+    const b = Math.round(C_GRAY[2] + t * (cb - C_GRAY[2]));
+
+    return `rgb(${r},${g},${b})`;
 }
 
 // ── Canonical 121-cell label lookup (per Architectural Directive §V) ──────────
@@ -128,6 +152,15 @@ export const IdeologyGrid = ({
         });
     }, []);
 
+    // Escape key to close (universal fullscreen exit hatch)
+    React.useEffect(() => {
+        const handler = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+        };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, [onClose]);
+
     const cells = useMemo(() => {
         const result = [];
         for (let y = 5; y >= -5; y--)
@@ -165,10 +198,12 @@ export const IdeologyGrid = ({
                     )}
                 </div>
                 <button
+                    data-testid="close-ideology-grid"
                     onClick={onClose}
-                    className="p-1.5 border border-slate-700 text-slate-500 hover:text-red-400 hover:border-red-800 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-700 text-slate-400 hover:text-red-400 hover:border-red-800 transition-colors text-[9px] uppercase tracking-wider"
                 >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-3 h-3" />
+                    <span>ESC</span>
                 </button>
             </div>
 
@@ -187,6 +222,7 @@ export const IdeologyGrid = ({
 
                         {/* Grid — fills remaining square space */}
                         <div
+                            data-testid="ideology-grid-cells"
                             className="flex-1 h-full border border-slate-800 relative"
                             style={{
                                 display: "grid",

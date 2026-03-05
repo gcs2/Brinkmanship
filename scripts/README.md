@@ -29,6 +29,35 @@ cargo test --manifest-path brinkmanship_engine/Cargo.toml
 
 ---
 
+## Visual Testing (AI_RULES.md Rule 3 — Visual Audits)
+
+Visual tests use **Playwright** with screenshot diffing. The baseline PNGs live in `ui/tests/visual.spec.ts-snapshots/`.
+
+### Regression Check (detect unintended changes)
+```powershell
+cd ui
+npm run test:visual
+```
+Compares each screenshot against the stored baseline. Fails if any diff exceeds `maxDiffPixelRatio`.
+
+### Accept New Baselines (after intentional UI changes)
+```powershell
+cd ui
+npm run test:visual:update
+```
+Re-runs all tests and **overwrites** the baseline PNGs with the new screenshots. Commit the updated PNGs to git to lock in the new baseline.
+
+### Interactive Playwright UI (manual inspection)
+```powershell
+cd ui
+npm run test:visual:ui
+```
+Opens the Playwright trace viewer — lets you step through each test, see screenshots, and debug selector failures.
+
+> **Workflow:** Make a UI change → run `test:visual` → if diff is intentional, run `test:visual:update` → commit updated baselines + code change together, so the diff is tracked in git history.
+
+---
+
 ## Script Reference
 
 | Script | Purpose |

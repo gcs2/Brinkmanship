@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# playwright — reporter output and failed test artifacts (NOT the baselines)
+# Baselines live in tests/visual.spec.ts-snapshots/ and ARE committed
+/playwright-report/
+/test-results/
