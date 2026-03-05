@@ -155,9 +155,8 @@ fn init_scenario(state: Arc<AppState>, scenario_id: String) -> Result<(), String
 
     let mut initial_ideology = HashMap::new();
     initial_ideology.insert("PLAYER".to_string(), crate::state::IdeologyComponent {
-        authoritarian_libertarian: 0.0,
-        planned_market: 0.0,
-        overton_radius: 0.20,
+        center: (0.0, 0.0),
+        spread: 0.20,
     });
 
     let s = State {
@@ -167,6 +166,9 @@ fn init_scenario(state: Arc<AppState>, scenario_id: String) -> Result<(), String
         metrics: initial_metrics,
         demographics: initial_demographics,
         ideology: initial_ideology,
+        estates: HashMap::new(),
+        factions: HashMap::new(),
+        authority: HashMap::new(),
         system_states: initial_systems,
         industry: HashMap::new(),
         diplomatic_ledgers: HashMap::new(),

@@ -24,9 +24,8 @@ pub struct DemographicsComponent {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct IdeologyComponent {
-    pub authoritarian_libertarian: f64, // -1.0 to 1.0
-    pub planned_market: f64,            // -1.0 to 1.0
-    pub overton_radius: f64,            // The current "Acceptable" zone
+    pub center: (f64, f64), // (Planned/Market, Auth/Lib)
+    pub spread: f64,       // The current "Acceptable" zone (Standard Deviation)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
@@ -34,6 +33,27 @@ pub struct SystemComponent {
     pub volatility: f64,
     pub provocation: f64,
     pub fear_index: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+pub struct Estate {
+    pub name: String,
+    pub influence: f64,
+    pub happiness: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+pub struct Faction {
+    pub name: String,
+    pub influence: f64,
+    pub alignment: (f64, f64), // (Planned/Market, Auth/Lib)
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+pub struct AuthorityComponent {
+    pub current: f64,
+    pub generation_rate: f64,
+    pub modifiers: HashMap<String, f64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
@@ -69,6 +89,9 @@ pub struct State {
     pub metrics: HashMap<EntityId, MetricsComponent>,
     pub demographics: HashMap<EntityId, DemographicsComponent>,
     pub ideology: HashMap<EntityId, IdeologyComponent>,
+    pub estates: HashMap<EntityId, HashMap<String, Estate>>,
+    pub factions: HashMap<EntityId, HashMap<String, Faction>>,
+    pub authority: HashMap<EntityId, AuthorityComponent>,
     pub system_states: HashMap<EntityId, SystemComponent>,
     pub industry: HashMap<EntityId, IndustryComponent>,
     pub diplomatic_ledgers: HashMap<EntityId, DiplomaticLedger>,

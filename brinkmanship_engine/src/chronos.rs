@@ -93,6 +93,9 @@ impl Chronos {
         let current_phase = state.active_phase;
 
         // 2. Component Drift (For each entity registered in metrics)
+        let mut next_ideology = state.ideology.clone();
+        let mut next_authority = state.authority.clone();
+        
         for entity_id in next_metrics.keys().cloned().collect::<Vec<_>>() {
             let mut m = next_metrics.get(&entity_id).unwrap().clone();
             let mut s = next_system_states.get(&entity_id).unwrap().clone();
@@ -137,9 +140,68 @@ impl Chronos {
             d.elites = (d.elites - (s.volatility - 15.0) * 0.01).clamp(0.0, 100.0);
             d.state_security = (d.state_security - (s.fear_index * 0.01)).clamp(0.0, 100.0);
 
-            // Re-calculate approval
-            let avg_app = (d.working_class + d.elites + d.state_security) / 3.0;
-            m.executive_approval = avg_app.round_to(4);
+
+            // A. DERIVE OVERTON WINDOW (From Factions)
+            if let Some(factions) = state.factions.get(&entity_id) {
+                if !factions.is_empty() {
+                    let total_influence: f64 = factions.values().map(|f| f.influence).sum();
+                    if total_influence > 0.0 {
+                        // Weighted Mean (Center)
+                        let mut center_x = 0.0;
+                        let mut center_y = 0.0;
+                        for f in factions.values() {
+                            center_x += f.alignment.0 * (f.influence / total_influence);
+                            center_y += f.alignment.1 * (f.influence / total_influence);
+                        }
+                        
+                        // Weighted Population Standard Deviation (Spread)
+                        let mut variance = 0.0;
+                        for f in factions.values() {
+                            let dist_sq = (f.alignment.0 - center_x).powi(2) + (f.alignment.1 - center_y).powi(2);
+                            variance += dist_sq * (f.influence / total_influence);
+                        }
+                        let spread = variance.sqrt().max(0.05);
+                        
+                        let mut ideology = state.ideology.get(&entity_id).cloned().unwrap_or_default();
+                        ideology.center = (center_x, center_y);
+                        ideology.spread = spread;
+                        next_ideology = next_ideology.update(entity_id.clone(), ideology);
+                    }
+                }
+            }
+
+            // B. DERIVE APPROVAL (From Estates)
+            if let Some(estates) = state.estates.get(&entity_id) {
+                if !estates.is_empty() {
+                    let total_inf: f64 = estates.values().map(|e| e.influence).sum();
+                    if total_inf > 0.0 {
+                        let weighted_happiness: f64 = estates.values()
+                            .map(|e| e.happiness * (e.influence / total_inf))
+                            .sum();
+                        m.executive_approval = weighted_happiness.round_to(4);
+                    }
+                } else {
+                    let avg_app = (d.working_class + d.elites + d.state_security) / 3.0;
+                    m.executive_approval = avg_app.round_to(4);
+                }
+            } else {
+                let avg_app = (d.working_class + d.elites + d.state_security) / 3.0;
+                m.executive_approval = avg_app.round_to(4);
+            }
+
+            // C. GENERATE AUTHORITY
+            if let Some(mut aut) = state.authority.get(&entity_id).cloned() {
+                // (Base 1.0 + Approval Bonus + Stability Bonus) * Modifiers
+                let app_bonus = (m.executive_approval / 100.0) * 2.0;
+                let stab_bonus = (m.stability / 100.0) * 1.0;
+                let mut modifier_product = 1.0;
+                for mod_val in aut.modifiers.values() {
+                    modifier_product *= mod_val;
+                }
+                
+                aut.current = (aut.current + (aut.generation_rate + app_bonus + stab_bonus) * modifier_product).round_to(4);
+                next_authority = next_authority.update(entity_id.clone(), aut);
+            }
 
             next_metrics.insert(entity_id.clone(), m);
             next_system_states.insert(entity_id.clone(), s);
@@ -156,7 +218,10 @@ impl Chronos {
             active_phase: final_phase,
             metrics: next_metrics,
             demographics: next_demographics,
-            ideology: state.ideology.clone(),
+            ideology: next_ideology,
+            estates: state.estates.clone(),
+            factions: state.factions.clone(),
+            authority: next_authority,
             system_states: next_system_states,
             industry: state.industry.clone(),
             diplomatic_ledgers: state.diplomatic_ledgers.clone(),
@@ -227,6 +292,9 @@ mod tests {
             metrics,
             demographics,
             ideology: HashMap::new(),
+            estates: HashMap::new(),
+            factions: HashMap::new(),
+            authority: HashMap::new(),
             system_states: systems,
             industry: HashMap::new(),
             diplomatic_ledgers: HashMap::new(),
