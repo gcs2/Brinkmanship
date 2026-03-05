@@ -31,86 +31,70 @@ function getCellColor(x: number, y: number): string {
     return `hsl(${hue},${sat.toFixed(0)}%,32%)`;
 }
 
-// ── Comprehensive ideology label lookup ───────────────────────────────────────
-// Covers all 121 (x,y) cells from [-5,5]×[-5,5].
-// Prioritizes named ideologies; fills gaps with descriptive compound labels.
+// ── Canonical 121-cell label lookup (per Architectural Directive §V) ──────────
+// Key format: "x,y" where x = economic axis [-5 Command → +5 Commodified]
+//                         y = authority axis [+5 Totalitarian → -5 Stateless]
+
+const IDEOLOGY_LABELS: Record<string, string> = {
+    // y=+5 Totalitarian
+    "-5,5": "Stalinism", "-4,5": "Maoism", "-3,5": "State Capitalism",
+    "-2,5": "War Economy", "-1,5": "Command Socialism", "0,5": "Garrison State",
+    "1,5": "Corporate Dirigisme", "2,5": "Stratocracy", "3,5": "Cyberpunk Autocracy",
+    "4,5": "Techno-Feudalism", "5,5": "Corporate Dystopia",
+    // y=+4 Autocratic
+    "-5,4": "Juche", "-4,4": "Command Administration", "-3,4": "State Champions",
+    "-2,4": "Dirigisme", "-1,4": "Neo-Statism", "0,4": "One-Party State",
+    "1,4": "Market Authoritarianism", "2,4": "Crony Capitalism", "3,4": "Plutocracy",
+    "4,4": "Oligarchic Capitalism", "5,4": "Private Tyranny",
+    // y=+3 Oligarchic
+    "-5,3": "Politburo Rule", "-4,3": "Nomenklatura", "-3,3": "Developmentalism",
+    "-2,3": "National Synergy", "-1,3": "Social Corporatism", "0,3": "Corporatism",
+    "1,3": "Paternalism", "2,3": "Clientelism", "3,3": "Plutocratic Republic",
+    "4,3": "Cartel State", "5,3": "Anarcho-Capitalist State",
+    // y=+2 Illiberal
+    "-5,2": "People's Republic", "-4,2": "State-Led Development", "-3,2": "Guided Economy",
+    "-2,2": "Welfare Statism", "-1,2": "Managed Democracy", "0,2": "Illiberal Democracy",
+    "1,2": "Soft Autocracy", "2,2": "Neoliberalism", "3,2": "Market Populism",
+    "4,2": "Private Statehood", "5,2": "Proprietary Rule",
+    // y=+1 Executive
+    "-5,1": "National Command", "-4,1": "Central Bureaucracy", "-3,1": "Industrial Policy",
+    "-2,1": "New Dealism", "-1,1": "Third Way", "0,1": "Executive Republic",
+    "1,1": "Liberal Democracy", "2,1": "Neoliberalism", "3,1": "Hyper-Privatization",
+    "4,1": "Contractualism", "5,1": "Market Hegemony",
+    // y=0 Constitutional
+    "-5,0": "Council Republic", "-4,0": "Planned Democracy", "-3,0": "Social Democracy",
+    "-2,0": "Welfare State", "-1,0": "Rhine Capitalism", "0,0": "Liberalism",
+    "1,0": "Market Democracy", "2,0": "Laissez-Faire Republic", "3,0": "Market Constitutionalism",
+    "4,0": "Galt's Gulch", "5,0": "Contract State",
+    // y=-1 Decentralized
+    "-5,-1": "Idealized Soviet", "-4,-1": "Local Planning", "-3,-1": "Guild Socialism",
+    "-2,-1": "Distributism", "-1,-1": "Social Liberalism", "0,-1": "Federalism",
+    "1,-1": "Minarchism", "2,-1": "Polycentric Law", "3,-1": "Voluntarism",
+    "4,-1": "Free Banking", "5,-1": "Market Anarchy",
+    // y=-2 Minimalist
+    "-5,-2": "Minarchist Commune", "-4,-2": "Syndicalism", "-3,-2": "Mutualism",
+    "-2,-2": "Georgism", "-1,-2": "Civil Society", "0,-2": "Classical Liberalism",
+    "1,-2": "Night-Watchman State", "2,-2": "Agorism", "3,-2": "Panarchism",
+    "4,-2": "Private Law Society", "5,-2": "Contract Society",
+    // y=-3 Watchman
+    "-5,-3": "Communitarianism", "-4,-3": "Cooperative Federation", "-3,-3": "Left-Agorism",
+    "-2,-3": "Market Socialism", "-1,-3": "Libertarianism", "0,-3": "Minarchism",
+    "1,-3": "Watchman State", "2,-3": "Anarcho-Capitalism Lite", "3,-3": "Voluntarism",
+    "4,-3": "Private Cities", "5,-3": "Market Order",
+    // y=-4 Autonomous
+    "-5,-4": "Autonomous Zone", "-4,-4": "Collective", "-3,-4": "Communes",
+    "-2,-4": "Cooperative Federation", "-1,-4": "Mutualism", "0,-4": "Free Territory",
+    "1,-4": "Autonomy", "2,-4": "Agorist Cell", "3,-4": "Voluntarism",
+    "4,-4": "Privatism", "5,-4": "Anarcho-Capitalism",
+    // y=-5 Stateless
+    "-5,-5": "Pure Communism", "-4,-5": "Gift Economy", "-3,-5": "Left-Anarchism",
+    "-2,-5": "Collectivism", "-1,-5": "Distributism", "0,-5": "Anarchism",
+    "1,-5": "Individualism", "2,-5": "Agorism", "3,-5": "Voluntarism",
+    "4,-5": "Market Anarchism", "5,-5": "Anarcho-Capitalism",
+};
 
 function getIdeologyLabel(x: number, y: number): string {
-    const dist = Math.sqrt(x * x + y * y);
-
-    // ── Center ───────────────────────────────────────────────────────────────
-    if (dist < 1.0) return "Liberalism";
-
-    // ── Corner extremes ───────────────────────────────────────────────────────
-    if (x >= 4 && y >= 4) return "Fascism";
-    if (x <= -4 && y >= 4) return "Stalinism";
-    if (x >= 4 && y <= -4) return "Anarcho-Capitalism";
-    if (x <= -4 && y <= -4) return "Anarcho-Communism";
-
-    // ── Edge extremes ─────────────────────────────────────────────────────────
-    if (y >= 4 && x > -3 && x < 3) return "Totalitarianism";
-    if (y <= -4 && x > -3 && x < 3) return "Anarchism";
-    if (x >= 4 && y > -3 && y < 3) return "Neoliberalism";
-    if (x <= -4 && y > -3 && y < 3) return "Communism";
-
-    // ── Near-edge transitions on axes ────────────────────────────────────────
-    if (y >= 3 && x >= 2) return "National Conservatism";
-    if (y >= 3 && x <= -2) return "Marxism-Leninism";
-    if (y <= -3 && x >= 2) return "Libertarianism";
-    if (y <= -3 && x <= -2) return "Anarcho-Syndicalism";
-
-    // ── Quadrant moderates (by dominant axis) ────────────────────────────────
-    const isRight = x > 0;
-    const isAuth = y > 0;
-    const strongX = Math.abs(x) >= 3;
-    const strongY = Math.abs(y) >= 3;
-    const mild = dist <= 2.0;
-
-    if (isAuth && isRight) {
-        if (mild) return "Centre-Right";
-        if (strongY && !strongX) return "Authoritarianism";
-        if (strongX && !strongY) return "Nat. Conservatism";
-        return "Conservatism";
-    }
-    if (isAuth && !isRight) {
-        if (mild) return "Centre-Left";
-        if (strongY && !strongX) return "State Socialism";
-        if (strongX && !strongY) return "Marxism";
-        return "Soc. Democracy";
-    }
-    if (!isAuth && isRight) {
-        if (mild) return "Liberal Democracy";
-        if (strongY && !strongX) return "Classical Liberalism";
-        if (strongX && !strongY) return "Libertarianism";
-        return "Social Liberalism";
-    }
-    // Lib-Left
-    if (mild) return "Progressivism";
-    if (strongY && !strongX) return "Left-Anarchism";
-    if (strongX && !strongY) return "Eco-Socialism";
-    return "Green Politics";
-}
-
-function getShortLabel(x: number, y: number): string {
-    const full = getIdeologyLabel(x, y);
-    // Abbreviate to fit in cell
-    const abbrevMap: Record<string, string> = {
-        "National Conservatism": "Nat. Con.",
-        "Marxism-Leninism": "Marxism-L",
-        "Anarcho-Capitalism": "Anarch-Cap",
-        "Anarcho-Communism": "Anarch-Com",
-        "Anarcho-Syndicalism": "Anarchosyn.",
-        "Totalitarianism": "Totalit.",
-        "Liberal Democracy": "Lib. Dem.",
-        "Social Liberalism": "Soc. Lib.",
-        "Classical Liberalism": "Class. Lib.",
-        "Soc. Democracy": "Soc. Dem.",
-        "State Socialism": "State Soc.",
-        "Left-Anarchism": "Left-Anarch",
-        "Centre-Right": "Ctr-Right",
-        "Centre-Left": "Ctr-Left",
-    };
-    return abbrevMap[full] ?? full;
+    return IDEOLOGY_LABELS[`${x},${y}`] ?? `(${x},${y})`;
 }
 
 // ── Filter config (Grid filter removed — labels always shown) ─────────────────
@@ -215,8 +199,7 @@ export const IdeologyGrid = ({
                                 const isPerceived = perceivedCell?.x === x && perceivedCell?.y === y;
                                 const isHistory = activeFilters.has("trajectory") && historySet.has(`${x},${y}`);
                                 const isHovered = hoveredCell?.x === x && hoveredCell?.y === y;
-                                const fullLabel = getIdeologyLabel(x, y);
-                                const shortLabel = getShortLabel(x, y);
+                                const label = getIdeologyLabel(x, y);
 
                                 return (
                                     <div
@@ -237,7 +220,7 @@ export const IdeologyGrid = ({
                                                 className="text-center leading-tight text-white/70 font-mono"
                                                 style={{ fontSize: "clamp(9px, 1.15vw, 13px)" }}
                                             >
-                                                {shortLabel}
+                                                {getIdeologyLabel(x, y)}
                                             </span>
                                         </div>
 
@@ -272,7 +255,7 @@ export const IdeologyGrid = ({
                                                     transform: "translateX(-50%)",
                                                 }}
                                             >
-                                                <div className="text-[13px] text-white font-mono mb-0.5">{fullLabel}</div>
+                                                <div className="text-[13px] text-white font-mono mb-0.5">{label}</div>
                                                 <div className="text-[8px] text-slate-500">
                                                     {x > 0 ? "+" : ""}{x},{y > 0 ? "+" : ""}{y}
                                                     &nbsp;·&nbsp;
