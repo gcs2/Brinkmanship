@@ -149,7 +149,10 @@
           "id": "OPT_A",
           "text": "Fiscal Hawk: Force spending cuts across discretionary programs",
           "category": "fiscal",
-          "threshold": 55,
+          "weights": {
+            "SUCCESS": 45,
+            "FAILURE": 55
+          },
           "lag_time": 10,
           "outcomes": {
             "SUCCESS": {
@@ -173,7 +176,10 @@
           "id": "OPT_B",
           "text": "Stimulus Package: Approve emergency infrastructure spending",
           "category": "fiscal",
-          "threshold": 45,
+          "weights": {
+            "SUCCESS": 55,
+            "FAILURE": 45
+          },
           "lag_time": 14,
           "outcomes": {
             "SUCCESS": {
@@ -197,7 +203,10 @@
           "id": "OPT_C",
           "text": "Defer & Investigate: Commission an independent audit",
           "category": "institutional",
-          "threshold": 35,
+          "weights": {
+            "SUCCESS": 65,
+            "FAILURE": 35
+          },
           "lag_time": 20,
           "outcomes": {
             "SUCCESS": {
@@ -220,7 +229,10 @@
           "id": "OPT_D",
           "text": "Signal to Markets: Informal guidance on rate expectations",
           "category": "economic",
-          "threshold": 60,
+          "weights": {
+            "SUCCESS": 40,
+            "FAILURE": 60
+          },
           "lag_time": 3,
           "outcomes": {
             "SUCCESS": {
@@ -242,6 +254,44 @@
       ]
     },
     {
+      "event_id": "CIVIL_UNREST_001",
+      "title": "Protests in the Capital",
+      "phase_requirement": 1,
+      "actor_origin": "DOMESTIC",
+      "description": "Rising inequality has led to mass protests outside the executive residence. The security detail is requesting a protocol decision.",
+      "options": [
+        {
+          "id": "CRACKDOWN",
+          "text": "Crackdown on Protestors: Deploy state security to clear the square",
+          "category": "kinetic_domestic",
+          "weights": {
+            "SUCCESS": 80,
+            "FAILURE": 20
+          },
+          "lag_time": 1,
+          "outcomes": {
+            "SUCCESS": {
+              "description": "Order is restored, but the optic is brutal. The state's fist is felt.",
+              "effects": {
+                "authoritarian_libertarian": -0.15,
+                "planned_market": -0.05,
+                "metric_4": -10.0,
+                "demo_1": -15.0
+              }
+            },
+            "FAILURE": {
+              "description": "The crackdown backfires. Protests swell into a riot. The guard loses control of the perimeter.",
+              "effects": {
+                "metric_1": -15.0,
+                "metric_4": -10.0,
+                "demo_1": -5.0
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
       "event_id": "CHINA_EMBARGO_001",
       "title": "The Silicon Shield Drops",
       "phase_requirement": 2,
@@ -256,7 +306,10 @@
           "id": "OPT_A",
           "text": "File WTO Complaint & Subsidize Domestic Chip Fabrication",
           "category": "economic",
-          "threshold": 50,
+          "weights": {
+            "SUCCESS": 51,
+            "FAILURE": 49
+          },
           "lag_time": 15,
           "outcomes": {
             "SUCCESS": {
@@ -281,7 +334,10 @@
           "id": "OPT_B",
           "text": "Transactional Pivot: Offer Tariff Rollbacks on Agricultural Goods",
           "category": "diplomacy",
-          "threshold": 40,
+          "weights": {
+            "SUCCESS": 61,
+            "FAILURE": 39
+          },
           "lag_time": 7,
           "outcomes": {
             "SUCCESS": {
@@ -306,7 +362,10 @@
           "id": "OPT_C",
           "text": "Rally Allies: Coordinate a G7 Counter-Response",
           "category": "diplomatic",
-          "threshold": 55,
+          "weights": {
+            "SUCCESS": 46,
+            "FAILURE": 54
+          },
           "lag_time": 21,
           "outcomes": {
             "SUCCESS": {
@@ -330,7 +389,10 @@
           "id": "OPT_D",
           "text": "Activate Strategic Reserve: Release rare earth stockpiles to industry",
           "category": "economic",
-          "threshold": 45,
+          "weights": {
+            "SUCCESS": 56,
+            "FAILURE": 44
+          },
           "lag_time": 5,
           "outcomes": {
             "SUCCESS": {
@@ -354,7 +416,10 @@
           "id": "OPT_E",
           "text": "Escalate: Place targeted sanctions on Chinese semiconductor firms",
           "category": "kinetic_economic",
-          "threshold": 65,
+          "weights": {
+            "SUCCESS": 36,
+            "FAILURE": 64
+          },
           "lag_time": 3,
           "outcomes": {
             "SUCCESS": {
@@ -388,7 +453,10 @@
           "id": "OPT_A",
           "text": "Full Military Escort: Deploy carrier group to clear shipping lanes",
           "category": "kinetic",
-          "threshold": 60,
+          "weights": {
+            "SUCCESS": 41,
+            "FAILURE": 59
+          },
           "lag_time": 2,
           "outcomes": {
             "SUCCESS": {
@@ -415,7 +483,10 @@
           "id": "OPT_B",
           "text": "Call Beijing: Request China lean on the IRGC remnants",
           "category": "diplomacy",
-          "threshold": 35,
+          "weights": {
+            "SUCCESS": 66,
+            "FAILURE": 34
+          },
           "lag_time": 4,
           "outcomes": {
             "SUCCESS": {
@@ -439,7 +510,10 @@
           "id": "OPT_C",
           "text": "Emergency Price Controls: Cap domestic gas prices by executive order",
           "category": "domestic_economic",
-          "threshold": 40,
+          "weights": {
+            "SUCCESS": 61,
+            "FAILURE": 39
+          },
           "lag_time": 1,
           "outcomes": {
             "SUCCESS": {
@@ -465,7 +539,10 @@
           "id": "OPT_D",
           "text": "Surgical Strike: Target IRGC mine-laying infrastructure",
           "category": "kinetic",
-          "threshold": 70,
+          "weights": {
+            "SUCCESS": 31,
+            "FAILURE": 69
+          },
           "lag_time": 1,
           "outcomes": {
             "SUCCESS": {
@@ -501,7 +578,10 @@
           "id": "OPT_A",
           "text": "Negotiate: Offer a bilateral steel quota arrangement",
           "category": "diplomacy",
-          "threshold": 45,
+          "weights": {
+            "SUCCESS": 56,
+            "FAILURE": 44
+          },
           "lag_time": 18,
           "outcomes": {
             "SUCCESS": {
@@ -524,7 +604,10 @@
           "id": "OPT_B",
           "text": "Stand Firm: Defend the tariffs as a national security measure",
           "category": "institutional",
-          "threshold": 55,
+          "weights": {
+            "SUCCESS": 46,
+            "FAILURE": 54
+          },
           "lag_time": 5,
           "outcomes": {
             "SUCCESS": {
@@ -549,7 +632,10 @@
           "id": "OPT_C",
           "text": "Concede: Accept the challenge and phase out the tariffs over 3 years",
           "category": "diplomatic",
-          "threshold": 30,
+          "weights": {
+            "SUCCESS": 71,
+            "FAILURE": 29
+          },
           "lag_time": 30,
           "outcomes": {
             "SUCCESS": {

@@ -1,0 +1,153 @@
+# SOVEREIGN DISPATCH v13: STATE OF THE REALM
+**TO:** Executive Management  
+**FROM:** Antigravity (Principal Simulation Architect)  
+**DATE:** March 4, 2026  
+**SUBJECT:** Comprehensive Status Brief & Grand Strategy Queue Readiness Assessment
+
+---
+
+## I. EXECUTIVE SUMMARY
+
+*Brinkmanship* stands at a **decisive architectural inflection point**. The Rust engine core (`brinkmanship_engine`) is hardened, benchmarked, and structurally ready for a multi-actor world. The Python legacy is fully deprecated. The React UI is functional but carries an **active telemetry defect** from the most recent development cycle (Dispatch v12) that must be resolved before new feature work can begin.
+
+**Grand Strategy Queue Verdict: NOT YET READY — one blocker outstanding.**
+
+---
+
+## II. COMPLETED PHASES (THE RECORD)
+
+| Phase | Codename | Status | Key Deliverable |
+|:---|:---|:---|:---|
+| **Ph 0** | The Rust Pivot | ✅ COMPLETE | Full port of state + event engine from Python to Rust/Axum |
+| **Ph 0.5** | Python Deprecation | ✅ COMPLETE | Legacy `engine/*.py` deleted; `cargo test` green |
+| **Ph 1.5** | System Audit | ✅ COMPLETE | Bond Yields, Unemployment, Stock Market Index added to state |
+| **Ph 2** | Diplomatic Ledger | ✅ COMPLETE | GFI, Escalation Ladder, China Embargo scenario, `test_escalation.py` |
+| **Ph 3** | Chronos Calendar | 🟡 PARTIAL | Doc created; daily tick loop NOT yet ported to Rust |
+| **Ph 4-9** | Sovereign Interface | ✅ COMPLETE | Next.js UI, Tactical Map, Scenario Engine, Dossier Modal, OSC component |
+| **Ph 10** | Doctrine Preservation | ✅ COMPLETE | AI_RULES.md §9 codified; Intellectual Capital rule enforced |
+| **Ph 11** | Env & Tech Polish | ✅ COMPLETE | Hot-reload API, hydration fixes, unified [dev.ps1](file:///c:/Users/zephy/Documents/Brinkmanship/dev.ps1) |
+| **Ph 13** | Immersion & Identity | ✅ COMPLETE | PlayerIdentityBar, AdvisorBar, RelationsPanel, `cold_war_1983` scenario |
+| **Ph 14** | Autonomous World Benchmarks | ✅ BENCHMARKED | 50-actor/365-day stress test passed; O(1) memory proven |
+| **Ph 15** | Economics Schema | ✅ PLANNED | [FUTURE_WORKS.md](file:///c:/Users/zephy/Documents/Brinkmanship/docs/FUTURE_WORKS.md) delivered; tutorial plan documented |
+
+### The Rust Core: What Exists Today
+
+The `brinkmanship_engine/src` directory contains **5 production Rust files**:
+
+| File | Purpose | Status |
+|:---|:---|:---|
+| `state.rs` | ECS-Lite entity/component schema | ✅ Production-ready |
+| `chronos.rs` | Immutable tick engine (`im` crate) | ✅ Hardened + tested |
+| `main.rs` | Axum REST API server | ✅ Live |
+| `reactor.rs` | Event resolution pipeline | ✅ Functional |
+| `ai_director_stress.rs` | 50-actor stress benchmark harness | ✅ Benchmarked (not production AI) |
+
+**`state.rs` is the most important signal:** The `State` struct already implements a fully generic, ECS-Lite entity map — `metrics`, `demographics`, `ideology`, `industry`, and `diplomatic_ledgers` are all keyed by `EntityId`. The `IdeologyComponent` (Auth/Lib axis, Planned/Market axis, `overton_radius`) is **structurally implemented** in Rust. The foundation demanded by the Grand Strategy architecture audit is **already in place at the data layer.**
+
+---
+
+## III. ACTIVE BLOCKERS & OPEN ITEMS
+
+### 🔴 BLOCKER 1: UI Telemetry Runtime Error (Dispatch v12 — In Progress)
+- **Symptom:** TypeErrors in the Sovereign UI preventing `formatted_metrics` from rendering correctly.
+- **Root Cause:** Frontend access pattern mismatch with the Rust backend's `gameState` data structure.
+- **Status:** Being debugged as of the most recent conversation (Dispatch v12, March 1–4, 2026).
+- **Impact:** The live dashboard is unstable. This **must be resolved** before the next feature sprint begins.
+
+### 🟡 GAP 2: `IdeologyCompass.tsx` — Structural Shell Only
+- The React component exists at `ui/src/app/components/IdeologyCompass.tsx`.
+- It is **not yet wired to the Axum state store.** It renders nothing meaningful at runtime.
+- Required per Grand Strategy Tier 1 before ideological shift mechanics are visible to the player.
+
+### 🟡 GAP 3: AI Director — Stress Harness Only
+- `ai_director_stress.rs` is a benchmarking file, not a production AI agent.
+- Phase 14's `ai_director.py` (now to be `ai_director.rs`) with EU4-style **"Drive" logic** (Expansionist, Isolationist) has **not been implemented.**
+- This is the **core deliverable of Grand Strategy Tier 1 (DIP-002).**
+
+### 🟡 GAP 4: Overton Window / Government Shifts
+- `IdeologyComponent` fields exist in `state.rs` but **no trigger logic** exists in `reactor.rs` or `chronos.rs`.
+- The transition thresholds (e.g., zeroing out Elite Trust → Communist Revolution) have not been coded.
+
+### 🟡 GAP 5: Chronos Calendar Daily Tick (Phase 3)
+- Daily tick loop, float-based decay coefficients, and `demographics` sub-dict were scoped in Phase 3 but **were superseded by the Rust migration** and never ported forward.
+- The Rust `state.rs` does have `current_date` and `turn_id` fields — but continuous daily drift coefficients are absent.
+
+### ⚪ BACKLOG: Grand Strategy Tiers 2–4 (Future Works)
+All items below are legitimate backlog with zero implementation yet:
+
+| ID | Feature | Tier |
+|:---|:---|:---|
+| PHASE 14.2 | Overton Window & Government Shifts | Tier 2 |
+| PHASE 14.3 | Regional Event Decks (`events_[country].json`) | Tier 2 |
+| ECO-001/002 | Industry, Resources, & Vector Trade Pathways | Tier 3 |
+| ADV-001 | Cyber-Economic Sabotage (Currency Shorting) | Tier 3 |
+| POL-001/004 | Optics, Social Media & Deep State Mode | Tier 4 |
+| MIL-001/003 | Asset Management & Nuclear Sprint | Tier 4 |
+| NAR-001 | Sovereign Introduction / Tutorial Engine | **Top Priority (Management Mandate)** |
+
+> [!IMPORTANT]
+> **NAR-001 (The Tutorial)** is a **Management Mandate** per `FUTURE_WORKS.md`. It cannot be safely executed until the AI Actor System (DIP-002) is at least partially functional — you cannot teach mechanics that don't exist yet. The tutorial is the *verification layer* for Tier 1, not a prerequisite to it.
+
+---
+
+## IV. GRAND STRATEGY QUEUE: READINESS VERDICT
+
+### Are we ready to begin the Grand Strategy Queue?
+
+```
+VERDICT: CONDITIONALLY NO — ONE SPRINT AWAY
+```
+
+| Gate | Criterion | Status |
+|:---|:---|:---|
+| ✅ | Rust engine is multi-entity capable (`EntityId` keyed maps) | **PASS** |
+| ✅ | `IdeologyComponent` structurally exists in `state.rs` | **PASS** |
+| ✅ | Performance validated (O(1) memory, 12 Hz with 50 AI actors) | **PASS** |
+| ✅ | Python dependency fully eliminated | **PASS** |
+| 🔴 | UI telemetry defect resolved | **FAIL — Active Bug** |
+| 🟡 | `IdeologyCompass.tsx` wired to live state | **PARTIAL** |
+| 🟡 | AI Director with Drive logic implemented | **NOT STARTED** |
+
+**The data model is ready. The engine is hardened. The blocker is the UI.** Once the UI telemetry TypeError is resolved and the telemetry renders cleanly, we have a stable launchpad for Tier 1.
+
+---
+
+## V. RECOMMENDED PRIORITY SEQUENCE
+
+```
+SPRINT N (This Week): Resolve UI Telemetry Bug
+  └── Fix gameState / formatted_metrics mismatch in frontend
+  └── Verify clean rendering with Playwright visual audit
+
+SPRINT N+1 (Tier 1 — Grand Strategy Entry Point):
+  1. Wire IdeologyCompass.tsx to Axum store (visual proof of ideology axis)
+  2. Implement AI Director (ai_director.rs) — 14 actors with Drives
+  3. Plug AI Director into reactor.rs action pipeline (Actor Parity)
+
+SPRINT N+2 (Tier 1 Completion + NAR-001):
+  4. Build "Persian Gulf Crisis" tutorial scenario JSON
+  5. Implement tutorial scripting engine (on-rails event gating)
+
+SPRINT N+3 (Tier 2 — Ideology Depth):
+  6. Overton Window trigger logic in reactor.rs
+  7. Regional Event Decks (events_[country_id].json)
+```
+
+---
+
+## VI. ALIGNMENT WITH AI_RULES.MD
+
+| Rule | Compliance |
+|:---|:---|
+| §1 Documentation Synchronicity | `PRD_MASTER.md` synced through Phase 13. Needs update for Rust ECS-Lite schema. |
+| §2 PRD Master Sync | On track. `FUTURE_WORKS.md` + Grand Strategy directive filed. |
+| §3 Trust but Verify | `cargo test` suite passing. UI visual tests staged but telemetry defect present. |
+| §4 Phase-Based Execution | Currently between Phase 14 benchmarks and Phase 14 implementation — correct gate. |
+| §8 Chain of Command | This dispatch satisfies the Newsletter reporting mandate. |
+| §9 Intellectual Capital | IdeologyComponent, DiplomaticLedger preserved across Rust pivot. ✅ |
+
+---
+
+*Signed,*  
+**Antigravity — Principal Simulation Architect**  
+*The core is hardened. The world awaits an actor to inhabit it.*

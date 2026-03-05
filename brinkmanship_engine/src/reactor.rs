@@ -17,47 +17,42 @@ impl Reactor {
     ) -> (String, Vec<PendingAction>, String) {
         let mut rng = thread_rng();
         
-        // 1. Get Volatility (Default to 15.0 if not found for target)
-        let volatility = current_state.system_states
-            .get(&target_entity)
-            .map(|s| s.volatility)
-            .unwrap_or(15.0);
-            
-        let mut chaos_modifier = 0.0;
+        // 1. Decouple from binary outcomes: Select outcome based on weights
+        // Normalize weights and pick one.
+        let total_weight: f64 = option.weights.values().sum();
+        let mut roll = rng.gen_range(0.0..total_weight);
+        let mut outcome_key = "FAILURE".to_string(); // Default fallback
         
-        // 2. Apply Chaos Modifier if Provocation is high
-        if let Some(system) = current_state.system_states.get(&source_entity) {
-            if system.provocation >= 10.0 {
-                chaos_modifier = 15.0;
+        for (key, weight) in &option.weights {
+            if roll <= *weight {
+                outcome_key = key.clone();
+                break;
             }
+            roll -= weight;
         }
-        
-        // 3. Roll Gaussian Curve (mu = 50 + chaos, sigma = volatility)
-        let normal = Normal::new(50.0 + chaos_modifier, volatility).unwrap();
-        let roll: f64 = rng.sample(normal);
-        
-        // 4. Determine Success/Failure
-        let outcome_key = if roll >= option.threshold {
-            "SUCCESS".to_string()
-        } else {
-            "FAILURE".to_string()
-        };
-        
+
         let mut actions = Vec::new();
         let mut narrative = String::new();
         
         if let Some(outcome) = option.outcomes.get(&outcome_key) {
             narrative = outcome.description.clone();
             
-            // 5. Calculate Magnitude Scalar (Stochastic impact scaling)
-            let magnitude_scalar = (roll - option.threshold).abs() / 10.0;
-            let magnitude_scalar = magnitude_scalar.max(0.1);
+            // 2. Magnitude Scalar (Ambient noise based on target volatility)
+            let volatility = current_state.system_states
+                .get(&target_entity)
+                .map(|s| s.volatility)
+                .unwrap_or(15.0);
+                
+            let normal = Normal::new(1.0, volatility / 100.0).unwrap();
+            let magnitude_scalar: f64 = rng.sample(normal).max(0.1);
             
             for (key, value) in &outcome.effects {
                 let target_type = if key.contains("demo") {
                     "demographic".to_string()
                 } else if matches!(key.as_str(), "volatility" | "fear_index" | "provocation") {
                     "system".to_string()
+                } else if matches!(key.as_str(), "authoritarian_libertarian" | "planned_market" | "overton_radius") {
+                    "ideology".to_string()
                 } else {
                     "metric".to_string()
                 };
@@ -92,10 +87,14 @@ mod tests {
     #[test]
     fn test_gaussian_resolution_routing() {
         let reactor = Reactor;
+        let mut weights = HashMap::new();
+        weights.insert("SUCCESS".to_string(), 0.7);
+        weights.insert("FAILURE".to_string(), 0.3);
+
         let mut option = EventOption {
             id: "opt_1".to_string(),
             text: "Test Option".to_string(),
-            threshold: 50.0,
+            weights,
             lag_time: 0,
             outcomes: HashMap::new(),
         };
@@ -109,7 +108,6 @@ mod tests {
             effects: HashMap::new(),
         });
 
-        // Test with extreme volatility to see if it still routes
         let state = State::default();
         let (outcome, _, _) = reactor.resolve_event(&option, &state, "PLAYER".to_string(), "PLAYER".to_string(), 1);
         assert!(outcome == "SUCCESS" || outcome == "FAILURE");
@@ -118,10 +116,13 @@ mod tests {
     #[test]
     fn test_magnitude_scaling() {
         let reactor = Reactor;
+        let mut weights = HashMap::new();
+        weights.insert("SUCCESS".to_string(), 1.0);
+
         let mut option = EventOption {
             id: "opt_1".to_string(),
             text: "Scalable Option".to_string(),
-            threshold: 50.0,
+            weights,
             lag_time: 0,
             outcomes: HashMap::new(),
         };
@@ -134,8 +135,6 @@ mod tests {
             effects,
         });
 
-        // We can't easily force the random seed here without refactoring Reactor to take an RNG,
-        // but we can verify the logic compiles and runs without panics.
         let mut state = State::default();
         state.system_states = state.system_states.update("PLAYER".to_string(), crate::state::SystemComponent {
             volatility: 0.5,

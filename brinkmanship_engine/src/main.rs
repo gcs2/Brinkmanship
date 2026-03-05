@@ -55,6 +55,7 @@ pub struct GameStateSnapshot {
     pub phase_name: String,
     pub player_profile: PlayerProfile,
     pub advisors: Vec<Advisor>,
+    pub player_ideology: crate::state::IdeologyComponent,
     pub formatted_metrics: Vec<FormattedMetric>,
     pub demographics: HashMap<String, f64>,
     pub system: crate::state::SystemComponent,
@@ -152,13 +153,20 @@ fn init_scenario(state: Arc<AppState>, scenario_id: String) -> Result<(), String
         fear_index: 0.0,
     });
 
+    let mut initial_ideology = HashMap::new();
+    initial_ideology.insert("PLAYER".to_string(), crate::state::IdeologyComponent {
+        authoritarian_libertarian: 0.0,
+        planned_market: 0.0,
+        overton_radius: 0.20,
+    });
+
     let s = State {
         turn_id: 0,
         current_date: "2025-01-20".to_string(),
         active_phase: 1,
         metrics: initial_metrics,
         demographics: initial_demographics,
-        ideology: HashMap::new(),
+        ideology: initial_ideology,
         system_states: initial_systems,
         industry: HashMap::new(),
         diplomatic_ledgers: HashMap::new(),
@@ -188,6 +196,7 @@ fn create_snapshot(s: &State) -> GameStateSnapshot {
     let player_demo = s.demographics.get("PLAYER").cloned().unwrap_or_default();
     let player_system = s.system_states.get("PLAYER").cloned().unwrap_or_default();
     let player_industry = s.industry.get("PLAYER").cloned().unwrap_or_default();
+    let player_ideology = s.ideology.get("PLAYER").cloned().unwrap_or_default();
 
     let formatted_metrics = vec![
         FormattedMetric { id: "stability".into(), label: "Global Stability".into(), value: player_metrics.stability, tooltip: "Baseline geopolitical cohesion index.".into() },
@@ -221,6 +230,7 @@ fn create_snapshot(s: &State) -> GameStateSnapshot {
             Advisor { id: "adv_1".into(), name: "Dr. Aris".into(), role: "Systems Specialist".into(), specialty: "defense".into(), trust: 85.0 },
             Advisor { id: "adv_2".into(), name: "Marcus Vane".into(), role: "Economic Strategist".into(), specialty: "finance".into(), trust: 42.0 },
         ],
+        player_ideology,
         formatted_metrics,
         demographics,
         system: player_system,

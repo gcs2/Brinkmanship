@@ -54,8 +54,7 @@ const IdeologyCompass = ({
             <motion.div
                 initial={false}
                 animate={{
-                    scale: [1, 1.05, 1],
-                    opacity: [0.1, 0.15, 0.1],
+                    opacity: [0.1, 0.3, 0.1],
                 }}
                 transition={{
                     duration: 4,
@@ -76,7 +75,7 @@ const IdeologyCompass = ({
             <motion.div
                 initial={false}
                 animate={{ left: `${x}%`, top: `${y}%` }}
-                transition={{ type: "spring", stiffness: 100, damping: 20 }}
+                transition={{ type: "spring", stiffness: 50, damping: 20 }}
                 className="absolute w-2 h-2 -ml-1 -mt-1"
             >
                 <div className="absolute inset-x-0 top-1/2 h-[1px] bg-amber-accent/50 -translate-y-1/2 w-8 -left-3" />

@@ -7,6 +7,7 @@ import TacticalMap from "./components/TacticalMap";
 import DossierPane from "./components/DossierPane";
 import IntelFeed from "./components/IntelFeed";
 import { IdentityPanel } from "./components/IdentityPanel";
+import IdeologyCompass from "./components/IdeologyCompass";
 
 export default function Home() {
   const [config, setConfig] = useState<any>(null);
@@ -213,14 +214,14 @@ export default function Home() {
               <span className="text-amber-500">PHASE {currentPhase}</span>
             </div>
             <div className="divide-y divide-slate-800/50 max-h-[35vh] overflow-y-auto">
-              {gameState?.formatted_metrics.map((metric: any) => (
+              {gameState?.formatted_metrics?.map((metric: any) => (
                 <div key={metric.id} className="group relative px-4 py-3 hover:bg-slate-800/30 transition-colors">
                   <div className="flex items-baseline justify-between">
                     <span className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">
                       {metric.label}
                     </span>
                     <span className="text-sm font-mono text-[#e0e0e0]">
-                      {metric.value.toFixed(2)}
+                      {metric.value?.toFixed(2) ?? "0.00"}
                     </span>
                   </div>
                   {metric.tooltip && (
@@ -231,6 +232,17 @@ export default function Home() {
                 </div>
               ))}
             </div>
+          </div>
+
+          <div className="border border-slate-800 bg-noir-800/50 p-4">
+            <div className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mb-4 border-b border-slate-800 pb-2">
+              Ideology Axis
+            </div>
+            <IdeologyCompass
+              authoritarianLibertarian={gameState?.player_ideology?.authoritarian_libertarian ?? 0}
+              plannedMarket={gameState?.player_ideology?.planned_market ?? 0}
+              overtonRadius={gameState?.player_ideology?.overton_radius ?? 0.2}
+            />
           </div>
         </div>
 

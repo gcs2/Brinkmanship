@@ -100,7 +100,7 @@ pub struct Event {
 pub struct EventOption {
     pub id: String,
     pub text: String,
-    pub threshold: f64,
+    pub weights: HashMap<String, f64>, // Map of OutcomeKey -> Weight (e.g. "SUCCESS" -> 0.7, "FAILURE" -> 0.3)
     pub lag_time: u32,
     pub outcomes: HashMap<String, EventOutcome>,
 }

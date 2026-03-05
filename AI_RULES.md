@@ -2,6 +2,11 @@
 
 This document serves as the persistent rulebook and guidelines for any AI agents operating within the Brinkmanship development environment.
 
+## 0. Test Everything (Non-Negotiable)
+- **Primary Directive**: Add testing for every bit of functionality introduced or modified.
+- **Coverage**: Aim for comprehensive 100% test coverage. This is the baseline requirement for any codebase expansion or refactoring.
+- **Verification**: No feature is considered "complete" or "hardened" until it is accompanied by a robust suite of passing unit/integration tests.
+
 ## 1. Documentation Synchronicity
 - **Rule of Thumb**: Code changes require documentation updates.
 - If a new metric, feature, or logic mechanic is introduced programmatically (e.g., in `state_manager.py` or `event_processor.py`), the corresponding PRD documentation MUST be updated simultaneously.
@@ -43,3 +48,8 @@ This document serves as the persistent rulebook and guidelines for any AI agents
 - **Non-Destructive Documentation**: Never overwrite, delete, or "clean up" existing technical sections (e.g., "How The Math Works") unless explicitly directed by Management. 
 - **Append-First Logic**: When adding new frameworks or doctrines (like "Narrative Weight"), always append them to the existing file or merge them gracefully. 
 - **Integrity Baseline**: Every documentation edit must be vetted to ensure that legacy "Technical Soul" of the project remains intact alongside new expansions.
+
+## 10. Radical Change Disclosure & HITL
+- **Definition**: A "Radical Change" includes modifying core simulation algorithms (e.g., the Reactor's outcome logic), altering fundamental state schemas, or refactoring central execution modules (Chronos, Reactor).
+- **Disclosure**: Any proposed radical change MUST be highlighted in the `implementation_plan.md` using a `[!WARNING]` or `[!CAUTION]` alert labeled **RADICAL ARCHITECTURAL PIVOT**.
+- **Human-in-the-Loop (HITL)**: You MUST seek explicit user approval for these pivots via `notify_user` before execution. Do not assume authorization for fundamental logic shifts even if they align with broad strategic goals.
