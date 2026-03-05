@@ -1,0 +1,29 @@
+# Project-level gitignore
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+
+# Node/UI artifacts
+ui/node_modules/
+ui/.next/
+ui/dist/
+ui/.env.local
+
+# Rust — handled in brinkmanship_engine/.gitignore but belt-and-suspenders here
+brinkmanship_engine/target/
+
+# Editor/OS
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
+*.swp
+
+# Log files
+*.log
