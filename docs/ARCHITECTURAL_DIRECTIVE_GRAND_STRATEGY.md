@@ -113,6 +113,61 @@ MIL-001 (Assets) ──► MIL-003 (Nuclear) ──► GeoStratLayer
 
 ---
 
+*Updated: SOVEREIGN_DISPATCH_V18 — 2026-03-04*
+
+---
+
+### **PRIORITY TIER 2.5 (ADDENDUM): PHASE 19 — THE FIXED CANVAS PIVOT**
+
+*Ratified 2026-03-05 by Executive Management. Full guardrails: `SOVEREIGN_DISPATCH_V18.md §I`. Implementation: `implementation_plan_phase19.md`.*
+
+13. **[UI19-001/002/003] Map as Permanent Background + Left/Right Sidebars:**
+    - **Why:** A draggable map is a contradiction in terms. The Tactical Map IS the theater of operations. It anchors spatial awareness.
+    - **Guardrail:** **Do not delete `react-rnd`.** The draggable window infrastructure is required in Phase 20 for floating "Deep Dive" panels (rival dossiers, treaty negotiation). Only the primary HUD elements move to fixed positions.
+    - **Left sidebar** (300px): Identity → Country Profile (click-to-expand inline) → Ideology Compass
+    - **Right sidebar** (300px): Telemetry → Estates (renamed) → Intel Feed. Estate rows show absolute value AND `±delta/tick`.
+
+14. **[UI19-004/005] Centered Event Modal with Auto-Pause:**
+    - **Why:** Players cannot process estate-impacting crisis choices while the world clock burns in the background.
+    - **Implementation:** `DossierPane` converts to a centered `z-[1100]` modal. **On mount, it dispatches `pause_simulation`.** Option display order: Label (amber, large) → Description → EST impact → Lag.
+
+---
+
+### **PRIORITY TIER 1 (ADDENDUM): PHASE 20 — AI ACTORS & SYMMETRIC CONSTRAINTS**
+
+*Management Directive: The Principle of Symmetric Constraints. `SOVEREIGN_DISPATCH_V18.md §II`.*
+
+15. **[AI-001/002] The AI Actor Engine:**
+    - **Mandate:** NPC actors are bound by the **identical** `ideology_matrix.rs` physics as the player. `action_authority_cost()` applies. Rubber Band pull applies. No exemptions.
+    - **Implementation:** Each AI has a hidden `Drive` enum (`Expansionist`, `Isolationist`, `Consolidationist`). Drives gate action selection through the same `reactor.rs` pipeline. The AI walks in the same gravity before diplomacy is built.
+
+16. **[AI-003] Ideological Diplomatic Friction:**
+    - **Mandate:** Abolish arbitrary Opinion integers. Diplomatic baseline friction = `dist(actor_a.position, actor_b.position)` on the Structural Matrix.
+    - **Formula:** `Diplomatic_AUT_Cost = Base_Treaty_Cost × (1.0 + dist × DC)`. Default `DC` (Diplomatic Coefficient) = management-tunable, recommend 0.5.
+    - **Example:** Anarcho-Capitalist `(+5,−5)` vs. Vanguard Communist `(−5,+5)`: `dist ≈ 14.14`. No trade deal is cheap at max ideological distance.
+
+17. **[AI-004] Event Chain State Machine Architecture:**
+    - **Mandate:** Event choices inject *latent triggers* into `chronos.rs`, not immediate stat modifiers. A latent fires 10–15 ticks later, conditioned on the Sovereign's intervening actions. The world has memory.
+    - **Foundation:** `event_chain.rs` structs (`LEG-001`) are already defined. Phase 20 wires them to the live tick loop.
+
+---
+
+### **DEPENDENCY GRAPH (UPDATED)**
+```
+IDX-001 (Grid) ──► IDX-002 (Friction) ──► IDX-006 (Rubber Band) ──► IDX-015 (Exp Bleed) ──► NAR-001 (Tutorial)
+IDX-003 (Zones) ──► IDX-014 (Zone Consequences) ──────────────────────► AI-001 (AI Actors)
+IDX-004 (Position) ─► IDX-005 (Flavor Label) ─► IDX-010 (Perception) ─► POL-004 (Deep State HUD)
+IDX-011 (History) ─► UI Comet Trail ─► MODE-001/002 (Game Modes)
+LEG-001 (Structs) ─► LEG-002 (Wonk) ─► LEG-003 (Whip) ─► LEG-004 (Pork) ─► LEG-005 (Outcomes)
+                   └──────────────────────────────────────────────────────► AI-004 (Latent Triggers)
+ECO-001 (Industry) ──► ECO-002 (Trade) ──► ADV-001 (Sabotage)
+MIL-001 (Assets) ──► MIL-003 (Nuclear) ──► GeoStratLayer
+AI-001 (Symmetric) ──► AI-003 (Dipl. Friction) ──► AI-005 (Intel) ──► AI-006 (UN Conferences)
+UI19-001 (Map BG) ──► UI19-002 (Left Sidebar) ──► UI19-003 (Right Sidebar) ──► UI19-004 (Event Modal)
+```
+
+---
+
 *"The transition to a 'Living Simulation' requires a coherent onboarding and narrative structure anchored in systemic physics, not just branching narrative."* — Executive Management
 
-*Updated: SOVEREIGN_DISPATCH_V18 — 2026-03-04*
+*Updated: SOVEREIGN_DISPATCH_V18 — 2026-03-05 (Phase 19 ratified, Phase 20 AI mandate issued)*

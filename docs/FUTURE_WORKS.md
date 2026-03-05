@@ -186,3 +186,42 @@ Priority order for all future development:
 |:---|:---|:---|:---|
 | **UI-GRID-001** | **Ideology Cell Flavor Descriptions** | Brief 1–2 sentence description for each named ideology zone (Fascism, Stalinism, Anarcho-Capitalism, Social Democracy, etc.) shown in the `IdeologyGrid` hover tooltip beneath the label and coordinates. Content to be supplied by management. | 🔵 **Deferred — awaiting content** |
 | **UI-GRID-002** | **Faction Heatmap Overlay** | Color-tint each cell by current faction lean (weighted average of active `faction.alignment` positions). Darker = stronger faction pull in that zone. Requires `/api/state` to expose faction position data. | 🔴 **Phase 19** |
+
+---
+
+## **XIII. PHASE 19 — THE SOVEREIGN WAR ROOM (METRIC_UI19)**
+
+*Per V18 Management Dispatch — APPROVED 2026-03-05. Ref: `implementation_plan_phase19.md`, `SOVEREIGN_DISPATCH_V18.md §III`.*
+
+| ID | Feature | Description | Status |
+|:---|:---|:---|:---|
+| **UI19-001** | **Fixed Map Canvas** | `TacticalMap` becomes a `position: fixed; z-index: 0` fullscreen background layer. Cannot be moved or closed. All UI floats above it. | 🔴 **Phase 19** |
+| **UI19-002** | **Left Sidebar** | Fixed `w-[300px]` panel: Identity Panel → Country Profile (inline, click-to-expand entrypoint) → Ideology Compass (compact, expand button retained). Toggle via header `◀` button; state persisted to `localStorage`. | 🔴 **Phase 19** |
+| **UI19-003** | **Right Sidebar** | Fixed `w-[300px]` panel: Telemetry → **Estates** (renamed from "Sector Pressures") → Intel Feed. Estate rows show absolute influence value **and** `±delta/tick`. Toggle via header `▶` button. | 🔴 **Phase 19** |
+| **UI19-004** | **Centered Event Modal** | `DossierPane` converted from right-side slide-in to centered `z-[1100]` modal with backdrop blur. Option layout: **Label** (amber, large) → **Description** (readable body text) → **EST impact tag** → **Lag time**. Fixes the "only effects visible" UX bug. | 🔴 **Phase 19** |
+| **UI19-005** | **Event Modal Auto-Pause** | Modal mounting dispatches `pause_simulation` to Chronos engine (sets `isPlaying = false`). A Sovereign cannot be forced to read an estate-impacting crisis while the world clock burns days. | 🔴 **Phase 19** *(Management Guardrail)* |
+| **UI19-006** | **Preserve `react-rnd` Infrastructure** | Do not delete draggable window system. Required for Phase 20 "Deep Dive" panels (rival sovereign dossiers, bilateral treaty negotiation). | 🔵 **Retained — Phase 20** *(Management Guardrail)* |
+
+> [!IMPORTANT]
+> **Management Directive (V18 — APPROVED 2026-03-05):** The `react-rnd` draggable window infrastructure MUST be retained. While the main HUD moves to fixed sidebars, Phase 20 will require floating "Deep Dive" panels for rival sovereign inspections and bilateral diplomacy. Do not burn the foundation.
+
+---
+
+## **XIV. PHASE 20 — AI ACTORS & DIPLOMACY (METRIC_AI)**
+
+*Per V18 Management Directive — Symmetric Constraint Mandate. Ref: `SOVEREIGN_DISPATCH_V18.md §II`.*
+
+| ID | Feature | Description | Status |
+|:---|:---|:---|:---|
+| **AI-001** | **AI Actor Engine (Symmetric Constraints)** | NPC sovereigns bound by identical `ideology_matrix.rs` physics as the player. AUT cost for ideology moves uses `action_authority_cost()` (IDX-002). Rubber Band pull applies equally. AI cannot cheat the physics. | 🔴 **Phase 20** |
+| **AI-002** | **AI Hidden Drives** | Each AI actor has a hidden `Drive` enum (`Expansionist`, `Isolationist`, `Consolidationist`). Drives gate which actions the AI queues through `reactor.rs`. | 🔴 **Phase 20** |
+| **AI-003** | **Ideological Diplomatic Friction** | Baseline diplomatic friction between two actors = `dist(actor_a.position, actor_b.position)` on the Structural Matrix (Euclidean). An Anarcho-Capitalist state (+5,−5) and a Vanguard Communist state (−5,+5) face `dist ≈ 14.1` — the maximum AUT multiplier to sign any agreement. Does not use arbitrary "Opinion" integers. | 🔴 **Phase 20** |
+| **AI-004** | **Event Chain State Machine** | Event choices inject *latent triggers* into `chronos.rs` — not immediate stat modifiers. A triggered latent fires 10–15 ticks later, conditioned on the Sovereign's intervening actions. Requires `event_chain.rs` (`LEG-001`) wired to the live tick loop. | 🔴 **Phase 20** |
+| **AI-005** | **Intel Reveal (DIP-001)** | Investing in intelligence reveals rival `position` coordinates on the Structural Matrix, decreasing decision latency for diplomatic maneuvers. | 🔴 **Phase 20** |
+| **AI-006** | **UN Conference Events** | High-stakes multilateral events. Outcome gated by each actor's AUT reserve and Structural Matrix position. Diplomatic friction formula (AI-003) determines base negotiation cost. | 🔴 **Phase 20** |
+
+> [!IMPORTANT]
+> **Management Directive (V18 — APPROVED 2026-03-05 — PRINCIPLE OF SYMMETRIC CONSTRAINTS):**
+> 1. AI actors are subject to the same `ideology_matrix.rs` physics as the player. No stat inflation, no hidden exemptions.
+> 2. Diplomatic baseline friction = Euclidean distance between `position` coordinates. Opinion integers are forbidden.
+> 3. Event chain choices inject *latent triggers* into `chronos.rs` that fire 10–15 ticks later — not immediate modifiers. Design events as state machines, not branching trees.

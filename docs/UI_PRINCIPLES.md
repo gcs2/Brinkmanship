@@ -118,3 +118,40 @@ Formula per cell (x,y) ∈ [-5,5]²:
 
 *"Every window is an instrument of state. Wire your own command center."*
 *— V18 Management Directive*
+
+---
+
+## VII. Sidebar System (Phase 19)
+
+*Per V18 Management Directive — APPROVED 2026-03-05.*
+
+- **The Tactical Map is the permanent canvas.** `position: fixed; z-index: 0`. It is never a window, never movable, never closeable.
+- **Left Sidebar** (`w-300px, fixed left`): Identity → Country Profile → Ideology Compass. Toggle with a `◀` button in the header left cluster.
+- **Right Sidebar** (`w-300px, fixed right`): Telemetry → Estates → Intel Feed. Toggle with a `▶` button in the header right cluster.
+- **Sidebar state** (`showLeftSidebar`, `showRightSidebar`) persists to `localStorage` — Glass Cockpit principle applies to sidebars too.
+- **Estate rows** must display: `label`, absolute value, and `±delta/tick` — legible at a glance without hover.
+- **`react-rnd` draggable windows are preserved** for Phase 20 "Deep Dive" panels (rival sovereign dossiers, treaty negotiation). Do not remove the window infrastructure.
+
+| Sidebar | Contents (top → bottom) |
+|:--------|:------------------------|
+| Left | Identity Panel → Country Profile → Ideology Compass |
+| Right | Primary Telemetry → Estates → Intel Feed |
+
+---
+
+## VIII. Crisis Interrupt Protocol (Phase 19)
+
+*Management Guardrail — V18 Dispatch §I.2.*
+
+The **Event Modal** (formerly `DossierPane` right-side slide-in) is the most cognitively demanding UI state. Rules:
+
+- **Position:** Centered overlay, `z-[1100]`, `bg-black/60 backdrop-blur-sm`. NOT a sidebar element.
+- **Auto-Pause Mandate:** On modal mount, `isPlaying` is set to `false`. The Sovereign cannot be forced to read estate-impacting crisis text while the world clock burns days.
+- **Option layout (top → bottom within each choice):**
+  1. **Label** — amber, large, the action text ("Impose Emergency Sanctions")
+  2. **Description** — readable body text explaining what the player is doing
+  3. **EST impact tag** — `EST: METRIC ±VALUE` in small monospaced amber
+  4. **Lag time** — `⏱ Resolves in ~N days`
+- **Dismiss / Defer** button always visible — player retains agency to skip.
+
+*Updated: SOVEREIGN_DISPATCH_V18 — 2026-03-05*
