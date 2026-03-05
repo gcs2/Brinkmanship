@@ -175,3 +175,14 @@ Priority order for all future development:
 
 > [!NOTE]
 > **V18 Rationale (2026-03-04):** Exponential bleed penalizes "tanking" the Overton rubber band at moderate positions (0.5–2.0 overshoot). Management deferred this to keep the Normal Mode simulation approachable. Hard Mode will surface the formula as a difficulty knob without breaking the default experience.
+
+---
+
+## **XII. UI CONTENT — IDEOLOGY CELL DESCRIPTIONS (UI-GRID)**
+
+*Requested 2026-03-04. Each of the ~30 named ideology zones should carry a brief (1–2 sentence) "flavor description" shown on hover in the `IdeologyGrid` fullscreen view. Stand by for content delivery.*
+
+| ID | Feature | Description | Status |
+|:---|:---|:---|:---|
+| **UI-GRID-001** | **Ideology Cell Flavor Descriptions** | Brief 1–2 sentence description for each named ideology zone (Fascism, Stalinism, Anarcho-Capitalism, Social Democracy, etc.) shown in the `IdeologyGrid` hover tooltip beneath the label and coordinates. Content to be supplied by management. | 🔵 **Deferred — awaiting content** |
+| **UI-GRID-002** | **Faction Heatmap Overlay** | Color-tint each cell by current faction lean (weighted average of active `faction.alignment` positions). Darker = stronger faction pull in that zone. Requires `/api/state` to expose faction position data. | 🔴 **Phase 19** |
