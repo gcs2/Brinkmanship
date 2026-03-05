@@ -2,7 +2,7 @@
 
 This document serves as the **Future Works Strategic Backlog** for the **Brinkmanship** project. It outlines the architectural expansion from a functional state engine into a comprehensive geopolitical simulation.
 
-All items cross-reference `implementation_plan_phase15.md` (V15 Implementation Plan) and `SOVEREIGN_DISPATCH_V15_THE_STRUCTURAL_MATRIX.md` where applicable.
+All items cross-reference `implementation_plan_phase15.md` (V15), `implementation_plan_phase16.md` (V16), `SOVEREIGN_DISPATCH_V15_THE_STRUCTURAL_MATRIX.md`, and `SOVEREIGN_DISPATCH_V16.md` where applicable.
 
 ---
 
@@ -85,12 +85,17 @@ and `implementation_plan_phase15.md` for the full design treatise.*
 | **IDX-003** | **Zone-Specific Systemic Gates** | Three active zones (Totalitarian Planned, Decentralized Laissez-Faire, Illiberal Directed) each unlock a Decision and activate a Disaster Risk counter. | ✅ **Implemented** in `ideology_matrix::check_zone_gates()` |
 | **IDX-004** | **Dual Coordinate System** | `position` (sovereign's policy track record) is distinct from `center` (Overton Window). The gap is **Ideological Tension** — a risk multiplier. | ✅ **Implemented** in `state::IdeologyComponent` |
 | **IDX-005** | **Dynamic HUD Title (Flavor Label)** | The sovereign's current grid label (stored as `flavor_label: String`) drives the live government title in the HUD. Changes automatically as policies shift position. | ✅ **Implemented** in `state::IdeologyComponent::flavor_label` |
-| **IDX-006** | **Rubber Band Effect** | If a sovereign forces a position jump beyond the Overton Spread, a Chaos Modifier spikes, degrading Stability. If STB falls too far, Estates rebel, snapping the position back. | 🔲 Pending — Reactor integration |
-| **IDX-007** | **Glacial Shift Mechanic** | Position only moves when underlying Estates shift their influence. Direct single-turn jumps across zones are mechanically prohibited without massive AUT/STB sacrifice. | 🔲 Pending — Chronos integration |
-| **IDX-008** | **Multi-Actor Matrix Test** | Integration test with 3 sovereign actors (e.g., USA/CHN/ARG archetypes), each with independent factions, estates, and matrix positions. Validates all IDX mechanics end-to-end. | ✅ **Implemented** in `tests/journey_tests.rs` |
+| **IDX-006** | **Rubber Band Effect (Gravitational Pull)** | Per-tick gravitational force pulling `position` toward Overton `center` when outside the Spread. **Not a teleport** — applies a velocity vector back toward center, bleeding `authority.current` each tick. If AUT runs dry, bleed converts to Stability loss. Formula: `pull = (tension - spread) × GRAVITY_CONSTANT`. Ref: `implementation_plan_phase16.md`. | 🔲 **Phase 16** — Chronos integration |
+| **IDX-007** | **Glacial Shift Mechanic** | Each tick, `position` drifts slightly toward `center` proportional to Estate influence momentum. Rate tied to estate influence shifts — slow, earned drift. Direct single-turn matrix jumps are capped. | 🔲 **Phase 16** — Chronos integration |
+| **IDX-008** | **Multi-Actor Matrix Test** | 3 sovereign actors (USA/CHN/ARG archetypes) on one shared State. Validates political physics end-to-end. | ✅ **Implemented** in `tests/journey_tests.rs` |
+| **IDX-009** | **Estate Velocity Memory** | Estates react to *how fast* the sovereign is moving, not just *where* they are. A rapid jump of >1.5 matrix units/tick triggers Capital Flight or equivalent Zone Gate event immediately — even if absolute position is not yet in the danger zone. Panic is caused by acceleration, not location. Field: `position_velocity: (f64, f64)` on `IdeologyComponent`. | 🔲 **Phase 16** |
+| **IDX-010** | **Perception Filter (Deep State Delta)** | The sovereign has two positions: `position` (real governing track record) and `perceived_position` (publicly projected). Spending Authority maintains the gap. If `euclidean_distance(position, perceived_position) > VEIL_COLLAPSE_THRESHOLD (3.5)`, the Veil Shatters — catastrophic Stability collapse. Enables Deep State Mode. | 🔲 **Phase 16** |
+| **IDX-011** | **Position Breadcrumb Trail** | `position_history: Vec<(f64, f64)>` stores last 10 positions. UI renders as a momentum trail on the IdeologyCompass — players see the drift line from *Liberal Democracy* toward *Managed Democracy*. Far more intimidating than a text flip. | 🔲 **Phase 16** — State + UI |
+| **IDX-012** | **ScenarioDef Rust Struct** | Strictly typed `ScenarioDef` + `ActorDef` structs in `scenario.rs`. Invalid scenario files (out-of-range positions, influence sums ≠ 100) cause engine panic at boot, not silent gameplay crashes. Required before NAR-001 scripting. | 🔲 **Phase 16** |
+| **IDX-013** | **Temporal Simulation Harness** | 10-tick headless game loop test: init USA at (+1,0), inject radical leftward policy at Tick 3, assert Authority drop + Tension spike at Tick 4, assert Rubber Band pull active Tick 5–6, assert stabilization or Estate rebellion by Tick 10. Primary difficulty-balance tool. | 🔲 **Phase 16** |
 
 > [!IMPORTANT]
-> **Management Directive (V15)**: IDX-006 (Rubber Band) and IDX-007 (Glacial Shift) are the next highest-priority engine items. Without them, the sovereign position is a label, not a constraint system. These must be implemented before the Tutorial (NAR-001) is scripted.
+> **Management Directive (V16 — APPROVED 2026-03-04)**: IDX-006 through IDX-013 are Phase 16. The Rubber Band must be a **gravitational pull vector**, not a hard teleport. Estate Velocity Memory (IDX-009) and the Perception Filter (IDX-010) are new management-injected mechanics. The Temporal Simulation Harness (IDX-013) is the capstone test and primary difficulty-balance tool. Ref: `SOVEREIGN_DISPATCH_V16.md §I–VII`.
 
 ---
 
@@ -98,7 +103,7 @@ and `implementation_plan_phase15.md` for the full design treatise.*
 
 *Refer to `implementation_plan_phase15.md` for the full test design and actor archetypes.*
 
-This integration test (`test_journey_three_actor_multipolar`) acts as a **living regression benchmark** for the entire political simulation layer. It must pass after every engine change.
+This integration test (`test_journey_three_actor_multipolar`) acts as a **living regression benchmark** for the political simulation math layer. It must pass after every engine change.
 
 **Three Archetypes Under Test:**
 
@@ -108,13 +113,20 @@ This integration test (`test_journey_three_actor_multipolar`) acts as a **living
 | `CHN` | `(-2, +3)` | National Synergy | Illiberal Directed — High approval from Party estates, Capital Flight risk |
 | `ARG` | `(-1, +1)` | Third Way | Volatile Populist — Worker-dominated estates, low happiness → approval crisis |
 
+> **Scope clarity (per V16):** This test validates simulation *math* across simultaneous actors. Cross-actor behavioral dynamics (diplomacy, faction contagion) require `DIP-002` and the AI Director.
+
 ---
 
 ### **MANAGEMENT DIRECTIVE**
 
-All future development must prioritize:
-1. **NAR-001 (The Tutorial)** to ensure all IDX functionality is accessible and legible to the end-user.
-2. **IDX-006 & IDX-007** (Rubber Band + Glacial Shift) to make the Structural Matrix a genuine constraint system, not just a label.
-3. **DIP-002 (AI Parity)** — Rival actors must autonomously navigate the matrix.
+Priority order for all future development:
 
-*Verbatim Reference (V15): "This structural framework guarantees that Brinkmanship is a simulation of systemic physics, not just a branching narrative. Every click has a mathematical weight defined by this 121-point matrix."*
+1. **IDX-006 & IDX-007** (Rubber Band + Glacial Shift) — make the Structural Matrix a genuine constraint system.
+2. **IDX-009** (Estate Velocity Memory) — panic on acceleration, not just location.
+3. **IDX-010** (Perception Filter) — Deep State Delta; the Veil Shatters mechanic.
+4. **IDX-012** (ScenarioDef) — required before NAR-001 scripting.
+5. **IDX-013** (Temporal Harness) — the capstone Phase 16 test.
+6. **NAR-001** (Tutorial) — only after IDX-012 is solid.
+7. **DIP-002** (AI Parity) — only after IDX-006/007; AI must walk in the gravity before it's built.
+
+*Verbatim (V15/V16): "Every click has a mathematical weight defined by this 121-point matrix. Make the player feel the weight of the system."*

@@ -1,3 +1,5 @@
+
+# NOTE: this seems outdated, maybe has some good ideas.
 # **PROJECT MANIFESTO: BRINKMANSHIP (SOVEREIGN DISPATCH)**
 
 ## **I. THE ARCHITECTURAL LAW: FUNCTIONAL IMMUTABILITY**

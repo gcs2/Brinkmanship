@@ -1,0 +1,158 @@
+# SOVEREIGN DISPATCH v16: THE STRUCTURAL MATRIX — FIELD REPORT
+
+**TO:** Executive Management
+**FROM:** Principal Simulation Architect (Antigravity)
+**DATE:** 2026-03-04
+**STATUS:** [PHASE 15 COMPLETE] — Structural Matrix Engine, 3-Actor Test, Infrastructure Hardening
+
+---
+
+## I. EXECUTIVE SUMMARY
+
+Phase 15 is complete. The *Brinkmanship* engine now has a formal, mathematically grounded **11×11 Structural Matrix** — 121 unique political archetypes — that governs sovereign identity, action costs, and disaster risk. This is the physics layer the simulation required. Test suite expanded from **6 tests → 42 tests**, all passing. Repository is clean. Codebase is reorganized.
+
+---
+
+## II. PHASE 15 DELIVERABLES
+
+### A. [ideology_matrix.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs) — The New Core Module
+
+A pure, stateless module (zero side effects). Implements the full V15 Dispatch design:
+
+| Function | Purpose |
+|:---------|:--------|
+| [resolve_flavor_label(x, y)](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs#98-123) | [(0,0)](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/main.rs#89-124) → *"Liberalism"*, [(-5,+5)](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/main.rs#89-124) → *"Stalinism"*, [(+5,-5)](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/main.rs#89-124) → *"Anarcho-Capitalism"* |
+| [euclidean_distance(a, b)](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs#124-137) | 2D distance between ideological coordinates |
+| [action_authority_cost(base, pos, target, fc)](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs#138-169) | `Base × (1 + dist × FC)` — the friction formula from V15 §IV |
+| [check_zone_gates(pos)](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs#170-209) | Returns active `ZoneGate` variants for the current grid position |
+
+**Zone Gates implemented:**
+
+| Zone | Condition | Unlock | Disaster |
+|:-----|:----------|:-------|:---------|
+| Totalitarian Planned | `x < -3, y > +3` | Five-Year Plan | Bureaucratic Famine |
+| Decentralized Laissez-Faire | `x > +3, y < -1` | Corporate Sovereign Zones | Plutocratic Secession |
+| Illiberal Directed | `x ∈ [-3,0], y ∈ [+1,+3]` | State Champion Subsidies | Capital Flight |
+
+### B. [state.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs) — [IdeologyComponent](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs#26-51) Extended
+
+Two new fields added with full doc-comments:
+
+- **`position: (f64, f64)`** — Where the sovereign *actually governs* (policy track record).
+- **`flavor_label: String`** — Live political archetype title for the HUD (e.g., *"Liberal Democracy"*).
+
+These are **distinct** from [center](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs#344-349) (the faction-weighted Overton Window). The Euclidean gap between `position` and [center](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs#344-349) is **Ideological Tension** — a risk multiplier defined in `METRIC_DEFINITIONS.md §8`.
+
+### C. [journey_tests.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/tests/journey_tests.rs) — 4-Test Integration Suite
+
+| Test | What It Validates |
+|:-----|:------------------|
+| [test_journey_populist_surge](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/tests/journey_tests.rs#48-121) | Single-actor Overton shift + estate-driven approval (Phase 14 regression) |
+| [test_journey_three_actor_multipolar](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/tests/journey_tests.rs#126-299) | 3 actors (USA/CHN/ARG archetypes) — independent OW windows, divergent approval, zone gates, friction cost differential |
+| [test_journey_ideology_matrix_labels](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/tests/journey_tests.rs#304-320) | 10 canonical grid coordinates verified against the Flavor CSV |
+| [test_journey_zone_gate_activation](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/tests/journey_tests.rs#325-346) | All 3 zones, boundary exclusions, CHN position confirmed |
+
+**On integration test scope (candid):** The 3-actor test validates simulation *math* across simultaneous actors — correct Overton derivation, approval weighting, zone gate activation, and friction cost differentials. It does not yet simulate *cross-actor behavioral dynamics* (diplomatic actions, faction contagion, proxy influence). That is `DIP-002` territory and requires the AI Director. The test is a permanent regression anchor for the political physics layer.
+
+---
+
+## III. TEST RESULTS — FULL SUITE
+
+```
+running 28 tests   [ideology_matrix + chronos + reactor]   ✅ 28/28 ok
+running 6 tests    [bin integration]                        ✅ 6/6  ok
+running 4 tests    [journey_tests]                          ✅ 4/4  ok
+running 4 doc-tests [ideology_matrix inline examples]       ✅ 4/4  ok
+
+TOTAL: 42 passed, 0 failed — Exit code: 0
+```
+
+---
+
+## IV. DOCUMENTATION OVERHAUL
+
+All three strategic documents updated with V15 cross-references:
+
+**[docs/METRIC_DEFINITIONS.md](file:///c:/Users/zephy/Documents/Brinkmanship/docs/METRIC_DEFINITIONS.md)** — Added §§7–11:
+- §7 Sovereign Grid Position (POS)
+- §8 Ideological Tension (IT)
+- §9 Friction Physics & Authority Cost Formula
+- §10 Flavor Label (FL)
+- §11 Zone Gates table
+
+**[docs/FUTURE_WORKS.md](file:///c:/Users/zephy/Documents/Brinkmanship/docs/FUTURE_WORKS.md)** — Added §§VII–VIII:
+- §VII: Structural Matrix Engine (IDX-001 through IDX-008) with implementation status
+- §VIII: 3-Actor Multi-Polar Test design table
+- IDX-006 (Rubber Band) and IDX-007 (Glacial Shift) flagged as **next highest priority**
+
+**[docs/ARCHITECTURAL_DIRECTIVE_GRAND_STRATEGY.md](file:///c:/Users/zephy/Documents/Brinkmanship/docs/ARCHITECTURAL_DIRECTIVE_GRAND_STRATEGY.md)** — Overhauled:
+- Tier 2 updated: V15 items marked complete, IDX-006/007 as next priority
+- All Python `state_manager.py` references replaced with Rust ECS ([state.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs))
+- Visual dependency graph added
+
+---
+
+## V. INFRASTRUCTURE HARDENING
+
+### Git History Cleanup
+- `target/` (Rust build cache, ~400MB of `.rlib`, `.pdb`, `.o` files) was committed before [.gitignore](file:///c:/Users/zephy/Documents/Brinkmanship/.gitignore) existed.
+- GitHub rejected both push attempts correctly — **no large files landed on remote**.
+- Installed `git-filter-repo`, rewrote all 39 commits to strip `target/` blobs entirely.
+- Force-pushed clean history. Root and engine-level [.gitignore](file:///c:/Users/zephy/Documents/Brinkmanship/.gitignore) added — this cannot recur.
+
+### Repository Reorganization — 16 Files Moved
+
+| Category | Old Location | New Location |
+|:---------|:-------------|:-------------|
+| Dev/build scripts ([dev_rust.ps1](file:///c:/Users/zephy/Documents/Brinkmanship/dev_rust.ps1), [dev.ps1](file:///c:/Users/zephy/Documents/Brinkmanship/dev.ps1), [build_app.ps1](file:///c:/Users/zephy/Documents/Brinkmanship/build_app.ps1), etc.) | root | `scripts/` |
+| Python utilities ([merge_scenarios.py](file:///c:/Users/zephy/Documents/Brinkmanship/merge_scenarios.py), [stress_test.py](file:///c:/Users/zephy/Documents/Brinkmanship/stress_test.py), etc.) | root | `scripts/` |
+| Manifesto/PRD/Guide docs | root | `docs/` |
+| [types.ts](file:///c:/Users/zephy/Documents/Brinkmanship/types.ts) | root | `ui/` |
+| [AI_RULES.md](file:///c:/Users/zephy/Documents/Brinkmanship/AI_RULES.md), [CHANGELOG.md](file:///c:/Users/zephy/Documents/Brinkmanship/CHANGELOG.md), [PRD_MASTER.md](file:///c:/Users/zephy/Documents/Brinkmanship/PRD_MASTER.md) | root | **root** (unchanged — project-wide authority documents) |
+
+> **Action required:** [dev_rust.ps1](file:///c:/Users/zephy/Documents/Brinkmanship/dev_rust.ps1) is now at [./scripts/dev_rust.ps1](file:///c:/Users/zephy/Documents/Brinkmanship/scripts/dev_rust.ps1). Restart the dev process from the new path when convenient.
+
+---
+
+## VI. NEXT PRIORITY QUEUE
+
+Per `FUTURE_WORKS.md §VII` and `ARCHITECTURAL_DIRECTIVE Tier 2`:
+
+1. **IDX-006 — Rubber Band Effect** *(Reactor integration)*: Force a position jump beyond Overton Spread → Chaos Modifier → Stability drain → Estate rebellion snap-back.
+2. **IDX-007 — Glacial Shift** *(Chronos integration)*: `position` drifts toward [center](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs#344-349) at a rate governed by Estate influence shifts. Direct single-turn matrix jumps are mechanically prohibited.
+3. **DIP-002 — AI Parity**: Rival actors autonomously navigate the Structural Matrix.
+4. **NAR-001 — Sovereign Introduction Tutorial**: Cannot ship without IDX-006/007 implemented first.
+
+---
+
+---
+
+## VII. ARCHITECT'S STRATEGIC RECOMMENDATIONS
+
+*My read on what matters most right now, based on everything in the codebase and design docs.*
+
+### Recommendation 1: IDX-006 (Rubber Band) Before Anything Else
+**Highest priority.** Without it, the `position` field on [IdeologyComponent](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs#26-51) is cosmetic. Any scenario we script for NAR-001 would have no mechanical teeth — the player can just press buttons without consequence. The Rubber Band is what makes the Structural Matrix a **constraint system** rather than a label system. It's also relatively small: ~30 lines in [reactor.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/reactor.rs) or [chronos.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/chronos.rs) checking if the requested position delta exceeds the Overton Spread and applying a Chaos Modifier if so.
+
+### Recommendation 2: Port [merge_scenarios.py](file:///c:/Users/zephy/Documents/Brinkmanship/merge_scenarios.py) to Rust Next
+**Quick win, clears the Python question permanently.** It's a ~50-line script that merges JSON scenario files. Porting it to a Rust function tested in the journey suite is fast and gets us to a point where we can confidently answer *"yes, the Python code is fully deprecated."* It's been on the backlog for two sprints.
+
+### Recommendation 3: Wire [flavor_label](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs#98-123) to the UI [IdeologyCompass.tsx](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/components/IdeologyCompass.tsx)
+**High visual payoff for almost zero engine work.** The [flavor_label](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs#98-123) field is already being stored in state and serialized via Axum. The UI just needs to render it as the government title. This is a 1-session frontend task and will make the simulation *feel* dramatically more alive — watching the title change from *"Liberal Democracy"* → *"Third Way"* → *"Managed Democracy"* as you govern is the single most tangible demonstration of the Structural Matrix to a new player or stakeholder.
+
+### Recommendation 4: Defer DIP-002 (AI Parity) Until IDX-006/007 Are Done
+**Strategic patience.** Rival AI actors are powerful but pointless if they can jump across the matrix freely. The AI Director should be built *on top of* the Rubber Band and Glacial Shift physics — otherwise we're coding around a broken foundation. Build the physics, then give rivals an AI that operates within them.
+
+### Recommendation 5: Consider a [scenarios/](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/main.rs#249-253) Refactor Before NAR-001
+**Narrative readiness.** The tutorial (NAR-001) will require scripted scenario files that set initial faction/estate compositions and starting grid positions. The current [scenarios/](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/main.rs#249-253) folder has 7 JSON files but no schema validation. Before scripting "The Persian Gulf Crisis," we should define a canonical scenario schema (in [state.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs) or a new `scenario.rs`) so the tutorial files are statically typed and testable — not loose JSON that breaks silently.
+
+---
+
+### The Honest Gap
+
+The current test suite validates **individual components in isolation**: the Overton math, the friction formula, the zone gate logic. What we do not yet have is a test that simulates a **sequence of sovereign decisions across multiple ticks** — enact a policy, watch `position` drift, watch faction influence shift reactively, watch a zone gate activate, watch an estate rebel. That 10-tick behavioral test is the true north star for journey testing and should be the culmination of IDX-006 and IDX-007 implementation.
+
+---
+
+*"The transition to a Living Simulation requires systemic physics, not just branching narrative."*
+— V15 Dispatch

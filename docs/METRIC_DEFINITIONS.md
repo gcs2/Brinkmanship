@@ -132,3 +132,41 @@ No ad-hoc definitions are permitted in code. Every coefficient must trace back h
 
 - **Implementation**: `ideology_matrix::check_zone_gates(position)`
 - **Cross-Ref**: See `SOVEREIGN_DISPATCH_V15_THE_STRUCTURAL_MATRIX.md`, Section III.
+
+---
+
+## 12. Position Velocity (VEL)
+- **Definition**: The vector change in the sovereign's governing `position` between the current and previous tick.
+- **Formula**: `VEL = current_position - prev_position` (component-wise subtraction)
+- **Field**: `position_velocity: (f64, f64)` on `IdeologyComponent`, updated each tick by `chronos.rs`.
+- **Mechanics** (IDX-009 — Estate Velocity Memory):
+    - **Shock Threshold**: A speed (magnitude of VEL) exceeding `1.5` units/tick is classified as a "Political Shock."
+    - **Shock Response**: Even if the absolute `position` is not in a Zone Gate, a Shock immediately triggers the corresponding estate event (e.g., Capital Flight for rapid leftward moves by the Elite Estate).
+    - **Design Rationale (V16)**: *"Panic is caused by sudden acceleration, not just location."*
+- **Cross-Ref**: `implementation_plan_phase16.md`, §IDX-009.
+
+---
+
+## 13. Perception Filter — Perceived Position (PERC)
+- **Definition**: The publicly projected sovereign position — what citizens and rivals are told the government represents, distinct from the actual governing `position`.
+- **Fields on `IdeologyComponent`**:
+    - `perceived_position: (f64, f64)` — the maintained public position.
+    - `perceived_flavor_label: String` — the publicly broadcasted government title.
+- **Mechanics**:
+    - **Maintenance Cost**: Each tick, `perception_maintenance_cost(real_pos, perceived_pos, base) → Option<f64>` is charged in Authority. Cost scales with Euclidean distance between `position` and `perceived_position`.
+    - **Veil Threshold**: If `euclidean_distance(position, perceived_position) > VEIL_COLLAPSE_THRESHOLD (3.5)`, returns `None` — **the Veil Shatters**.
+    - **Veil Shatter Event**: Catastrophic Stability loss. The `flavor_label` and `perceived_flavor_label` snap to the same value (reality exposed). Estate rebellions and Faction backlash are triggered with elevated magnitude.
+- **Use Case (Deep State Mode)**: The player may govern at `(+3, -2)` (Oligarchic) while spending AUT each tick to keep `perceived_flavor_label = "Liberalism"`. Managing this gap is the core Deep State gameplay loop.
+- **Design Rationale (V16)**: *"If the Euclidean distance between Reality and Perception gets too wide, the illusion shatters."*
+- **Implementation**: `ideology_matrix::perception_maintenance_cost()` + `VEIL_COLLAPSE_THRESHOLD`
+- **Cross-Ref**: `implementation_plan_phase16.md`, §IDX-010; `SOVEREIGN_DISPATCH_V16.md` §III-B.
+
+---
+
+## 14. Position History & Breadcrumb Trail (HIST)
+- **Definition**: A capped ring of the last 10 governing `position` coordinates, ordered oldest-first.
+- **Field**: `position_history: Vec<(f64, f64)>` on `IdeologyComponent`.
+- **Updated**: Each tick by `chronos.rs` — push `prev_position`, truncate to 10 entries.
+- **UI Purpose** (IDX-011): Rendered as a breadcrumb/momentum trail on `IdeologyCompass.tsx`. Players see their drift line — the visual momentum from *"Liberal Democracy"* toward *"Managed Democracy"* is more psychologically impactful than a text flip alone.
+- **Engine Purpose**: Provides the raw data for `VEL` computation and for any future "trend-based" event triggers (e.g., "Continuous Leftward Drift for 5+ ticks" triggers Investor Confidence warning).
+- **Cross-Ref**: `implementation_plan_phase16.md`, §IDX-011.
