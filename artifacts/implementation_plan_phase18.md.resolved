@@ -1,0 +1,167 @@
+# Phase 18 Implementation Plan: The Tactile Sovereign Simulator
+
+**Directive:** V18 Management Conversation — EU4-Style Windows, Colorful Ideology Grid, Satellite Map
+**Cross-Reference:** [docs/UI_PRINCIPLES.md](file:///c:/Users/zephy/Documents/Brinkmanship/docs/UI_PRINCIPLES.md), [implementation_plan_phase17.md](file:///C:/Users/zephy/.gemini/antigravity/brain/d82755e2-b20b-4e4e-88a9-a419e6646b6d/implementation_plan_phase17.md)
+
+---
+
+## Background
+
+The current UI is a fixed CSS grid dashboard. Phase 18 transforms it into a spatial, windowed command center with:
+- Draggable/resizable "Sovereign Windows" (EU4-style)
+- A colorful 11×11 ideology grid with fullscreen mode and filter bar  
+- Country profile popout window
+- Satellite world map (zoomable with react-leaflet)
+- UI Principles documentation codifying the Glass Cockpit / Perception Gap design language
+
+---
+
+## Proposed Changes
+
+### Step 1 — Install `react-rnd`
+
+```powershell
+cd ui && npm install react-rnd --legacy-peer-deps
+```
+
+`react-rnd` provides drag + resize out of the box. No need for `@dnd-kit` overhead.
+
+---
+
+### Step 2 — Window Manager Foundation
+
+#### [NEW] [WindowManager.tsx](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/context/WindowManager.tsx)
+
+`WindowManagerContext` — tracks open/closed state, z-index (focus order), and maximized state for each window. IDs: [ideology](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/tests/journey_tests.rs#305-321), `worldMap`, `country`, `telemetry`, `intel`, `demographics`.
+
+Key functions: `openWindow(id)`, `closeWindow(id)`, `bringToFront(id)`, `toggleMaximize(id)`. Positions stored in `localStorage`.
+
+#### [NEW] [SovereignWindow.tsx](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/components/SovereignWindow.tsx)
+
+The `<SovereignWindow>` wrapper using `react-rnd`. Props:
+```typescript
+interface SovereignWindowProps {
+  id: string;
+  title: string;
+  defaultPosition: { x: number; y: number };
+  defaultSize: { width: number; height: number };
+  children: React.ReactNode;
+  onClose?: () => void;
+  canMaximize?: boolean;
+}
+```
+Features: drag handle (title bar), close ✕, maximize ⤢, minimize _, amber border glow on focus, CRT scanline header, framer-motion `AnimatePresence` mount/unmount.
+
+---
+
+### Step 3 — IdeologyGrid Component
+
+#### [NEW] [IdeologyGrid.tsx](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/components/IdeologyGrid.tsx)
+
+The 11×11 colorful political matrix. Color formula (per `UI_PRINCIPLES.md §III`):
+```
+dist = √(x² + y²)
+saturation = clamp((dist / 7.07) × 100, 0, 100)
+hue = quadrant_base (Blue/Red/Green/Yellow per quadrant)
+cell = hsl(hue, saturation%, 38%)
+```
+
+Props: `currentPos`, `perceivedPos`, `positionHistory`, `flavorLabel`, `onCellHover` (shows label tooltip from engine's 121-cell lookup).
+
+**Filter Bar** (bottom of component, shown in fullscreen):
+
+| Icon | Filter | Action |
+|:-----|:-------|:-------|
+| 🗺️ Grid | Overlay 121 labels | Toggle text labels on cells |
+| 🔥 Heatmap | Faction lean overlay | Darken cells by faction dominance |
+| 🌊 Trajectory | Comet trail | Show `positionHistory` dots |
+| 👁️ Veil | Perception overlay | Show perceived vs. real gap |
+
+**Fullscreen behavior:** clicking the expand icon dispatches `pause_simulation` to the backend (`POST /api/pause`), then expands to a `fixed inset-0 z-[1000]` overlay.
+
+---
+
+### Step 4 — Country Profile Window
+
+#### [NEW] [CountryProfile.tsx](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/components/CountryProfile.tsx)
+
+Popout `<SovereignWindow>` showing:
+- **Leader name** + **sovereign title** (from `gameState.player_profile`)
+- **Country name** + current **flavor label** / **perceived flavor label**
+- Key stats: AUT, STB, APP, GFI as large glowing numerals
+- Estate influence as a horizontal bar breakdown (Royal Diwan / Armed Forces / Oil Workers)
+- Current ideological position badge (flavor label text, color-coded by quadrant)
+
+Opened via a "Profile" button in the header toolbar.
+
+---
+
+### Step 5 — Satellite World Map
+
+#### [MODIFY] [TacticalMap.tsx](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/components/TacticalMap.tsx)
+
+Replace current static map with a `react-simple-maps` `ComposableMap` (already installed) enhanced with:
+- **Satellite aesthetic**: dark fill `#0d1117` with country borders in `rgba(255,176,0,0.3)` (amber amber grid) — this gives the "satellite surveillance" look without a paid tile provider
+- **Zoom/pan**: wrap in `react-zoom-pan-pinch`'s `<TransformWrapper>` + `<TransformComponent>` (install needed)
+- **Country hover**: amber glow `stroke` on hover; tooltip shows country name
+- **Expand button**: opens map as maximized `<SovereignWindow>`
+
+> **Note on satellite tiles:** Using Mapbox/Leaflet requires an API key and a Next.js server component workaround. For Phase 18, we use `react-simple-maps` + dark SVG styling to achieve the "surveillance aesthetic." Real satellite imagery can be added in Phase 19 if user provides a Mapbox token.
+
+---
+
+### Step 6 — page.tsx Restructure
+
+#### [MODIFY] [page.tsx](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/page.tsx)
+
+Wrap everything in `<WindowProvider>`. Replace the fixed CSS grid with a `relative min-h-screen` canvas. Each panel becomes a `<SovereignWindow>`. Header toolbar gets window-toggle buttons:
+
+```
+[ANCHOR] [RECALL] [SWAP CONFIG ▾] [PROFILE] [MAP ⤢] [START CHRONOS ▶]
+```
+
+The `[PROFILE]` button opens the `country` window. The `[MAP ⤢]` button maximizes the worldMap window.
+
+---
+
+### Step 7 — npm install `react-zoom-pan-pinch`
+
+```powershell
+cd ui && npm install react-zoom-pan-pinch --legacy-peer-deps
+```
+
+---
+
+## Verification Plan
+
+### TypeScript Build
+```powershell
+cd ui && npx tsc --noEmit
+```
+Must pass with 0 errors.
+
+### Visual Verification (Manual — app must be running)
+```powershell
+./scripts/dev_rust.ps1
+```
+Then open **http://localhost:3000** and verify:
+
+1. ✅ IdeologyCompass window is draggable — drag it to a new position
+2. ✅ Clicking the ideology compass pauses the sim (Chronos date stops ticking) and expands to fullscreen
+3. ✅ Filter bar appears at bottom of fullscreen compass with 4 icon buttons
+4. ✅ Toggle "Grid" filter → 121 cell labels appear
+5. ✅ Cells are colorful (4 quadrant colors, gray center)
+6. ✅ Hover over a cell → glowing border + flavor label tooltip
+7. ✅ Close fullscreen (✕) → sim resumes
+8. ✅ Click [PROFILE] in header → CountryProfile window opens
+9. ✅ CountryProfile window is draggable and closeable
+10. ✅ World map is zoomable (scroll wheel)
+11. ✅ Country hover shows amber glow
+12. ✅ Window z-index: clicking a background window brings it to front
+13. ✅ Page refresh → window positions restored from localStorage
+
+### Cargo Tests (engine must not be broken)
+```powershell
+cargo test --manifest-path brinkmanship_engine/Cargo.toml
+```
+All 59 tests must still pass.

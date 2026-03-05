@@ -9,6 +9,7 @@ interface EventOption {
     label: string;
     description: string;
     lag_time?: number;
+    predicted_impact?: string;
 }
 
 interface DossierPaneProps {
