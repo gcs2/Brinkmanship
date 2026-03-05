@@ -3,7 +3,7 @@
 import React, { useRef } from "react";
 import { Rnd } from "react-rnd";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Maximize2, Minimize2, Minus } from "lucide-react";
+import { X, Maximize2 } from "lucide-react";
 import { useWindowManager } from "../../context/WindowManager";
 
 interface SovereignWindowProps {
@@ -97,13 +97,6 @@ export const SovereignWindow = ({
                                         <Maximize2 className="w-2.5 h-2.5" />
                                     </button>
                                 )}
-                                <button
-                                    onClick={() => toggleMaximize(id)}
-                                    className="p-0.5 text-slate-600 hover:text-slate-300 transition-colors"
-                                    title="Maximize"
-                                >
-                                    {win.isMaximized ? <Minimize2 className="w-2.5 h-2.5" /> : <Minus className="w-2.5 h-2.5" />}
-                                </button>
                                 <button
                                     onClick={() => closeWindow(id)}
                                     className="p-0.5 text-slate-600 hover:text-red-400 transition-colors"

@@ -21,7 +21,7 @@ Every window is **an instrument of state.** The player configures their own comm
 
 - All major UI elements are draggable `<SovereignWindow>` components
 - Windows stack by z-index; clicking a window brings it to the front
-- Each window has: **Title bar** (drag handle) · **Minimize icon** · **Maximize icon** · **Close icon**
+- Each window has: **Title bar** (drag handle) · **Fullscreen icon** (if applicable) · **Close icon**
 - Window positions are persisted to `localStorage` so the layout survives page refreshes
 - The minimap (bottom-right) always stays fixed — it is the anchor of the sovereign's situational awareness
 
