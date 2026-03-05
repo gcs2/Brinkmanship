@@ -1,0 +1,152 @@
+{
+    "id": "persian_gulf_crisis",
+    "name": "The Persian Gulf Crisis",
+    "description": "A flashpoint in the Gulf of Oman. As the sovereign of a major Gulf state, you must navigate rising Iranian naval tension, domestic factional pressure from the Religious Establishment, and American diplomatic demands — all while keeping the oil flowing and your Authority intact.",
+    "starting_date": "2027-01-15",
+    "actors": [
+        {
+            "id": "PLAYER",
+            "name": "Gulf Sovereign",
+            "position": [
+                0.5,
+                2.0
+            ],
+            "factions": [
+                {
+                    "id": "tribal_royalists",
+                    "alignment": [
+                        0.5,
+                        2.5
+                    ],
+                    "influence": 40
+                },
+                {
+                    "id": "religious_establishment",
+                    "alignment": [
+                        -0.5,
+                        3.0
+                    ],
+                    "influence": 35
+                },
+                {
+                    "id": "technocratic_reformers",
+                    "alignment": [
+                        2.0,
+                        0.5
+                    ],
+                    "influence": 25
+                }
+            ],
+            "estates": [
+                {
+                    "id": "royal_diwan",
+                    "influence": 45
+                },
+                {
+                    "id": "armed_forces",
+                    "influence": 30
+                },
+                {
+                    "id": "oil_workers_union",
+                    "influence": 25
+                }
+            ]
+        },
+        {
+            "id": "USA",
+            "name": "United States",
+            "position": [
+                1.0,
+                0.0
+            ],
+            "factions": [
+                {
+                    "id": "state_department",
+                    "alignment": [
+                        1.5,
+                        -0.5
+                    ],
+                    "influence": 50
+                },
+                {
+                    "id": "pentagon",
+                    "alignment": [
+                        1.0,
+                        1.0
+                    ],
+                    "influence": 30
+                },
+                {
+                    "id": "isolationist_bloc",
+                    "alignment": [
+                        2.0,
+                        -1.0
+                    ],
+                    "influence": 20
+                }
+            ],
+            "estates": [
+                {
+                    "id": "military_industrial",
+                    "influence": 40
+                },
+                {
+                    "id": "financial_sector",
+                    "influence": 35
+                },
+                {
+                    "id": "civil_society",
+                    "influence": 25
+                }
+            ]
+        },
+        {
+            "id": "IRN",
+            "name": "Islamic Republic of Iran",
+            "position": [
+                -1.5,
+                3.0
+            ],
+            "factions": [
+                {
+                    "id": "supreme_leader_office",
+                    "alignment": [
+                        -2.0,
+                        4.0
+                    ],
+                    "influence": 55
+                },
+                {
+                    "id": "irgc",
+                    "alignment": [
+                        -1.0,
+                        3.5
+                    ],
+                    "influence": 30
+                },
+                {
+                    "id": "reformist_bloc",
+                    "alignment": [
+                        -0.5,
+                        1.5
+                    ],
+                    "influence": 15
+                }
+            ],
+            "estates": [
+                {
+                    "id": "revolutionary_guard",
+                    "influence": 50
+                },
+                {
+                    "id": "clerical_council",
+                    "influence": 35
+                },
+                {
+                    "id": "bazaari_merchants",
+                    "influence": 15
+                }
+            ]
+        }
+    ]
+}

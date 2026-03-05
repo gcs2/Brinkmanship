@@ -1,0 +1,86 @@
+# SOVEREIGN DISPATCH V17 — FIELD REPORT
+
+**TO:** Executive Management (Senior Architecture Desk)
+**FROM:** Principal Simulation Architect (Antigravity)
+**SUBJECT:** Phase 16 Complete — The Living Constraint System is Online
+**DATE:** 2026-03-04
+**COMMIT:** See main branch — IDX-006 through IDX-013
+
+---
+
+## I. EXECUTIVE SUMMARY
+
+Phase 16 is complete. The Structural Matrix is no longer a label — it is a **constraint system with memory, friction, and consequence**. All 8 management-injected mechanics from the V16 Dispatch have been implemented, tested, and committed.
+
+**Test Score: 52/52 ✅**
+- 42 lib/bin unit tests
+- 5 integration journey tests (including the new 10-tick Temporal Harness)
+- 5 doc-tests
+
+---
+
+## II. PHASE 16 DELIVERY LEDGER
+
+| IDX | Mechanic | Status | Physics Behavior Observed |
+|:----|:---------|:------:|:--------------------------|
+| IDX-006 | Rubber Band Gravitational Pull | ✅ | Position corrects within 2-3 ticks outside Overton Spread. AUT bleed fires but is outpaced by generation for moderate distances — extreme positions (±5.0) will show clear drain (Phase 17 stress test) |
+| IDX-007 | Glacial Shift | ✅ | Estate-momentum micro-drift confirmed. Causes ~0.01–0.05 unit/tick drift. Visible in journey test friction cost delta (160.30 vs 160.00) |
+| IDX-009 | Estate Velocity Shock | ✅ | Fires at >1.5 units/tick delta between consecutive chronos ticks. Spikes volatility. Action log entry confirmed. **Note: shock requires chained natural tick observation, not manual state injection** |
+| IDX-010 | Perception Filter / Veil Shatters | ✅ | [perception_maintenance_cost()](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs#223-264) and `VEIL_COLLAPSE_THRESHOLD = 3.5` implemented. Veil Shatters: Stability −20, perceived snaps to real, action log fires |
+| IDX-011 | Breadcrumb Trail | ✅ | `position_history` ring buffer (last 10 ticks) confirmed populating across the 10-tick harness |
+| IDX-012 | ScenarioDef | ✅ | Strict serde validation, panic-at-boot. 6 unit tests covering all validation branches |
+| IDX-013 | Temporal Simulation Harness | ✅ | 10-tick headless loop, USA Radicalization scenario. Rubber Band, Glacial Shift, position history, and flavor label all validated across tick chain |
+| STATE | IdeologyComponent extensions | ✅ | `position_velocity`, `position_history`, `perceived_position`, `perceived_flavor_label` |
+
+---
+
+## III. PHYSICS OBSERVATIONS (FOR MANAGEMENT CALIBRATION)
+
+> These are not bugs. They are system behaviors observed during Phase 16 that management should factor into balance decisions.
+
+### 1. Rubber Band Efficiency vs. AUT Bleed
+- **Observed:** For positions 0.5–2.0 units outside Overton Spread, Rubber Band corrects position within 2–3 ticks. AUT **generation** (3.5/tick base + bonuses) outpaces AUT bleed (3.0 AUT/unit × pull magnitude).
+- **Implication:** The current `GRAVITY_CONSTANT = 0.05` and `AUTHORITY_BLEED_PER_UNIT = 3.0` create a **benign rubber band** — painful for extreme positions but tolerable for moderate drift.
+- **Recommendation for Phase 17:** Add a dedicated stress test at position [(-5.0, 5.0)](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/main.rs#91-126) (Stalinism corner) to validate bleed dominates generation at extremes. May need to tune `AUTHORITY_BLEED_PER_UNIT` upward.
+
+### 2. Velocity Shock Detection Boundary
+- **Observed:** `position_velocity` in [IdeologyComponent](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs#26-83) stores the **post-gravity** delta, not the raw input jump. The shock fires correctly in the engine from the pre-gravity velocity, but the stored field reflects a much smaller magnitude.
+- **Implication:** The stored `position_velocity` field is best used for **continuous drift tracking** (Breadcrumb Trail direction), not for retrospective shock magnitude.
+- **Recommendation:** Add a separate `shock_event_this_tick: bool` field to [IdeologyComponent](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs#26-83) if the UI needs to surface shock events without reading action_logs. Or use the action_log directly.
+
+### 3. UI Status
+- **No UI work was done in Phase 16.** The frontend ([IdeologyCompass.tsx](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/components/IdeologyCompass.tsx)) does not yet surface: `position_history` (breadcrumb trail), `perceived_position` vs [position](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/scenario.rs#232-248) delta, or the new flavor label. This is the **highest-leverage Phase 17 item** for making the physics *visible* to the player.
+
+---
+
+## IV. PROPOSED PHASE 17 STRATEGY
+
+### Priority 1 — AUT Extreme Bleed Stress Test (IDX-006 hardening)
+Add a dedicated unit test with position [(-5.0, 5.0)](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/main.rs#91-126) and zero factions/estates to isolate pure rubber band bleed with no generation interference. Validate that AUT drains to 0 within ~20 ticks.
+
+### Priority 2 — UI Surface: The Matrix Comes Alive
+Wire the following to the React frontend:
+- `position_history` → IdeologyCompass breadcrumb trail (last 10 positions as fading dots)
+- [position](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/scenario.rs#232-248) vs `perceived_position` → Show gap as "Deep State Delta" overlay on the compass
+- [flavor_label](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs#98-123) vs `perceived_flavor_label` → Show dual-label in the HUD header
+- Velocity Shock action_log entries → Flash a `⚡ POLITICAL SHOCK` banner in the UI
+
+### Priority 3 — Persian Gulf Crisis Scenario File
+Write `scenarios/persian_gulf_crisis.json` using the new [ScenarioDef](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/scenario.rs#35-52) format. This will be the engine's first officially supported scenario and serve as the regression file for all future balance testing.
+
+### Priority 4 — IDX-014: Zone Gate Consequences (Emerging)
+The zone gates (`FiveYearPlan`, `BureaucraticFamine`, `CapitalFlight`, etc.) are detected but produce no mechanical consequences. Phase 17 should wire [check_zone_gates()](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs#170-209) into the chronos tick loop to deliver per-tick bonuses and disaster triggers based on active gates.
+
+---
+
+## V. ARCHITECT'S SELF-ASSESSMENT
+
+Phase 16 was more complex than anticipated due to Rust ownership semantics in the journey test harness (borrow-after-move requiring `.clone()`) and physics boundary conditions that required careful reasoning (shock detection, decaying volatility). All issues were resolved cleanly with no compromises to the simulation logic. The engine is now more realistic, more constrained, and more testable than at any point in its history.
+
+**The simulation has gravity. The matrix has teeth. Phase 17 will give it a face.**
+
+---
+
+*Refer to [implementation_plan_phase16.md](file:///C:/Users/zephy/.gemini/antigravity/brain/d82755e2-b20b-4e4e-88a9-a419e6646b6d/implementation_plan_phase16.md) for the prior phase design specification.*
+*Refer to [SOVEREIGN_DISPATCH_V16.md](file:///C:/Users/zephy/.gemini/antigravity/brain/d82755e2-b20b-4e4e-88a9-a419e6646b6d/SOVEREIGN_DISPATCH_V16.md) for the management injections that drove this phase.*
+*All metrics defined in [docs/METRIC_DEFINITIONS.md](file:///c:/Users/zephy/Documents/Brinkmanship/docs/METRIC_DEFINITIONS.md) §12–14.*

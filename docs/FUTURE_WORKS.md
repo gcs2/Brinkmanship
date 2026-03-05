@@ -2,7 +2,7 @@
 
 This document serves as the **Future Works Strategic Backlog** for the **Brinkmanship** project. It outlines the architectural expansion from a functional state engine into a comprehensive geopolitical simulation.
 
-All items cross-reference `implementation_plan_phase15.md` (V15), `implementation_plan_phase16.md` (V16), `SOVEREIGN_DISPATCH_V15_THE_STRUCTURAL_MATRIX.md`, and `SOVEREIGN_DISPATCH_V16.md` where applicable.
+All items cross-reference `implementation_plan_phase15.md` (V15), `implementation_plan_phase16.md` (V16), `implementation_plan_phase17.md` (V17), `SOVEREIGN_DISPATCH_V15_THE_STRUCTURAL_MATRIX.md`, `SOVEREIGN_DISPATCH_V16.md`, and `SOVEREIGN_DISPATCH_V17.md` where applicable.
 
 ---
 
@@ -80,22 +80,27 @@ and `implementation_plan_phase15.md` for the full design treatise.*
 
 | ID | Feature | Description | Status |
 |:---|:---|:---|:---|
-| **IDX-001** | **11×11 Sovereign Grid** | 121-label political archetype lookup table. Each `(econ_x, auth_y)` coordinate resolves to a flavor label (e.g., "Liberalism", "Stalinism"). Seeded from `artifacts/Sovereign Flavor Matrix Explained.csv`. | ✅ **Implemented** in `ideology_matrix.rs` |
-| **IDX-002** | **Ideological Friction Physics** | `Final_AUT_Cost = Base_Cost × (1.0 + dist(current_pos, action_pos) × friction_coeff)`. Ensures radical policy changes carry massive Authority premiums. Default FC = 0.3. | ✅ **Implemented** in `ideology_matrix::action_authority_cost()` |
-| **IDX-003** | **Zone-Specific Systemic Gates** | Three active zones (Totalitarian Planned, Decentralized Laissez-Faire, Illiberal Directed) each unlock a Decision and activate a Disaster Risk counter. | ✅ **Implemented** in `ideology_matrix::check_zone_gates()` |
-| **IDX-004** | **Dual Coordinate System** | `position` (sovereign's policy track record) is distinct from `center` (Overton Window). The gap is **Ideological Tension** — a risk multiplier. | ✅ **Implemented** in `state::IdeologyComponent` |
-| **IDX-005** | **Dynamic HUD Title (Flavor Label)** | The sovereign's current grid label (stored as `flavor_label: String`) drives the live government title in the HUD. Changes automatically as policies shift position. | ✅ **Implemented** in `state::IdeologyComponent::flavor_label` |
-| **IDX-006** | **Rubber Band Effect (Gravitational Pull)** | Per-tick gravitational force pulling `position` toward Overton `center` when outside the Spread. **Not a teleport** — applies a velocity vector back toward center, bleeding `authority.current` each tick. If AUT runs dry, bleed converts to Stability loss. Formula: `pull = (tension - spread) × GRAVITY_CONSTANT`. Ref: `implementation_plan_phase16.md`. | 🔲 **Phase 16** — Chronos integration |
-| **IDX-007** | **Glacial Shift Mechanic** | Each tick, `position` drifts slightly toward `center` proportional to Estate influence momentum. Rate tied to estate influence shifts — slow, earned drift. Direct single-turn matrix jumps are capped. | 🔲 **Phase 16** — Chronos integration |
-| **IDX-008** | **Multi-Actor Matrix Test** | 3 sovereign actors (USA/CHN/ARG archetypes) on one shared State. Validates political physics end-to-end. | ✅ **Implemented** in `tests/journey_tests.rs` |
-| **IDX-009** | **Estate Velocity Memory** | Estates react to *how fast* the sovereign is moving, not just *where* they are. A rapid jump of >1.5 matrix units/tick triggers Capital Flight or equivalent Zone Gate event immediately — even if absolute position is not yet in the danger zone. Panic is caused by acceleration, not location. Field: `position_velocity: (f64, f64)` on `IdeologyComponent`. | 🔲 **Phase 16** |
-| **IDX-010** | **Perception Filter (Deep State Delta)** | The sovereign has two positions: `position` (real governing track record) and `perceived_position` (publicly projected). Spending Authority maintains the gap. If `euclidean_distance(position, perceived_position) > VEIL_COLLAPSE_THRESHOLD (3.5)`, the Veil Shatters — catastrophic Stability collapse. Enables Deep State Mode. | 🔲 **Phase 16** |
-| **IDX-011** | **Position Breadcrumb Trail** | `position_history: Vec<(f64, f64)>` stores last 10 positions. UI renders as a momentum trail on the IdeologyCompass — players see the drift line from *Liberal Democracy* toward *Managed Democracy*. Far more intimidating than a text flip. | 🔲 **Phase 16** — State + UI |
-| **IDX-012** | **ScenarioDef Rust Struct** | Strictly typed `ScenarioDef` + `ActorDef` structs in `scenario.rs`. Invalid scenario files (out-of-range positions, influence sums ≠ 100) cause engine panic at boot, not silent gameplay crashes. Required before NAR-001 scripting. | 🔲 **Phase 16** |
-| **IDX-013** | **Temporal Simulation Harness** | 10-tick headless game loop test: init USA at (+1,0), inject radical leftward policy at Tick 3, assert Authority drop + Tension spike at Tick 4, assert Rubber Band pull active Tick 5–6, assert stabilization or Estate rebellion by Tick 10. Primary difficulty-balance tool. | 🔲 **Phase 16** |
+| **IDX-001** | **11×11 Sovereign Grid** | 121-label political archetype lookup table. | ✅ **Implemented** |
+| **IDX-002** | **Ideological Friction Physics** | `Final_AUT_Cost = Base_Cost × (1.0 + dist × FC)`. Default FC = 0.3. | ✅ **Implemented** |
+| **IDX-003** | **Zone-Specific Systemic Gates** | Three active zones unlock Decisions and Disaster Risk counters. | ✅ **Implemented** |
+| **IDX-004** | **Dual Coordinate System** | `position` vs `center` — gap is Ideological Tension. | ✅ **Implemented** |
+| **IDX-005** | **Dynamic HUD Title (Flavor Label)** | `flavor_label: String` drives live government title in HUD. | ✅ **Implemented** |
+| **IDX-006** | **Rubber Band Effect** | Per-tick gravitational pull toward Overton center; AUT bleed when outside Spread. **Phase 17:** upgrading to exponential bleed formula. | ✅ **Phase 16** / 🔴 **Phase 17 hardening** |
+| **IDX-007** | **Glacial Shift Mechanic** | Per-tick position drift toward center proportional to estate momentum. | ✅ **Phase 16** |
+| **IDX-008** | **Multi-Actor Matrix Test** | 3-actor journey test (USA/CHN/ARG). | ✅ **Implemented** |
+| **IDX-009** | **Estate Velocity Memory** | Shock detection at >1.5 units/tick. `position_velocity` field. UI: `⚡ POLITICAL SHOCK` banner. | ✅ **Phase 16** / 🔴 **Phase 17 UI surface** |
+| **IDX-010** | **Perception Filter (Deep State Delta)** | `perceived_position` vs `position`. `VEIL_COLLAPSE_THRESHOLD = 3.5`. Veil Shatters: Stability −20. UI: hollow ring + tension line. | ✅ **Phase 16** / 🔴 **Phase 17 UI surface** |
+| **IDX-011** | **Position Breadcrumb Trail** | `position_history: Vec<(f64,f64)>` ring buffer (last 10). UI: fading comet trail on IdeologyCompass. | ✅ **Phase 16** / 🔴 **Phase 17 UI surface** |
+| **IDX-012** | **ScenarioDef Rust Struct** | `scenario.rs`: panic-at-boot validation of position bounds, influence sums. | ✅ **Phase 16** |
+| **IDX-013** | **Temporal Simulation Harness** | 10-tick headless loop journey test: USA Radicalization scenario. | ✅ **Phase 16** |
+| **IDX-014** | **Zone Gate Consequences** | Wire `check_zone_gates()` into chronos tick loop. Deliver per-tick bonuses and disaster triggers for active gates (not just detection). | 🔴 **Phase 17** |
+| **IDX-015** | **Exponential AUT Bleed (IDX-006 Hardening)** | Change bleed from linear (`pull × 3.0`) to exponential (`BLEED_BASE × e^(BLEED_EXPONENT × overshoot)`). At corner position (±5.0): bleed ~50 AUT/tick. Stress test: AUT drains to 0 in ≤20 ticks. | 🔴 **Phase 17 Priority 1** |
 
 > [!IMPORTANT]
 > **Management Directive (V16 — APPROVED 2026-03-04)**: IDX-006 through IDX-013 are Phase 16. The Rubber Band must be a **gravitational pull vector**, not a hard teleport. Estate Velocity Memory (IDX-009) and the Perception Filter (IDX-010) are new management-injected mechanics. The Temporal Simulation Harness (IDX-013) is the capstone test and primary difficulty-balance tool. Ref: `SOVEREIGN_DISPATCH_V16.md §I–VII`.
+
+> [!IMPORTANT]
+> **Management Directive (V18 — APPROVED 2026-03-04)**: IDX-015 (Exponential Bleed) is the Phase 17 Priority 1 hardening. IDX-014 (Zone Gate Consequences) unlocks the disaster deck. UI surface (IDX-009/010/011 visual layer) is Priority 2. NAR-001 (Persian Gulf Crisis JSON scenario) is Priority 3. The Legislative Engine (`legislation.rs`) is Priority 4. Ref: `SOVEREIGN_DISPATCH_V18.md`.
 
 ---
 
@@ -121,12 +126,52 @@ This integration test (`test_journey_three_actor_multipolar`) acts as a **living
 
 Priority order for all future development:
 
-1. **IDX-006 & IDX-007** (Rubber Band + Glacial Shift) — make the Structural Matrix a genuine constraint system.
-2. **IDX-009** (Estate Velocity Memory) — panic on acceleration, not just location.
-3. **IDX-010** (Perception Filter) — Deep State Delta; the Veil Shatters mechanic.
-4. **IDX-012** (ScenarioDef) — required before NAR-001 scripting.
-5. **IDX-013** (Temporal Harness) — the capstone Phase 16 test.
-6. **NAR-001** (Tutorial) — only after IDX-012 is solid.
-7. **DIP-002** (AI Parity) — only after IDX-006/007; AI must walk in the gravity before it's built.
+1. **IDX-015** (Exponential AUT Bleed) — physics hardening of IDX-006 Rubber Band.
+2. **UI Surface** (IDX-009/010/011 visual layer) — make the physics *visible* to the player.
+3. **NAR-001** (Persian Gulf Crisis Scenario) — canonical regression testbed.
+4. **IDX-014** (Zone Gate Consequences) — disaster deck activation.
+5. **LEG-001** (Legislative Engine) — event chain minigame framework.
+6. **DIP-002** (AI Parity) — only after IDX-006 hardened; AI must walk in the gravity before it's built.
 
-*Verbatim (V15/V16): "Every click has a mathematical weight defined by this 121-point matrix. Make the player feel the weight of the system."*
+*Verbatim (V15/V16/V18): "Every click has a mathematical weight defined by this 121-point matrix. Make the player feel the weight of the system."*
+
+---
+
+## **IX. THE LEGISLATIVE ENGINE (METRIC_LEG)**
+
+*Per V18 Management Dispatch: legislation is a minigame event chain with real mechanical consequences. Ref: `implementation_plan_phase17.md §Priority 4`.*
+
+| ID | Feature | Description | Status |
+|:---|:---|:---|:---|
+| **LEG-001** | **LegislationDef Struct** | `legislation.rs`: `LegislationDef` (id, name, ideological_coordinate, base_aut_cost, phases). Each bill is an event chain with player choices that adjust pass probability. | 🔴 **Phase 17** |
+| **LEG-002** | **Wonk Workshop** | Before proposing a bill, player assigns Political Advisors. Advisors spend AUT to shift bill's ideological coordinate toward Overton Window, reducing final friction cost. | 🔴 **Phase 17** |
+| **LEG-003** | **Congressional Whip Counts** | Bills enter a "Floor Debate" phase. Congress divided into factions via Estate distributions. Player lobbies factions to build a majority. | 🔴 **Phase 18** |
+| **LEG-004** | **Pork-Barrel Mechanics** | If bill is stuck, player can attach Pork: guaranteed passage but permanent negative modifier to Scarcity Coefficient or treasury drain. Teaches real-world omnibus bill dynamics. | 🔴 **Phase 18** |
+| **LEG-005** | **Outcome Consequences** | Passed bills deliver lasting mechanical effects: approval boost, increased taxation, trade route unlock, government ownership of resources. Failed bills: Stability loss, AUT drain. | 🔴 **Phase 17–18** |
+
+> **Design Principle (user-directed)**: The legislative system is a framework for *event chains in general*. Any policy, crisis, or diplomatic maneuver can be expressed as a `LegislationDef`. Player decisions shift pass probability; the fundamental loop is *spend resources → affect probability → reap or suffer outcome*.
+
+---
+
+## **X. GAME MODES (METRIC_MODE)**
+
+*Per V18 Management Directive: structure UI and State for eventual two-mode support. Ref: `SOVEREIGN_DISPATCH_V18.md §III`.*
+
+| ID | Mode | Description | Status |
+|:---|:---|:---|:---|
+| **MODE-001** | **Deep State Mode** | Player IS the permanent bureaucracy. Elections are "weather events" — Overton Window shifts violently; player spends AUT to drag new admin back. Lose condition: Stability = 0, Civil War, default. | 🔴 **Architecture phase** |
+| **MODE-002** | **Politician Mode (Ironman)** | Player IS the administration. Strict 4/8-year electoral clock. `perceived_flavor_label` must align with median voter by Election Tick. Lose condition: APP below threshold on Election Day. | 🔴 **Architecture phase** |
+
+---
+
+## **XI. DIFFICULTY SYSTEM (METRIC_DIFF)**
+
+*Deferred from V18 Priority 1 per management decision. Exponential AUT bleed is better expressed as a difficulty setting than a hard physics change.*
+
+| ID | Feature | Description | Status |
+|:---|:---|:---|:---|
+| **DIFF-001** | **Exponential AUT Bleed (Hard Mode)** | Replaces linear bleed formula (`pull × AUTHORITY_BLEED_PER_UNIT`) with `BLEED_BASE × e^(BLEED_EXPONENT × overshoot)`. At ±5.0 corner: ~50 AUT/tick drain. Normal Mode keeps linear. Hard Mode exposes tuneable `BLEED_BASE` (default 3.0) and `BLEED_EXPONENT` (default 0.7) config knobs. | 🔵 **Deferred — Phase 17+** |
+| **DIFF-002** | **Difficulty Runtime Flag** | `difficulty_mode: DifficultyMode` enum on `State` (`Normal`, `Hard`, `Ironman`). `Ironman` = Hard Mode physics + Politician Mode game mode. | 🔴 **Phase 18** |
+
+> [!NOTE]
+> **V18 Rationale (2026-03-04):** Exponential bleed penalizes "tanking" the Overton rubber band at moderate positions (0.5–2.0 overshoot). Management deferred this to keep the Normal Mode simulation approachable. Hard Mode will surface the formula as a difficulty knob without breaking the default experience.

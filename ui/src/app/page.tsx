@@ -16,6 +16,8 @@ export default function Home() {
   const [notification, setNotification] = useState<string | null>(null);
   const [scenarios, setScenarios] = useState<string[]>([]);
   const [showScenarioMenu, setShowScenarioMenu] = useState(false);
+  const [velocityShock, setVelocityShock] = useState(false);
+  const prevLogsRef = useRef<string[]>([]);
 
   // Autoplay logic
   const [isPlaying, setIsPlaying] = useState(false);
@@ -39,7 +41,22 @@ export default function Home() {
       }
 
       const stateRes = await fetch("http://localhost:8000/api/state");
-      if (stateRes.ok) setGameState(await stateRes.json());
+      if (stateRes.ok) {
+        const newState = await stateRes.json();
+        setGameState(newState);
+
+        // Detect VELOCITY SHOCK in fresh action_logs (IDX-009)
+        const newLogs: string[] = newState?.action_logs ?? [];
+        const prevLogs = prevLogsRef.current;
+        const hasNewShock = newLogs.some(
+          (l: string) => l.includes("VELOCITY SHOCK") && !prevLogs.includes(l)
+        );
+        if (hasNewShock) {
+          setVelocityShock(true);
+          setTimeout(() => setVelocityShock(false), 2600);
+        }
+        prevLogsRef.current = newLogs;
+      }
     } catch { }
   }, [config]);
 
@@ -242,6 +259,12 @@ export default function Home() {
               authoritarianLibertarian={gameState?.player_ideology?.authoritarian_libertarian ?? 0}
               plannedMarket={gameState?.player_ideology?.planned_market ?? 0}
               overtonRadius={gameState?.player_ideology?.overton_radius ?? 0.2}
+              positionHistory={gameState?.player_ideology?.position_history ?? []}
+              perceivedPosition={gameState?.player_ideology?.perceived_position}
+              veilGap={gameState?.player_ideology?.veil_gap ?? 0}
+              flavorLabel={gameState?.player_ideology?.flavor_label}
+              perceivedFlavorLabel={gameState?.player_ideology?.perceived_flavor_label}
+              velocityShock={velocityShock}
             />
           </div>
         </div>

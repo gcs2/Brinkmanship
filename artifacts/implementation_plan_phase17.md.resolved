@@ -1,0 +1,187 @@
+# Phase 17 Implementation Plan: The Living Matrix, Wired
+
+**TO:** Principal Simulation Architect (Antigravity)
+**FROM:** Architect's Internal Planning Document
+**SUBJECT:** Phase 17 Execution — V18 Dispatch Implementation
+**DATE:** 2026-03-04
+**Cross-Reference:** `SOVEREIGN_DISPATCH_V18` (V18 Management Dispatch), [implementation_plan_phase16.md](file:///C:/Users/zephy/.gemini/antigravity/brain/d82755e2-b20b-4e4e-88a9-a419e6646b6d/implementation_plan_phase16.md), [docs/METRIC_DEFINITIONS.md](file:///c:/Users/zephy/Documents/Brinkmanship/docs/METRIC_DEFINITIONS.md), [AI_RULES.md](file:///c:/Users/zephy/Documents/Brinkmanship/AI_RULES.md)
+
+---
+
+## Background
+
+Phase 16 delivered the full Living Constraint System: IDX-006 through IDX-013. Phase 17 executes in strict Priority order per V18 management directive:
+
+1. Physics calibration (exponential bleed)
+2. UI materialization (IdeologyCompass.tsx wiring)
+3. Persian Gulf Crisis scenario file
+4. Legislative Engine architecture
+
+---
+
+## Revision Notes (Post-Management Review)
+
+- **Exponential bleed DEFERRED**: The formula change is complex and better expressed as a *difficulty setting* — Hard Mode cranks `BLEED_BASE` and `BLEED_EXPONENT`; Normal Mode keeps linear bleed. This keeps the engine physics simple and lets players choose their friction level. Documenting in `FUTURE_WORKS.md §X` as `DIFF-001`.
+- **`LegislationDef` renamed to `EventChainDef`**: The struct is a universal container for any event chain — bills, crisis events, diplomatic incidents, minigames. `legislation.rs` becomes `event_chain.rs`.
+- **Priority reorder**: P1=UI Surface → P2=Persian Gulf Scenario → P3=EventChainDef skeleton → P4=Difficulty Mode documentation
+
+---
+
+## Proposed Changes
+
+### Priority 1 — UI Surface: The Matrix Comes Alive
+
+---
+
+#### [MODIFY] [IdeologyCompass.tsx](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/components/IdeologyCompass.tsx)
+
+**Current state:** 96 lines. Props: `authoritarianLibertarian`, `plannedMarket`, `overtonRadius`. Does not receive Phase 16 fields.
+
+**Required prop extensions:**
+```typescript
+interface IdeologyCompassProps {
+    // Existing
+    authoritarianLibertarian: number;
+    plannedMarket: number;
+    overtonRadius: number;
+    // Phase 17 additions
+    positionHistory?: [number, number][];     // IDX-011 breadcrumb trail
+    perceivedPosition?: [number, number];     // IDX-010 Deep State Delta
+    flavorLabel?: string;                     // IDX-005 real label
+    perceivedFlavorLabel?: string;            // IDX-010 perceived label
+    velocityShock?: boolean;                  // IDX-009 shock flash trigger
+    veilGap?: number;                         // Gap for coloring the tension line
+}
+```
+
+**Visual additions:**
+1. **Breadcrumb Comet** — 10 fading dots from `positionHistory`. Oldest: opacity 0.05, newest: 0.7. Color: `amber-accent/60`.
+2. **Deep State Delta** — `perceivedPosition` as hollow glowing ring. Real [position](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/scenario.rs#232-248) stays solid amber crosshair. Tension line between them: orange at gap > 2.5, `#FF2222` at gap > 3.5 (Veil Collapse).
+3. **Dual Flavor Labels** — Hover overlay: `LABEL:` + `PERCEIVED:` (dimmer, italic). Only shown when they differ.
+4. **Velocity Shock Banner** — `⚡ POLITICAL SHOCK` flash, `AnimatePresence`, 2s duration, CRT scanline distortion overlay.
+
+#### [MODIFY] [page.tsx](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/page.tsx)
+
+Extend state fetch to pass `position_history`, `perceived_position`, `perceived_flavor_label`, [flavor_label](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs#98-123), `position_velocity` from `/state` API as props to [IdeologyCompass](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/components/IdeologyCompass.tsx#12-94).
+
+---
+
+### Priority 2 — The Canonical Crisis Scenario
+
+---
+
+#### [NEW] [persian_gulf_crisis.json](file:///c:/Users/zephy/Documents/Brinkmanship/scenarios/persian_gulf_crisis.json)
+
+3 actors: `PLAYER` (Gulf State Sovereign, pos [(0.5, 2.0)](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/chronos.rs#18-358)), `USA` (pos [(1.0, 0.0)](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/chronos.rs#18-358)), `IRN` (pos [(-1.5, 3.0)](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/chronos.rs#18-358)).
+
+---
+
+### Priority 3 — EventChainDef Framework
+
+---
+
+#### [NEW] [event_chain.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/event_chain.rs)
+
+`EventChainDef` is the **universal event container** — legislation, crises, diplomacy, minigames all use this format:
+
+```rust
+pub struct EventChainDef {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+    pub ideological_coordinate: (f64, f64),
+    pub base_aut_cost: f64,
+    pub phases: Vec<EventPhase>,
+}
+
+pub struct EventPhase {
+    pub name: String,
+    pub description: String,
+    pub player_choices: Vec<EventChoice>,
+}
+
+pub struct EventChoice {
+    pub label: String,
+    pub metric_deltas: Vec<(String, f64)>,
+    pub pass_chance_modifier: f64,
+    pub ideological_shift: Option<(f64, f64)>,
+}
+
+pub enum EventOutcome {
+    Success(Vec<(String, f64)>),
+    Failure(Vec<(String, f64)>),
+    Compromised(Vec<(String, f64)>),  // "Pork-Barrel" — guaranteed pass with cost
+}
+```
+
+#### [MODIFY] [state.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs)
+
+Add `active_events: Vec<EventChainDef>` and `event_log: Vec<String>` to [State](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs#152-172).
+
+---
+
+### Priority 4 — Difficulty Mode (Exponential Bleed Deferred)
+
+---
+
+Document `DIFF-001` in [FUTURE_WORKS.md](file:///c:/Users/zephy/Documents/Brinkmanship/docs/FUTURE_WORKS.md) as a planned difficulty system. No code change yet — the current linear bleed stays. Hard Mode will expose `BLEED_BASE` and `BLEED_EXPONENT` as tuneable config knobs at a future date.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+```powershell
+# Priority 1: Run full test suite after exponential bleed change
+cargo test --manifest-path brinkmanship_engine/Cargo.toml 2>&1
+# ALL 52+ tests must pass. Any journey test failures from bleed change = update tolerance.
+
+# Priority 1: Target the new extreme bleed stress test specifically
+cargo test --manifest-path brinkmanship_engine/Cargo.toml test_extreme_bleed
+
+# Priority 4: After legislation.rs module added
+cargo test --manifest-path brinkmanship_engine/Cargo.toml 2>&1
+```
+
+### UI Verification (Priority 2)
+
+After UI changes, run the dev server and take a visual snapshot:
+
+```powershell
+# Run the Rust backend
+cargo run --manifest-path brinkmanship_engine/Cargo.toml 2>&1 &
+# Run the Next.js frontend
+cd ui && npm run dev
+```
+
+Visually verify:
+1. Breadcrumb trail dots visible and fading in [IdeologyCompass](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/components/IdeologyCompass.tsx#12-94)
+2. Hollow ring for `perceived_position` distinct from solid crosshair for [position](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/scenario.rs#232-248)
+3. Tension line changes color at gap > 2.5 and > 3.5
+4. Dual labels appear in hover overlay when they differ
+5. `⚡ POLITICAL SHOCK` banner flashes on shock event and disappears after 2s
+
+### Scenario File
+
+```powershell
+# Validate ScenarioDef loads without panic
+cargo test --manifest-path brinkmanship_engine/Cargo.toml test_persian_gulf_scenario_validates
+```
+
+### Commit Rhythm (Rule 6)
+
+- Commit after Priority 1 (physics calibration + stress test green)
+- Commit after Priority 2 (UI changes)
+- Commit after Priority 3 (scenario file)
+- Commit after Priority 4 (legislation.rs skeleton + tests)
+
+---
+
+## Game Mode Architecture Note
+
+Per V18 directive, `legislation.rs` and [state.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs) additions should be structured to eventually support:
+- **Deep State Mode**: Player IS the permanent bureaucracy; administrations change via Election Algorithm
+- **Politician Mode**: Player IS the administration; 4–8 year electoral clock; `perceived_flavor_label` must match median voter
+
+Both modes share the same engine physics. Mode is a runtime flag, not an architectural split.

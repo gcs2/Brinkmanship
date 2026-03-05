@@ -10,7 +10,7 @@ To achieve that highly elusive "fun" factor, the engine must pivot away from a s
 **FROM:** Executive Management
 **SUBJECT:** Big-Picture Implementation & AAA Priority Queue — Phases 14–15 and Future Works
 
-*Cross-Reference: `implementation_plan_phase15.md` (V15 Implementation Plan), `SOVEREIGN_DISPATCH_V15_THE_STRUCTURAL_MATRIX.md`, `docs/FUTURE_WORKS.md`, `docs/METRIC_DEFINITIONS.md`*
+*Cross-Reference: `implementation_plan_phase15.md` (V15), `implementation_plan_phase16.md` (V16), `implementation_plan_phase17.md` (V17), `SOVEREIGN_DISPATCH_V15_THE_STRUCTURAL_MATRIX.md`, `SOVEREIGN_DISPATCH_V16.md`, `SOVEREIGN_DISPATCH_V17.md`, `docs/FUTURE_WORKS.md`, `docs/METRIC_DEFINITIONS.md`*
 
 Antigravity, we are initiating a massive expansion of the *Brinkmanship* engine. The objective is to build an autonomous, reactive world that provides a AAA-quality gameplay loop. The environment must be actively hostile, ideologically complex, and economically rigorous.
 
@@ -45,17 +45,16 @@ Below is the **Strict Priority Queue** for the upcoming development cycles. Exec
    - **Verified by:** `test_journey_three_actor_multipolar` (3 actors: USA, CHN, ARG archetypes). See `FUTURE_WORKS.md §VIII`.
    - **Mathematical foundation:** `Final_AUT_Cost = Base_Cost × (1.0 + dist(POS, action_pos) × FC)`. Default FC = 0.3. See `METRIC_DEFINITIONS.md §9`.
 
-4. **[IDX-006] The Rubber Band Effect:**
-   - **Why:** Without it, the sovereign can freely teleport across the matrix. This must be constrained.
-   - **Implementation:** In `reactor.rs` or `chronos.rs`: when an action shifts position by more than the Overton Spread, apply a Chaos Modifier that drains Stability. If Stability < threshold, Estates rebel and position snaps back.
+4. **[IDX-006] The Rubber Band Effect: ✅ Phase 16 Implemented. Phase 17: upgrading to exponential bleed:**
+   - **Phase 16 delivery:** Implemented in `chronos.rs`. Linear bleed formula: `pull × AUTHORITY_BLEED_PER_UNIT`.
+   - **Phase 17 hardening (IDX-015):** Bleed upgrades to `BLEED_BASE × e^(BLEED_EXPONENT × overshoot)`. At (±5.0) corner: ~50 AUT/tick drain. Extreme bleed stress test validates AUT = 0 in ≤20 ticks.
 
-5. **[IDX-007] The Glacial Shift Mechanic:**
-   - **Why:** Historical ideological drift is slow. Position changes must be earned through sustained estate manipulation.
-   - **Implementation:** In `chronos.rs`: each tick, the `position` drifts slightly toward the faction-weighted `center`. The drift rate is proportional to Estate influence shifts. Direct single-turn jumps are capped.
+5. **[IDX-007] The Glacial Shift Mechanic: ✅ Phase 16 Implemented:**
+   - **Status:** `GLACIAL_DRIFT_RATE = 0.01`, estate-momentum driven per-tick drift toward center. Confirmed via journey test tolerance adjustment.
 
-6. **[PHASE 14.3 / REGIONAL] Country-Specific Disaster Decks:**
-   - **Why:** Prevents identical playthroughs. Zone Gates (IDX-003) need disaster counters that actually tick.
-   - **Implementation:** Hidden counters per zone (BureaucraticFamine, CapitalFlight, PlutocraticSecession) tick each turn the sovereign remains in that zone. On threshold trigger, catastrophic events fire.
+6. **[PHASE 14.3 / REGIONAL] Country-Specific Disaster Decks (IDX-014 — Phase 17):**
+   - **Why:** Zone gates are now *detected* but produce no consequences. Disaster counters must tick.
+   - **Implementation (Phase 17):** Wire `check_zone_gates()` into `chronos.rs` tick loop. Active gate = per-tick counter increment. On threshold: catastrophic event fires (BureaucraticFamine, CapitalFlight, PlutocraticSecession).
 
 ---
 
@@ -86,11 +85,28 @@ Below is the **Strict Priority Queue** for the upcoming development cycles. Exec
 
 ---
 
+### **PRIORITY TIER 2.5: PHASE 17 — UI MATERIALIZATION & LEGISLATIVE ENGINE**
+*The physics exist. Now make the player feel them.*
+
+11. **[UI Phase 17] IdeologyCompass.tsx — Phase 16 Surface:**
+    - **What to build:** Breadcrumb Comet (10 fading `position_history` dots), Deep State Delta (hollow `perceived_position` ring + color-coded tension line), Dual Flavor Labels, `⚡ POLITICAL SHOCK` banner with framer-motion + CRT distortion.
+    - **Wire via:** `page.tsx` extending the `/state` API fetch to source the new `IdeologyComponent` fields.
+
+12. **[LEG-001] The Legislative Engine (Event Chain Framework):**
+    - **Why:** Policy decisions need real mechanical consequences. The legislative loop is the core gameplay moment: *spend AUT + workshop bill → floor debate → outcome*.
+    - **Structs:** `LegislationDef`, `LegislationPhase`, `LegislationChoice`, `LegislationOutcome` in `legislation.rs`.
+    - **State integration:** `pending_legislation: Vec<LegislationDef>` + `legislation_log` on `State`.
+    - **Outcomes:** Passed (approval boost, trade unlock, tax increase), Failed (Stability −, AUT drain), Pork-Barreled (guaranteed pass + permanent Scarcity Coefficient malus).
+
+---
+
 ### **DEPENDENCY GRAPH**
 ```
-IDX-001 (Grid) ──► IDX-002 (Friction) ──► IDX-006 (Rubber Band) ──► NAR-001 (Tutorial)
-IDX-003 (Zones) ──► Regional Decks ──────────────────────────────────► DIP-002 (AI Rivals)
-IDX-004 (Position) ─► IDX-005 (Flavor Label) ─► POL-004 (Deep State HUD)
+IDX-001 (Grid) ──► IDX-002 (Friction) ──► IDX-006 (Rubber Band) ──► IDX-015 (Exp Bleed) ──► NAR-001 (Tutorial)
+IDX-003 (Zones) ──► IDX-014 (Zone Consequences) ──────────────────────► DIP-002 (AI Rivals)
+IDX-004 (Position) ─► IDX-005 (Flavor Label) ─► IDX-010 (Perception) ─► POL-004 (Deep State HUD)
+IDX-011 (History) ─► UI Comet Trail ─► MODE-001/002 (Game Modes)
+LEG-001 (Structs) ─► LEG-002 (Wonk) ─► LEG-003 (Whip) ─► LEG-004 (Pork) ─► LEG-005 (Outcomes)
 ECO-001 (Industry) ──► ECO-002 (Trade) ──► ADV-001 (Sabotage)
 MIL-001 (Assets) ──► MIL-003 (Nuclear) ──► GeoStratLayer
 ```
@@ -98,3 +114,5 @@ MIL-001 (Assets) ──► MIL-003 (Nuclear) ──► GeoStratLayer
 ---
 
 *"The transition to a 'Living Simulation' requires a coherent onboarding and narrative structure anchored in systemic physics, not just branching narrative."* — Executive Management
+
+*Updated: SOVEREIGN_DISPATCH_V18 — 2026-03-04*
