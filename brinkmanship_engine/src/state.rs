@@ -22,10 +22,42 @@ pub struct DemographicsComponent {
     pub state_security: f64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct IdeologyComponent {
-    pub center: (f64, f64), // (Planned/Market, Auth/Lib)
-    pub spread: f64,       // The current "Acceptable" zone (Standard Deviation)
+    /// The faction-weighted Overton Window center (mean alignment of all Factions).
+    /// Derived each tick from Faction influence × alignment.
+    pub center: (f64, f64),
+
+    /// The Overton Window spread (weighted standard deviation of Faction alignments).
+    /// High spread = polarized society. Low spread = ideological consensus.
+    pub spread: f64,
+
+    /// The sovereign's actual governing position on the 11×11 Structural Matrix.
+    /// Distinct from `center`: a leader can govern at (+2, 0) while factions pull
+    /// toward (0, 0). The Euclidean gap is `Ideological Tension`.
+    /// X-Axis: Economic (-5 Command → +5 Commodified)
+    /// Y-Axis: Authority (-5 Stateless → +5 Totalitarian)
+    ///
+    /// See: `ideology_matrix::euclidean_distance(position, center)` for tension calc.
+    pub position: (f64, f64),
+
+    /// The human-readable flavor label for the current `position`.
+    /// Updated each tick via `ideology_matrix::resolve_flavor_label(position)`.
+    /// e.g., "Liberalism", "Stalinism", "Market Democracy"
+    ///
+    /// Cross-ref: `artifacts/SOVEREIGN_DISPATCH_V15_THE_STRUCTURAL_MATRIX.md`
+    pub flavor_label: String,
+}
+
+impl Default for IdeologyComponent {
+    fn default() -> Self {
+        Self {
+            center: (0.0, 0.0),
+            spread: 0.0,
+            position: (0.0, 0.0),
+            flavor_label: "Liberalism".to_string(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]

@@ -157,6 +157,8 @@ fn init_scenario(state: Arc<AppState>, scenario_id: String) -> Result<(), String
     initial_ideology.insert("PLAYER".to_string(), crate::state::IdeologyComponent {
         center: (0.0, 0.0),
         spread: 0.20,
+        position: (0.0, 0.0),
+        flavor_label: "Liberalism".to_string(),
     });
 
     let s = State {

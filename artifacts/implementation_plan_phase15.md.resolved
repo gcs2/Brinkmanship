@@ -1,0 +1,135 @@
+# Phase 15: The Structural Matrix — Multi-Polar Integration Test & Documentation
+
+## Goal
+Implement the **3-Actor Multi-Polar Integration Test** validating the 2D Ideological Matrix physics, while bucketing all new V15 design directives into the canonical documentation hierarchy.
+
+## Background
+
+The V15 Dispatch defines a formal 11×11 **Sovereign Grid** (121 cells, `economy_x ∈ [-5, +5]`, `authority_y ∈ [-5, +5]`). It introduces **three hard constraints** that must all be verifiable by automated tests:
+
+1. **Friction Physics**: The Euclidean distance between the current ideological position and an action's ideological center governs Authority cost.
+2. **Systemic Gating**: Specific grid zones unlock decisions and trigger disasters.
+3. **Flavor Labels**: Each coordinate resolves to a named political archetype (e.g., [(+0, 0)](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/chronos.rs#17-234) → *Liberalism*, [(-5, +5)](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/chronos.rs#17-234) → *Stalinism*).
+
+The **3-Actor test** will simulate 3 sovereign entities interacting simultaneously on the same shared [State](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs#84-104), each with distinct factional makeups, different positions on the matrix, and diverging approval trajectories.
+
+---
+
+## Proposed Changes
+
+### Core Engine: [state.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs)
+
+#### [MODIFY] [state.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs)
+- Add a `flavor_label: String` field to [IdeologyComponent](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs#26-30) (the human-readable grid cell name, e.g., "Liberalism").
+- Add a `position: (f64, f64)` alias to [IdeologyComponent](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs#26-30) (same as `center`, but semantically pinned to the player's *current* position, distinct from the Overton Window's *derived* center which can drift from the actual position).
+
+> [!IMPORTANT]
+> The `position` field represents **where the sovereign actually is** on the grid (their policy track record). The `center` field represents **where their factions pull them** ideologically (Overton Window). These are two distinct concepts that can diverge — a leader can govern at (+2, 0) while their public narrative center is at (0, 0). This divergence is political tension.
+
+### New Module: `ideology_matrix.rs`
+
+#### [NEW] [ideology_matrix.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/ideology_matrix.rs)
+
+This is a pure, stateless utility module. No side effects.
+
+```rust
+pub fn resolve_flavor_label(econ_x: f64, auth_y: f64) -> &'static str { ... }
+pub fn euclidean_distance(a: (f64, f64), b: (f64, f64)) -> f64 { ... }
+pub fn action_authority_cost(base_cost: f64, current_pos: (f64, f64), action_pos: (f64, f64), friction_coefficient: f64) -> f64 { ... }
+pub fn check_zone_gates(pos: (f64, f64)) -> Vec<ZoneGate> { ... }
+```
+
+**`resolve_flavor_label`**: Rounds the float coordinates to the nearest integer on [-5, +5] and looks up the 121-cell static table (seeded from the Flavor Matrix CSV).
+
+**`action_authority_cost`**:
+```
+Final_Cost = Base_Cost * (1.0 + (euclidean_distance(current_pos, action_pos) * friction_coefficient))
+```
+
+**`ZoneGate`**: An enum of unlocked decisions and disaster risks:
+```rust
+pub enum ZoneGate {
+    FiveYearPlan,        // Totalitarian Planned zone
+    BureaucraticFamine,  // Totalitarian Planned zone (disaster)
+    CorporateSovZone,    // Decentralized Laissez-Faire zone
+    PlutocraticSecession,// Decentralized Laissez-Faire zone (disaster)
+    StateChampionSubsidy,// Illiberal Directed zone
+    CapitalFlight,       // Illiberal Directed zone (disaster)
+}
+```
+
+### Journey Test: [journey_tests.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/tests/journey_tests.rs)
+
+#### [MODIFY] [journey_tests.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/tests/journey_tests.rs)
+Add a new test function: **`test_journey_three_actor_multipolar`**
+
+**Three actors and their archetypes:**
+
+| Actor | Position (Econ X, Auth Y) | Flavor Label | Dominant Faction | Estate Balance |
+|:------|:--------------------------|:-------------|:-----------------|:---------------|
+| `USA` | (+1, 0) — Liberal Democracy | Centrist neoliberal | Establishment (65%), Progressives (35%) | Corporate (60%) / Labor (40%) |
+| `CHN` | (-2, +3) — National Synergy | Oligarchic/Illiberal | Party Cadre (80%), Entrepreneurs (20%) | State Sec (70%) / Workers (30%) |
+| `ARG` | (-1, +1) — Third Way | Volatile populist | Peronists (55%), Liberals (45%) | Workers (80%) / Elites (20%) |
+
+**Key assertions the test will validate:**
+
+1. **Matrix Label Correctness**: `resolve_flavor_label(1.0, 0.0)` == `"Liberal Democracy"`
+2. **Friction Physics**: The AUT cost for CHN to enact a market deregulation (+3 X) is dramatically higher than for USA to enact the same.
+3. **Three Independent Overton Windows**: After one tick, all three actors have distinct `ideology.center` values derived from their respective factions.
+4. **Divergent Approval Trajectories**: CHN's Party Cadre-dominated estates yield high approval; ARG's worker-dominated estates with low happiness yield low approval, potentially triggering an instability event.
+5. **Zone Gating**: CHN's position at (-2, +3) triggers the `StateChampionSubsidy` zone gate and `CapitalFlight` risk.
+
+### [lib.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/lib.rs)
+
+#### [MODIFY] [lib.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/lib.rs)
+- Export the new `ideology_matrix` module.
+
+---
+
+### Documentation Updates
+
+#### [MODIFY] [FUTURE_WORKS.md](file:///c:/Users/zephy/Documents/Brinkmanship/docs/FUTURE_WORKS.md)
+Add a new top-level section **`VII. THE STRUCTURAL MATRIX ENGINE (METRIC_IDX)`** containing:
+- `IDX-001`: The 11×11 Sovereign Grid (121 labels from Flavor Matrix CSV)
+- `IDX-002`: Ideological Friction Physics (Euclidean Distance → AUT cost formula)
+- `IDX-003`: Zone-Specific Systemic Gates (Five-Year Plan, Plutocratic Secession, etc.)
+- `IDX-004`: Dynamic HUD Title (Live grid label as sovereign title)
+- `IDX-005`: Rubber Band Effect (Chaos Modifier on forced radical shifts)
+
+Move `EST-001` from `METRIC_POL` to the new `METRIC_IDX` section (it is now correctly bucketed under the structural matrix, not simple political perception).
+
+#### [MODIFY] [ARCHITECTURAL_DIRECTIVE_GRAND_STRATEGY.md](file:///c:/Users/zephy/Documents/Brinkmanship/docs/ARCHITECTURAL_DIRECTIVE_GRAND_STRATEGY.md)
+Update **PRIORITY TIER 2** with the Structural Matrix as the resolved implementation of the "Overton Window & Government Shifts" item. Reference the new `ideology_matrix.rs` module and the 121-point grid. Update the note on `state_manager.py` → [state.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs) (the Rust ECS).
+
+#### [MODIFY] [docs/METRIC_DEFINITIONS.md](file:///c:/Users/zephy/Documents/Brinkmanship/docs/METRIC_DEFINITIONS.md)
+Add definitions for:
+- `Sovereign Position (ECON_X, AUTH_Y)`: The actual policy-track record on the 11×11 grid.
+- `Overton Center (OW_X, OW_Y)`: The faction-weighted ideological mean.
+- `Ideological Tension (IT)`: `euclidean_distance(Position, OW_Center)` — measures how far the leader governs from the public's Overton Window.
+- `Friction Coefficient (FC)`: A per-action constant (default 0.3) derived from the action's own ideological weight.
+- `Flavor Label (FL)`: The human-readable political archetype at a given [(ECON_X, AUTH_Y)](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/chronos.rs#17-234) grid coordinate.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+```powershell
+# Run the full test suite (unit tests + journey tests)
+cargo test --manifest-path brinkmanship_engine/Cargo.toml
+```
+
+**Specific assertions to verify `ideology_matrix.rs`:**
+- `resolve_flavor_label(0.0, 0.0)` returns `"Liberalism"`
+- `resolve_flavor_label(-5.0, 5.0)` returns `"Stalinism"`
+- `resolve_flavor_label(5.0, -5.0)` returns `"Anarcho-Capitalism"`
+- `euclidean_distance((0.0, 0.0), (3.0, 4.0))` returns `5.0`
+- `action_authority_cost(100.0, (1.0, 0.0), (-2.0, 0.0), 0.3)` returns `190.0` (distance=3, multiplier=1.9)
+
+**Journey test `test_journey_three_actor_multipolar` assertions:**
+- All 3 actors have distinct `ideology.center` after tick 1
+- CHN AUT cost for deregulation action > USA AUT cost for same action
+- ARG approval < 60.0 due to low worker happiness dominating estates
+
+### Manual Verification (Optional)
+- Review the generated `flavor_label` on the UI [IdeologyCompass](file:///c:/Users/zephy/Documents/Brinkmanship/ui/src/app/components/IdeologyCompass.tsx#12-94) panel to confirm the grid title updates correctly as actions are applied.
