@@ -32,7 +32,8 @@ This document serves as the persistent rulebook and guidelines for any AI agents
 - For audit steps, produce an `audit_report.md` artifact detailing findings objectively.
 
 ## 6. Version Control Hygiene
-- **Small, Frequent Pushes**: Avoid monolithic commits. Push logical units of work (e.g., "Updated API tests", "Refined UI styles") frequently to the remote repository.
+- **Small, Frequent Pushes**: Avoid monolithic commits. Push logical units of work (e.g., "Updated API tests", "Refined UI styles") frequently.
+- **Commit & Push**: Whenever a logical unit is committed, it MUST be pushed to the remote repository immediately. High-frequency synchronization is the baseline. 
 - Ensure every major implementation phase is backed up to GitHub before moving to the next.
 
 ## 7. Reporting Rhythms
