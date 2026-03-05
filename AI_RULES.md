@@ -33,7 +33,7 @@ This document serves as the persistent rulebook and guidelines for any AI agents
 
 ## 6. Version Control Hygiene
 - **Small, Frequent Pushes**: Avoid monolithic commits. Push logical units of work (e.g., "Updated API tests", "Refined UI styles") frequently.
-- **Commit & Push**: Whenever a logical unit is committed, it MUST be pushed to the remote repository immediately. High-frequency synchronization is the baseline. 
+- **Commit & Push**: Whenever a logical unit is committed, you MUST git push to the remote repository immediately. High-frequency synchronization is the baseline. 
 - Ensure every major implementation phase is backed up to GitHub before moving to the next.
 
 ## 7. Reporting Rhythms
@@ -50,7 +50,7 @@ This document serves as the persistent rulebook and guidelines for any AI agents
 - **Append-First Logic**: When adding new frameworks or doctrines (like "Narrative Weight"), always append them to the existing file or merge them gracefully. 
 - **Integrity Baseline**: Every documentation edit must be vetted to ensure that legacy "Technical Soul" of the project remains intact alongside new expansions.
 
-## 10. Radical Change Disclosure & HITL
-- **Definition**: A "Radical Change" includes modifying core simulation algorithms (e.g., the Reactor's outcome logic), altering fundamental state schemas, or refactoring central execution modules (Chronos, Reactor).
-- **Disclosure**: Any proposed radical change MUST be highlighted in the `implementation_plan.md` using a `[!WARNING]` or `[!CAUTION]` alert labeled **RADICAL ARCHITECTURAL PIVOT**.
-- **Human-in-the-Loop (HITL)**: You MUST seek explicit user approval for these pivots via `notify_user` before execution. Do not assume authorization for fundamental logic shifts even if they align with broad strategic goals.
+## 11. Semantic Integrity (Metric Definitions)
+- **Directive**: Any code modifying simulation metrics (State, Chronos, Reactor) MUST align with the definitions in `docs/METRIC_DEFINITIONS.md`.
+- **Maintenance**: If a new metric is introduced or an existing one is refactored, the definition document MUST be updated first to ensure cross-agent and cross-session consistency.
+- **Zero Drift**: No ad-hoc definitions or "hidden" logic. Every coefficient must be traceable to a defined metric interaction.

@@ -38,6 +38,7 @@ This document serves as the **Future Works Strategic Backlog** for the **Brinkma
 | **POL-002** | **The Approval Loop** | Managing domestic factions. Failure results in a "Succession Crisis" or "Election Shift." |
 | **POL-003** | **Politician Mode** | Direct control over charisma, speeches, and public optics. Rival politicians can vie to take you down. |
 | **POL-004** | **Deep State Mode** | Playing as the permanent bureaucracy. Administrations change via the **Election Algorithm**. |
+| **EST-001** | **Living Overton Window** | The political "Acceptable" zone is derived from the weighted standard deviation of Interest Group (Estate) alignments. |
 
 ---
 

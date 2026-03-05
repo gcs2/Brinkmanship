@@ -1,0 +1,59 @@
+# Implementation Plan - Estate-Driven Ideology & Journey Testing
+
+## Goal
+Elevate the ideological simulation by replacing the static `overton_radius` with a dynamic model driven by **Interest Group (Estate)** influence and happiness. Concurrently, refactor the engine into a library/binary split and establish a 100% coverage-focused integration test suite.
+
+> [!CAUTION]
+> ### RADICAL ARCHITECTURAL PIVOT: Estate-Driven Ideology
+> The [IdeologyComponent](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs#26-31) will no longer be direct state targets for most actions. Instead, actions will target **Interest Groups (Estates)**, and country-level Ideology/Overton Window will be **derived** during the Chronos tick.
+> - **Rationale**: To reflect real-world political friction where the "Acceptable" zone is a product of competing power centers.
+> - **Impact**: `overton_radius` is deprecated. UI will derive the window from the spread and influence of Estates.
+
+## Proposed Changes
+
+### [brinkmanship_engine]
+
+#### [MODIFY] [state.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs)
+- **[NEW]** `Estate` struct: `{ name: String, influence: f64, happiness: f64, alignment: (f64, f64) }`.
+- **[NEW]** `InterestGroupsComponent`: `HashMap<String, Estate>`.
+- **[MODIFY]** [IdeologyComponent](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs#26-31): Replace `overton_radius` with `center: (f64, f64)` and `spread: f64`.
+
+#### [MODIFY] [chronos.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/chronos.rs)
+- **Estate Resolution**: Apply [PendingAction](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs#52-62) to specific estates.
+- **Overton Calculation**:
+  - `Center = Σ(Alignment * Influence) / Σ(Influence)`
+  - `Spread = sqrt(Σ(Influence * (Alignment - Center)^2) / Σ(Influence))`
+- This ensures the "Acceptable" zone expands/contracts based on polarization and influence shifts.
+
+#### [MODIFY] [chronos.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/chronos.rs)
+- **Estate Resolution**: Apply [PendingAction](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/state.rs#52-62) to specific estates (Happiness/Influence).
+- **Ideology Derivation**: 
+  - `center = WeightedMean(Estates.alignment by influence)`.
+  - `spread = StandardDeviation(Estates.alignment weighted by influence)`.
+- Re-calculate `active_phase` based on average happiness/stability.
+
+#### [NEW] [journey_tests.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/tests/journey_tests.rs)
+- **"The Populist Surge" Journey**:
+  1. Initialize state with influential "Lower Class" estate.
+  2. Apply "Economic Stimulus" (Target: Lower Class, Happiness +10).
+  3. Advance 5 turns.
+  4. Verify the `IdeologyComponent.center` shifts toward the "Planned" axis.
+
+### [Documentation & Meta]
+
+#### [MODIFY] [AI_RULES.md](file:///c:/Users/zephy/Documents/Brinkmanship/AI_RULES.md)
+- Ensure Rule 0 (Testing) and Rule 10 (Disclosure) are finalized.
+
+#### [MODIFY] [FUTURE_WORKS.md](file:///c:/Users/zephy/Documents/Brinkmanship/docs/FUTURE_WORKS.md)
+- Define the "Living Overton Window" research path (EST-001).
+
+## Verification Plan
+
+### Automated Tests
+- **Estate Math**: `cargo test` in [chronos.rs](file:///c:/Users/zephy/Documents/Brinkmanship/brinkmanship_engine/src/chronos.rs) to verify weighted mean/SD calculation.
+- **Journey**: `cargo test --test journey_tests` for end-to-end "Populist Surge" validation.
+- **Command**: `cargo test --manifest-path brinkmanship_engine/Cargo.toml`
+
+### Manual Verification
+- **UI Logic**: Check `/api/state` DTO to ensure `player_ideology` contains the new derived `center` and `spread` fields.
+- **Scenario parity**: Update [modern_geopolitics/scenario.json](file:///c:/Users/zephy/Documents/Brinkmanship/scenarios/modern_geopolitics/scenario.json) to include the initial Estate definitions.
